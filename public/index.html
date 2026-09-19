@@ -3,9 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beggy — Order Food Online • Bengaluru Express Delivery</title>
-  <meta name="description" content="Order food online from top-rated kitchens near you in Bengaluru. Fast 20-min delivery on Bwiggy partner network.">
+  <title>Beggy — Crave It. Simulate It. Save the Bill.</title>
+  <meta name="description" content="Feel the full dopamine rush of ordering takeout in Bengaluru for ₹0, track the rider live, and turn the bill into real personal savings.">
+  <meta name="theme-color" content="#FF5200">
   <link rel="icon" type="image/jpeg" href="logo.jpg">
+
+  <!-- Open Graph / WhatsApp / Facebook Previews -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://arunachalamvenkatachalapathy-dev.github.io/beggy/">
+  <meta property="og:title" content="Beggy — Crave It. Simulate It. Save the Bill.">
+  <meta property="og:description" content="Feel the full ordering thrill for ₹0, watch the rider move, and turn the food bill into real personal savings. The 45-second craving killer.">
+  <meta property="og:image" content="https://arunachalamvenkatachalapathy-dev.github.io/beggy/logo.jpg">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://arunachalamvenkatachalapathy-dev.github.io/beggy/">
+  <meta name="twitter:title" content="Beggy — Order Nothing. Save Everything.">
+  <meta name="twitter:description" content="Turn midnight impulse food cravings into a visible savings score. 100% simulated, 100% money saved.">
+  <meta name="twitter:image" content="https://arunachalamvenkatachalapathy-dev.github.io/beggy/logo.jpg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
@@ -17,20 +33,20 @@
   <!-- Dopamine Reveal Confetti Canvas -->
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- Simulated Indian Bank SMS / Push Notification Toast -->
+  <!-- Simulated Vault SMS / Push Notification Toast -->
   <div class="bank-sms-toast" id="bank-sms-toast" aria-live="polite">
     <div class="sms-header">
       <div class="sms-sender">
-        <span class="sms-bank-badge">🏦 BHARAT-BANK</span>
+        <span class="sms-bank-badge">🏦 [SIMULATED] BEGGY VAULT</span>
         <span class="sms-time">Just now</span>
       </div>
       <button class="sms-close-btn" id="sms-close-btn" aria-label="Close notification">&times;</button>
     </div>
     <div class="sms-body">
-      <strong class="sms-amount" id="sms-amount">₹340.00 Credited</strong>
-      <p id="sms-message">A/C **4921 credited with ₹340.00 on 18-Sep-2026 via UPI/Beggy Anti-Spend. Avail Bal: ₹48,990.00. Craving defeated!</p>
+      <strong class="sms-amount" id="sms-amount">₹340.00 Saved</strong>
+      <p id="sms-message">Beggy Vault: ₹340.00 credited to your Anti-Spending Savings Ledger. Craving defeated!</p>
     </div>
-    <div class="sms-badge">✓ Real Savings Transferred</div>
+    <div class="sms-badge">✓ 100% Money Kept in Your Bank</div>
   </div>
 
   <!-- Main Navigation Header -->
@@ -66,7 +82,13 @@
       <!-- Header Actions -->
       <div class="header-actions">
         <button class="nav-home-btn" id="nav-home-btn">
-          <span>🍽️ Restaurants</span>
+          <span>🍽️ Kitchens</span>
+        </button>
+
+        <!-- Savings Passbook & Streak Trigger Button -->
+        <button class="passbook-trigger-btn" id="passbook-trigger-btn" aria-label="View Savings Passbook">
+          <span>🏦 Passbook</span>
+          <span class="streak-pill" id="header-streak-pill">🔥 0d</span>
         </button>
 
         <!-- Cart Trigger Button -->
@@ -86,16 +108,83 @@
          STAGE 1: RESTAURANT SELECTION VIEW
          ==================================================================== -->
     <section class="app-view active" id="view-restaurants">
-      <!-- Top Offer Strip -->
-      <div class="offer-banner-strip">
-        <div class="strip-left">
-          <span class="swiggy-one-badge">⚡ BWIGGY ONE</span>
-          <span>Free Delivery on all orders above ₹149 in Bengaluru</span>
+
+      <!-- Friend Challenge Dynamic Alert Banner -->
+      <div class="friend-challenge-banner" id="friend-challenge-banner" style="display: none;">
+        <div class="fcb-content">
+          <span class="fcb-icon">⚔️</span>
+          <div class="fcb-text">
+            <strong id="fcb-title">Friend Challenge Received!</strong>
+            <p id="fcb-desc">Someone resisted an impulse craving. Can you defeat yours?</p>
+          </div>
         </div>
-        <div class="strip-right">
-          <span>Use Coupon: <strong>BWIGGY100</strong> for 100% OFF your order</span>
-        </div>
+        <button class="fcb-btn" id="fcb-accept-btn">Accept Challenge ➔</button>
       </div>
+
+      <!-- Discovery Mode Switcher Tabs -->
+      <div class="mode-tabs-bar">
+        <button class="mode-tab-btn active" id="tab-browse-restaurants">
+          <span>🍽️ Browse Kitchens</span>
+        </button>
+        <button class="mode-tab-btn" id="tab-quick-craving">
+          <span>⚡ Quick Craving Mode</span>
+          <span class="tab-pill">Instant</span>
+        </button>
+      </div>
+
+      <!-- Quick Craving Mode Panel (F1) -->
+      <div class="quick-craving-panel" id="quick-craving-panel" style="display: none;">
+        <div class="qcp-header">
+          <div class="qcp-tag">CRAVE IT. SIMULATE IT. SAVE THE BILL.</div>
+          <h2 class="qcp-title">What are you craving right now?</h2>
+          <p class="qcp-sub">Pick a popular takeout craving below or type your own. Experience the full 100% ordering dopamine rush, pay ₹0, and watch your cravings become real savings.</p>
+        </div>
+
+        <div class="qcp-presets-wrap">
+          <span class="qcp-presets-label">Popular Indian Cravings:</span>
+          <div class="qcp-chips-row" id="qcp-chips-row">
+            <button class="craving-chip" type="button" data-dish="Chicken Dum Biryani" data-price="340" data-cat="biryani">🍗 Chicken Dum Biryani • ₹340</button>
+            <button class="craving-chip" type="button" data-dish="Double Truffle Smashburger" data-price="280" data-cat="burgers-pizza">🍔 Double Truffle Burger • ₹280</button>
+            <button class="craving-chip" type="button" data-dish="Peri Peri Woodfire Pizza" data-price="449" data-cat="burgers-pizza">🍕 Peri Peri Pizza • ₹449</button>
+            <button class="craving-chip" type="button" data-dish="Paneer Butter Masala & Garlic Naan" data-price="290" data-cat="north-indian">🍛 Paneer Butter Masala • ₹290</button>
+            <button class="craving-chip" type="button" data-dish="Crispy Benne Masala Dosa" data-price="130" data-cat="south-indian">🥞 Benne Masala Dosa • ₹130</button>
+            <button class="craving-chip" type="button" data-dish="Brown Sugar Boba Milk Tea" data-price="240" data-cat="desserts">🧋 Brown Sugar Boba • ₹240</button>
+            <button class="craving-chip" type="button" data-dish="Hot Gulab Jamun Feast" data-price="160" data-cat="desserts">🍨 Gulab Jamun Feast • ₹160</button>
+          </div>
+        </div>
+
+        <form class="qcp-custom-form" id="qcp-custom-form">
+          <div class="qcp-form-row">
+            <div class="qcp-input-group qcp-input-dish">
+              <label for="custom-dish-name">Custom Craving Dish</label>
+              <input type="text" id="custom-dish-name" placeholder="e.g. Chicken Dum Biryani, Shawarma..." maxlength="40" value="Chicken Dum Biryani" required>
+            </div>
+            <div class="qcp-input-group qcp-input-price">
+              <label for="custom-dish-price">Estimated Takeout Cost (₹)</label>
+              <input type="number" id="custom-dish-price" placeholder="340" min="10" max="5000" value="340" required>
+            </div>
+          </div>
+          <div class="qcp-form-actions">
+            <button type="submit" class="btn-simulate-craving" id="btn-simulate-craving">
+              <span>Simulate This Craving & Save ₹<span id="btn-craving-amount">340</span> 🚀</span>
+            </button>
+          </div>
+          <p class="qcp-disclaimer">🔒 100% Simulation • Zero money charged • Instant craving dopamine satisfaction</p>
+        </form>
+      </div>
+
+      <!-- Browse Kitchens Container -->
+      <div class="browse-kitchens-panel" id="browse-kitchens-panel">
+        <!-- Top Offer Strip -->
+        <div class="offer-banner-strip">
+          <div class="strip-left">
+            <span class="swiggy-one-badge">⚡ BWIGGY ONE</span>
+            <span>Free Delivery on all orders above ₹149 in Bengaluru</span>
+          </div>
+          <div class="strip-right">
+            <span>Use Coupon: <strong>BWIGGY100</strong> for 100% OFF your order</span>
+          </div>
+        </div>
 
       <!-- Cuisine Category Scroller -->
       <div class="cuisine-scroller-wrap">
@@ -124,6 +213,7 @@
       <div class="restaurants-grid" id="restaurants-grid">
         <!-- Injected dynamically via script.js -->
       </div>
+      </div> <!-- /browse-kitchens-panel -->
     </section>
 
     <!-- ====================================================================
@@ -384,7 +474,7 @@
           <div class="mc-info">
             <span class="partner-avatar">🛵</span>
             <div>
-              <strong>Rider Partner: Suresh K.</strong>
+              <strong>Rider Partner: Manjunath K.</strong>
               <span id="map-partner-distance">1.2 km away from your Indiranagar location</span>
             </div>
           </div>
@@ -408,16 +498,25 @@
       <div class="dopamine-reveal-card" id="dopamine-reveal-card" style="display: none;">
         <div class="dopamine-header">
           <div class="dopamine-icon">🎉</div>
-          <div class="dopamine-eyebrow">MISSION ACCOMPLISHED!</div>
+          <div class="dopamine-eyebrow">CRAVE IT. SIMULATE IT. SAVE THE BILL.</div>
           <h2 class="dopamine-title">DOPAMINE HIT DONE!</h2>
-          <p class="dopamine-subtext">Wait... where is your food delivery? 😮</p>
+          <p class="dopamine-joke" id="dopamine-joke">Your biryani is still in the restaurant's imagination.</p>
+        </div>
+
+        <!-- Head-to-Head Friend Challenge Result Banner -->
+        <div class="challenge-result-card" id="challenge-result-card" style="display: none;">
+          <div class="crc-icon">⚔️</div>
+          <div class="crc-body">
+            <h4 id="crc-title">Challenge Victorious!</h4>
+            <p id="crc-desc">You resisted this craving and kept 100% of the money!</p>
+          </div>
         </div>
 
         <div class="dopamine-savings-highlight">
           <span class="dsh-tag">YOUR FOOD WAS NEVER ORDERED... BUT YOU JUST SAVED:</span>
           <div class="dsh-amount" id="reveal-saved-amount">₹340.00</div>
           <p class="dsh-note">
-            You got 100% of the craving excitement, menu browsing thrill, and delivery dopamine rush — <strong>without burning your real bank account money!</strong>
+            You experienced 100% of the craving excitement, menu browsing thrill, and delivery dopamine rush — <strong>without burning a single rupee from your bank!</strong>
           </p>
         </div>
 
@@ -427,7 +526,7 @@
             <div class="rs-icon-wrap">🏦</div>
             <div class="rs-text-wrap">
               <strong>Dopamine Hit Done — Let's Do Real Save</strong>
-              <span id="rs-subtext">Transfer <span id="rs-amount-val">₹340.00</span> to Your Dummy Savings Account</span>
+              <span id="rs-subtext">Transfer <span id="rs-amount-val">₹340.00</span> to Your Savings Ledger</span>
             </div>
           </button>
         </div>
@@ -436,20 +535,57 @@
         <div class="savings-account-card" id="savings-account-card">
           <div class="sa-top">
             <div class="sa-bank-label">
-              <span>🏦 BHARAT BANK</span>
-              <span class="sa-type">Digital Savings Account</span>
+              <span>🏦 BEGGY SAVINGS VAULT</span>
+              <span class="sa-type">Digital Anti-Spending Ledger</span>
             </div>
             <div class="sa-chip">💳</div>
           </div>
           <div class="sa-account-num">A/C **4921 • UPI / Beggy Anti-Spend</div>
           <div class="sa-balance-wrap">
             <span class="sa-bal-label">TOTAL ANTI-SPENDING VAULT BALANCE</span>
-            <div class="sa-bal-val" id="sa-balance-val">₹48,990.00</div>
+            <div class="sa-bal-val" id="sa-balance-val">₹0.00</div>
           </div>
           <div class="sa-footer">
-            <span>✓ Verified Safe From Takeout Spending</span>
-            <span id="sa-victories-count">14 Cravings Defeated</span>
+            <span id="sa-streak-badge">🔥 0-Day Save Streak</span>
+            <span id="sa-victories-count">0 Cravings Defeated</span>
           </div>
+        </div>
+
+        <!-- ==============================================================
+             VIRAL SHARING ENGINE: DYNAMIC CANVAS SHARE CARD GENERATOR (F2)
+             ============================================================== -->
+        <div class="share-card-section" id="share-card-section">
+          <div class="sc-header">
+            <span class="sc-badge">🔥 VIRAL SAVINGS CARD</span>
+            <h3 class="sc-title">Flex Your Willpower</h3>
+            <p class="sc-sub">Share your craving victory directly to Instagram Stories, WhatsApp, or X with one tap.</p>
+          </div>
+
+          <!-- Live Canvas Container -->
+          <div class="sc-canvas-box">
+            <canvas id="share-card-canvas" width="1080" height="1920" class="share-card-canvas"></canvas>
+          </div>
+
+          <!-- Share Actions Grid -->
+          <div class="sc-actions-grid">
+            <button class="btn-sc-action btn-sc-primary" id="btn-sc-share">
+              <span class="btn-sc-icon">📲</span>
+              <span>Share Story Card</span>
+            </button>
+            <button class="btn-sc-action btn-sc-secondary" id="btn-sc-download">
+              <span class="btn-sc-icon">💾</span>
+              <span>Download PNG</span>
+            </button>
+            <button class="btn-sc-action btn-sc-secondary" id="btn-sc-copy">
+              <span class="btn-sc-icon">📋</span>
+              <span>Copy Caption & Link</span>
+            </button>
+            <button class="btn-sc-action btn-sc-challenge" id="btn-sc-challenge">
+              <span class="btn-sc-icon">⚔️</span>
+              <span>Challenge a Friend</span>
+            </button>
+          </div>
+          <p class="sc-toast-msg" id="sc-toast-msg"></p>
         </div>
 
         <!-- Secret Chef Recipe Card with Natural Amazon Helper Button -->
@@ -478,6 +614,7 @@
                 <span class="amz-icon">🛒</span>
                 <span>Get Fresh Ingredients to Cook This on Amazon</span>
               </a>
+              <p class="amazon-disclosure">As an Amazon Associate I earn from qualifying purchases. Cook fresh at home for a fraction of takeout cost.</p>
             </div>
 
             <div class="cr-steps">
@@ -487,6 +624,11 @@
               </ol>
             </div>
           </div>
+        </div>
+
+        <!-- Trust and Simulation Disclaimer -->
+        <div class="trust-safety-banner">
+          🛡️ <strong>100% Simulation</strong> • No real money charged • No real food dispatched • We never ask for bank, card, or UPI details.
         </div>
 
         <!-- Back to Home / Order Again Button -->
@@ -555,10 +697,75 @@
         <p>The revolutionary anti-spending dopamine platform giving you the full excitement of food delivery while keeping 100% of your money in your savings account.</p>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 Beggy. Crafted with ❤️ for India.</span>
+        <span>© 2026 Beggy • Crave It. Simulate It. Save the Bill. Crafted with ❤️ for India.</span>
       </div>
     </div>
   </footer>
+
+  <!-- ====================================================================
+       INTERACTIVE SAVINGS PASSBOOK & STREAKS MODAL (F3)
+       ==================================================================== -->
+  <div class="passbook-modal" id="passbook-modal" aria-hidden="true" role="dialog" aria-labelledby="pb-title">
+    <div class="passbook-modal-box">
+      <div class="pb-header">
+        <div class="pb-header-left">
+          <span class="pb-badge">🏦 BEGGY VAULT</span>
+          <h2 id="pb-title">Anti-Spending Passbook</h2>
+          <p class="pb-subtitle">Every rupee you resisted spending on impulsive takeout.</p>
+        </div>
+        <button class="pb-close-btn" id="pb-close-btn" aria-label="Close Passbook">&times;</button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="pb-stats-grid">
+        <div class="pb-stat-card">
+          <span class="pb-stat-label">Total Saved</span>
+          <strong class="pb-stat-val" id="pb-stat-total">₹0.00</strong>
+          <span class="pb-stat-sub">100% in your bank</span>
+        </div>
+        <div class="pb-stat-card">
+          <span class="pb-stat-label">Current Streak</span>
+          <strong class="pb-stat-val" id="pb-stat-streak">🔥 0 Days</strong>
+          <span class="pb-stat-sub" id="pb-stat-best">Best: 0 Days</span>
+        </div>
+        <div class="pb-stat-card">
+          <span class="pb-stat-label">Cravings Defeated</span>
+          <strong class="pb-stat-val" id="pb-stat-cravings">0</strong>
+          <span class="pb-stat-sub">Takeouts resisted</span>
+        </div>
+      </div>
+
+      <!-- Milestone Badges Grid -->
+      <div class="pb-badges-section">
+        <h4 class="pb-section-title">Milestone Badges</h4>
+        <div class="pb-badges-grid" id="pb-badges-grid">
+          <!-- Dynamically populated via script.js -->
+        </div>
+      </div>
+
+      <!-- Transaction History Table -->
+      <div class="pb-history-section">
+        <div class="pb-history-header">
+          <h4 class="pb-section-title">Saved Cravings Ledger</h4>
+          <span class="pb-history-count" id="pb-history-count">0 transactions</span>
+        </div>
+        <div class="pb-history-list" id="pb-history-list">
+          <!-- Dynamically populated via script.js -->
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="pb-footer-actions">
+        <button class="pb-btn-reset" id="pb-btn-reset" type="button">
+          <span>🗑️ Reset All Data</span>
+        </button>
+        <button class="pb-btn-done" id="pb-btn-done" type="button">
+          <span>Done</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="passbook-backdrop" id="passbook-backdrop"></div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

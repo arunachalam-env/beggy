@@ -700,17 +700,143 @@ const DISHES_CATALOG = [
 // ── Real Leaflet GPS Coordinates (Bengaluru, India) ──────────────────────────
 const HOME_COORDS = [12.9784, 77.6408]; // Indiranagar 100ft Rd
 
+// ── Milestone Badges Config ──────────────────────────────────────────────────
+const BADGES_CONFIG = [
+  { id: "first_defeat", title: "First Defeat", desc: "Defeated your first impulse food craving", icon: "🏆" },
+  { id: "midnight_warrior", title: "Midnight Warrior", desc: "Resisted a late-night craving (11 PM – 4 AM)", icon: "🌙" },
+  { id: "thousand_club", title: "₹1,000 Club", desc: "Saved over ₹1,000 in your Beggy vault", icon: "💰" },
+  { id: "five_thousand_club", title: "₹5,000 Club", desc: "Saved over ₹5,000 in your Beggy vault", icon: "👑" },
+  { id: "streak_3", title: "3-Day Streak", desc: "Kept savings streaks for 3 days in a row", icon: "🔥" },
+  { id: "streak_7", title: "7-Day Streak", desc: "Master of restraint for 7 consecutive days", icon: "⚡" }
+];
+
+// ── Reactive User State & Streaks Engine (F3) ───────────────────────────────
+function loadInitialUserState() {
+  const defaultState = {
+    totalSaved: 0,
+    cravingsDefeated: 0,
+    streak: 0,
+    bestStreak: 0,
+    lastSaveDate: null,
+    history: [],
+    badges: []
+  };
+
+  try {
+    const raw = localStorage.getItem("beggy_user_state_v2");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...defaultState, ...parsed };
+    }
+  } catch (e) {
+    console.warn("Could not parse user state:", e);
+  }
+  return defaultState;
+}
+
+let userState = loadInitialUserState();
+
+function recordCravingVictory(dishTitle, restaurantName, amount) {
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+  const hour = today.getHours();
+
+  userState.totalSaved += amount;
+  userState.cravingsDefeated += 1;
+
+  // Streak logic
+  if (!userState.lastSaveDate) {
+    userState.streak = 1;
+  } else {
+    const lastDate = new Date(userState.lastSaveDate);
+    const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) {
+      if (userState.streak === 0) userState.streak = 1;
+    } else if (diffDays === 1) {
+      userState.streak += 1;
+    } else {
+      userState.streak = 1;
+    }
+  }
+
+  if (userState.streak > userState.bestStreak) {
+    userState.bestStreak = userState.streak;
+  }
+  userState.lastSaveDate = todayStr;
+
+  userState.history.unshift({
+    id: "tx_" + Date.now(),
+    date: today.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+    dish: dishTitle,
+    restaurant: restaurantName,
+    amount: amount
+  });
+  if (userState.history.length > 50) userState.history.pop();
+
+  // Badges unlock
+  if (!userState.badges.includes("first_defeat")) userState.badges.push("first_defeat");
+  if ((hour >= 23 || hour < 4) && !userState.badges.includes("midnight_warrior")) userState.badges.push("midnight_warrior");
+  if (userState.totalSaved >= 1000 && !userState.badges.includes("thousand_club")) userState.badges.push("thousand_club");
+  if (userState.totalSaved >= 5000 && !userState.badges.includes("five_thousand_club")) userState.badges.push("five_thousand_club");
+  if (userState.streak >= 3 && !userState.badges.includes("streak_3")) userState.badges.push("streak_3");
+  if (userState.streak >= 7 && !userState.badges.includes("streak_7")) userState.badges.push("streak_7");
+
+  saveUserState();
+}
+
+function saveUserState() {
+  try {
+    localStorage.setItem("beggy_user_state_v2", JSON.stringify(userState));
+    localStorage.setItem("beggy_savings_account_bal", userState.totalSaved.toFixed(2));
+  } catch (e) {
+    console.warn("Could not save user state:", e);
+  }
+  updateUserStateUI();
+}
+
+function updateUserStateUI() {
+  if (headerStreakPill) {
+    headerStreakPill.textContent = `🔥 ${userState.streak}d`;
+  }
+  if (saBalanceVal) {
+    saBalanceVal.textContent = `₹${userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (saStreakBadge) {
+    saStreakBadge.textContent = `🔥 ${userState.streak}-Day Save Streak`;
+  }
+  if (saVictoriesCount) {
+    saVictoriesCount.textContent = `${userState.cravingsDefeated} Cravings Defeated`;
+  }
+  if (pbStatTotal) {
+    pbStatTotal.textContent = `₹${userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (pbStatStreak) {
+    pbStatStreak.textContent = `🔥 ${userState.streak} Days`;
+  }
+  if (pbStatBest) {
+    pbStatBest.textContent = `Best: ${userState.bestStreak} Days`;
+  }
+  if (pbStatCravings) {
+    pbStatCravings.textContent = `${userState.cravingsDefeated}`;
+  }
+  if (pbHistoryCount) {
+    pbHistoryCount.textContent = `${userState.history.length} transactions`;
+  }
+}
+
 // ── Application State ────────────────────────────────────────────────────────
 const state = {
   currentView: "restaurants",
+  discoveryMode: "browse", // "browse" or "quick"
   activeRestaurant: RESTAURANTS_DATA[0],
   activeCuisine: "all",
   activeDiet: "all",
   cart: [],
   paymentMethod: "gpay",
-  savingsAccountBalance: parseFloat(localStorage.getItem("beggy_savings_account_bal") || "48650.00"),
+  userState: userState,
   lastOrderSaved: 340.00,
-  activeRecipeDish: DISHES_CATALOG[0]
+  activeRecipeDish: DISHES_CATALOG[0],
+  activeChallenge: null
 };
 
 // ── DOM References ───────────────────────────────────────────────────────────
@@ -723,10 +849,27 @@ const viewTracking = document.getElementById("view-tracking");
 // Header elements
 const navBrandHome = document.getElementById("nav-brand-home");
 const navHomeBtn = document.getElementById("nav-home-btn");
+const passbookTriggerBtn = document.getElementById("passbook-trigger-btn");
+const headerStreakPill = document.getElementById("header-streak-pill");
 const foodSearch = document.getElementById("food-search");
 const clearSearch = document.getElementById("clear-search");
 const cartTriggerBtn = document.getElementById("cart-trigger-btn");
 const cartCountBadge = document.getElementById("cart-count");
+
+// Discovery Mode Elements
+const friendChallengeBanner = document.getElementById("friend-challenge-banner");
+const fcbTitle = document.getElementById("fcb-title");
+const fcbDesc = document.getElementById("fcb-desc");
+const fcbAcceptBtn = document.getElementById("fcb-accept-btn");
+const tabBrowseRestaurants = document.getElementById("tab-browse-restaurants");
+const tabQuickCraving = document.getElementById("tab-quick-craving");
+const browseKitchensPanel = document.getElementById("browse-kitchens-panel");
+const quickCravingPanel = document.getElementById("quick-craving-panel");
+const qcpChipsRow = document.getElementById("qcp-chips-row");
+const qcpCustomForm = document.getElementById("qcp-custom-form");
+const customDishName = document.getElementById("custom-dish-name");
+const customDishPrice = document.getElementById("custom-dish-price");
+const btnCravingAmount = document.getElementById("btn-craving-amount");
 
 // Restaurant view elements
 const cuisinePillsRow = document.getElementById("cuisine-pills-row");
@@ -767,10 +910,16 @@ const mapPartnerDistance = document.getElementById("map-partner-distance");
 
 // Dopamine Reveal elements
 const dopamineRevealCard = document.getElementById("dopamine-reveal-card");
+const dopamineJoke = document.getElementById("dopamine-joke");
+const challengeResultCard = document.getElementById("challenge-result-card");
+const crcTitle = document.getElementById("crc-title");
+const crcDesc = document.getElementById("crc-desc");
 const revealSavedAmount = document.getElementById("reveal-saved-amount");
 const btnRealSave = document.getElementById("btn-real-save");
 const rsAmountVal = document.getElementById("rs-amount-val");
 const saBalanceVal = document.getElementById("sa-balance-val");
+const saStreakBadge = document.getElementById("sa-streak-badge");
+const saVictoriesCount = document.getElementById("sa-victories-count");
 const crDishTitle = document.getElementById("cr-dish-title");
 const crDishSub = document.getElementById("cr-dish-sub");
 const crPrepTime = document.getElementById("cr-prep-time");
@@ -779,6 +928,28 @@ const crHomeCost = document.getElementById("cr-home-cost");
 const crIngList = document.getElementById("cr-ing-list");
 const crStepsList = document.getElementById("cr-steps-list");
 const btnOrderAgain = document.getElementById("btn-order-again");
+
+// Share Card Generator Elements (F2)
+const shareCardCanvas = document.getElementById("share-card-canvas");
+const btnScShare = document.getElementById("btn-sc-share");
+const btnScDownload = document.getElementById("btn-sc-download");
+const btnScCopy = document.getElementById("btn-sc-copy");
+const btnScChallenge = document.getElementById("btn-sc-challenge");
+const scToastMsg = document.getElementById("sc-toast-msg");
+
+// Passbook Modal Elements (F3)
+const passbookModal = document.getElementById("passbook-modal");
+const passbookBackdrop = document.getElementById("passbook-backdrop");
+const pbCloseBtn = document.getElementById("pb-close-btn");
+const pbStatTotal = document.getElementById("pb-stat-total");
+const pbStatStreak = document.getElementById("pb-stat-streak");
+const pbStatBest = document.getElementById("pb-stat-best");
+const pbStatCravings = document.getElementById("pb-stat-cravings");
+const pbBadgesGrid = document.getElementById("pb-badges-grid");
+const pbHistoryList = document.getElementById("pb-history-list");
+const pbHistoryCount = document.getElementById("pb-history-count");
+const pbBtnReset = document.getElementById("pb-btn-reset");
+const pbBtnDone = document.getElementById("pb-btn-done");
 
 // Cart Drawer elements
 const cartDrawer = document.getElementById("cart-drawer");
@@ -1238,7 +1409,7 @@ function startLiveTracking() {
     document.getElementById("step-line-2").className = "step-line completed";
     document.getElementById("step-node-3").className = "step-node active";
     trackingStatusTitle.textContent = "Rider on the Way!";
-    trackingStatusDesc.textContent = "Suresh picked up your piping hot order and is on CMH Road.";
+    trackingStatusDesc.textContent = "Manjunath picked up your piping hot order and is on CMH Road.";
   }, 3500);
 }
 
@@ -1300,6 +1471,16 @@ function setupMapRouteAndScooter(r) {
   }, 400);
 }
 
+// ── Rotating Comedic Second-Beat Punchlines (F4) ──────────────────────────────
+const PUNCHLINES = [
+  "Your biryani is still in the restaurant's imagination.",
+  "The rider was emotionally supportive but logistically fictional.",
+  "Congrats — you just outsmarted your own midnight stomach.",
+  "That craving? Deleted. That money? Safely in your bank.",
+  "100% of the dopamine hit. 0% of the bank balance drop.",
+  "Plot twist: Your wallet survives to see another day."
+];
+
 // ── The Dopamine Hit Arrival & Twist Reveal ──────────────────────────────────
 function triggerOrderArrival() {
   if (courierTimer) clearInterval(courierTimer);
@@ -1311,8 +1492,13 @@ function triggerOrderArrival() {
   document.getElementById("step-node-4").className = "step-node completed active";
 
   trackingStatusTitle.textContent = "Delivery Partner Arrived! 🎉";
-  trackingStatusDesc.textContent = "Suresh has arrived at your Indiranagar location.";
+  trackingStatusDesc.textContent = "Manjunath has arrived at your Indiranagar location.";
   trackingEtaPill.textContent = "Arrived!";
+
+  // Haptic vibration pulse if supported
+  if (navigator.vibrate) {
+    try { navigator.vibrate([100, 50, 100]); } catch (e) {}
+  }
 
   // Trigger Confetti
   triggerConfetti();
@@ -1323,13 +1509,30 @@ function triggerOrderArrival() {
 
   revealSavedAmount.textContent = `₹${savedAmount.toFixed(2)}`;
   rsAmountVal.textContent = `₹${savedAmount.toFixed(2)}`;
-  saBalanceVal.textContent = `₹${state.savingsAccountBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  // Rotating joke
+  if (dopamineJoke) {
+    const randomJoke = PUNCHLINES[Math.floor(Math.random() * PUNCHLINES.length)];
+    dopamineJoke.textContent = randomJoke.replace("{amount}", savedAmount.toFixed(0));
+  }
+
+  // Friend Challenge Result Check
+  if (state.activeChallenge && challengeResultCard) {
+    challengeResultCard.style.display = "flex";
+    if (crcTitle) crcTitle.textContent = `⚔️ Craving Defeated vs ${state.activeChallenge.from}!`;
+    if (crcDesc) crcDesc.textContent = `You saved ₹${savedAmount.toFixed(0)} on ${dish.title} vs ${state.activeChallenge.from}'s ₹${state.activeChallenge.amount.toFixed(0)} save. Both wallets win!`;
+  } else if (challengeResultCard) {
+    challengeResultCard.style.display = "none";
+  }
 
   // Reset "Real Save" button appearance
   btnRealSave.disabled = false;
   btnRealSave.querySelector("strong").textContent = "Dopamine Hit Done — Let's Do Real Save";
-  btnRealSave.querySelector("#rs-subtext").innerHTML = `Transfer <span id="rs-amount-val">₹${savedAmount.toFixed(2)}</span> to Your Dummy Savings Account`;
+  btnRealSave.querySelector("#rs-subtext").innerHTML = `Transfer <span id="rs-amount-val">₹${savedAmount.toFixed(2)}</span> to Your Savings Ledger`;
   btnRealSave.style.background = "linear-gradient(135deg, #10B981, #059669)";
+
+  // Update Savings Account Card Balance
+  updateUserStateUI();
 
   // Render Recipe
   crDishTitle.textContent = dish.title;
@@ -1348,6 +1551,9 @@ function triggerOrderArrival() {
     </li>
   `).join('');
 
+  // Generate the Canvas Share Card immediately
+  renderShareCard(dish.title, savedAmount);
+
   // Show the Dopamine Reveal Card and scroll to it smoothly
   dopamineRevealCard.style.display = "block";
   dopamineRevealCard.scrollIntoView({ behavior: "smooth" });
@@ -1356,39 +1562,450 @@ function triggerOrderArrival() {
 // ── "Dopamine Hit Done — Let's Do Real Save" Handler ─────────────────────────
 function handleRealSave() {
   const savedAmount = state.lastOrderSaved || 340.00;
+  const dish = state.activeRecipeDish || DISHES_CATALOG[0];
 
-  // Add saved money to user's dummy savings account
-  state.savingsAccountBalance += savedAmount;
-  localStorage.setItem("beggy_savings_account_bal", state.savingsAccountBalance.toFixed(2));
+  // Record victory in reactive user state
+  recordCravingVictory(dish.title, state.activeRestaurant.name, savedAmount);
 
   // Audio chime & Confetti
   playBankChime();
   triggerConfetti();
 
-  // Update Savings Account Card Balance
-  saBalanceVal.textContent = `₹${state.savingsAccountBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
   // Update Button visual state
-  btnRealSave.querySelector("strong").textContent = `✓ Transferred ₹${savedAmount.toFixed(2)} to Your Real Savings!`;
-  btnRealSave.querySelector("#rs-subtext").textContent = "BHARAT BANK credit alert generated. ₹0 spent on takeout!";
+  btnRealSave.querySelector("strong").textContent = `✓ Recorded ₹${savedAmount.toFixed(2)} in Your Savings Vault!`;
+  btnRealSave.querySelector("#rs-subtext").textContent = "100% of your money remains safely in your bank account!";
   btnRealSave.style.background = "linear-gradient(135deg, #059669, #047857)";
 
   // Trigger Slide-Down Bank SMS Notification Toast
-  const todayStr = new Date().toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
-  const availBalStr = state.savingsAccountBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  smsAmount.textContent = `₹${savedAmount.toFixed(2)} Credited`;
-  smsMessage.textContent = `BHARAT BANK Alert: A/C **4921 credited with ₹${savedAmount.toFixed(2)} on ${todayStr} via UPI/Beggy Anti-Spend. Avail Bal: ₹${availBalStr}. Craving defeated!`;
+  const availBalStr = userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  smsAmount.textContent = `₹${savedAmount.toFixed(2)} Saved`;
+  smsMessage.textContent = `Beggy Vault: ₹${savedAmount.toFixed(2)} credited to your Anti-Spending Savings Ledger. Avail Bal: ₹${availBalStr}. Craving defeated!`;
 
   bankSmsToast.classList.add("show");
   if (window._smsTimeout) clearTimeout(window._smsTimeout);
   window._smsTimeout = setTimeout(() => {
     bankSmsToast.classList.remove("show");
   }, 7000);
+
+  // Re-render share card with updated streak & totals
+  renderShareCard(dish.title, savedAmount);
+}
+
+// ── DYNAMIC CANVAS SHARE CARD GENERATOR (F2) ──────────────────────────────────
+function renderShareCard(dishTitle, savedAmount) {
+  if (!shareCardCanvas) return;
+  const ctx = shareCardCanvas.getContext("2d");
+  if (!ctx) return;
+
+  const w = 1080;
+  const h = 1920;
+  shareCardCanvas.width = w;
+  shareCardCanvas.height = h;
+
+  // Background Gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+  bgGrad.addColorStop(0, "#090D16");
+  bgGrad.addColorStop(0.35, "#1E1B4B");
+  bgGrad.addColorStop(0.7, "#0F172A");
+  bgGrad.addColorStop(1, "#020617");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle radial ambient glow
+  const radialGlow = ctx.createRadialGradient(w / 2, 600, 100, w / 2, 600, 850);
+  radialGlow.addColorStop(0, "rgba(255, 82, 0, 0.22)");
+  radialGlow.addColorStop(0.6, "rgba(99, 102, 241, 0.12)");
+  radialGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = radialGlow;
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle background grid
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+  ctx.lineWidth = 2;
+  for (let x = 60; x < w; x += 120) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 60; y < h; y += 120) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Top Badge / Eyebrow
+  ctx.save();
+  ctx.fillStyle = "#FF5200";
+  ctx.beginPath();
+  ctx.roundRect(w / 2 - 220, 140, 440, 74, 37);
+  ctx.fill();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "bold 32px 'Plus Jakarta Sans', sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("BEGGY ANTI-SPEND VAULT", w / 2, 177);
+  ctx.restore();
+
+  // Punchline: I ALMOST SPENT
+  ctx.fillStyle = "#94A3B8";
+  ctx.font = "bold 52px 'Plus Jakarta Sans', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("I ALMOST SPENT", w / 2, 340);
+
+  // Big Saved Rupee Value
+  ctx.save();
+  const amountGrad = ctx.createLinearGradient(0, 380, 0, 560);
+  amountGrad.addColorStop(0, "#34D399");
+  amountGrad.addColorStop(1, "#10B981");
+  ctx.fillStyle = amountGrad;
+  ctx.font = "900 170px 'Space Grotesk', sans-serif";
+  ctx.textAlign = "center";
+  ctx.shadowColor = "rgba(16, 185, 129, 0.4)";
+  ctx.shadowBlur = 35;
+  ctx.fillText(`₹${savedAmount.toFixed(0)}`, w / 2, 520);
+  ctx.restore();
+
+  // Craving Dish Name Card Box
+  ctx.save();
+  ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(140, 600, w - 280, 200, 28);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#F8FAFC";
+  ctx.font = "800 54px 'Plus Jakarta Sans', sans-serif";
+  ctx.textAlign = "center";
+  let displayDish = dishTitle;
+  if (displayDish.length > 28) displayDish = displayDish.substring(0, 25) + "...";
+  ctx.fillText(displayDish, w / 2, 690);
+
+  ctx.fillStyle = "#94A3B8";
+  ctx.font = "600 34px 'Plus Jakarta Sans', sans-serif";
+  ctx.fillText("CRAVING ORDER DEFEATED 🚀", w / 2, 755);
+  ctx.restore();
+
+  // Large Gold Stamp: BEGGY SAVED IT
+  ctx.save();
+  ctx.translate(w / 2, 930);
+  ctx.rotate(-0.06);
+  ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
+  ctx.strokeStyle = "#F59E0B";
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.roundRect(-360, -70, 720, 140, 24);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#FBBF24";
+  ctx.font = "900 70px 'Space Grotesk', sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("BEGGY SAVED IT 💰", 0, 0);
+  ctx.restore();
+
+  // Middle Quote
+  ctx.fillStyle = "#E2E8F0";
+  ctx.font = "italic 38px 'Plus Jakarta Sans', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText('"The food was imaginary. The savings are real."', w / 2, 1130);
+
+  // User Stats 3-Pill Matrix
+  const statsY = 1240;
+  const pillW = 240;
+  const gap = 30;
+  const startX = (w - (3 * pillW + 2 * gap)) / 2;
+
+  const statBoxes = [
+    { label: "STREAK", val: `🔥 ${userState.streak}d`, sub: "Daily habit" },
+    { label: "LIFETIME SAVED", val: `₹${userState.totalSaved.toFixed(0)}`, sub: "100% in bank" },
+    { label: "DEFEATED", val: `⚔️ ${userState.cravingsDefeated}`, sub: "Cravings" }
+  ];
+
+  statBoxes.forEach((s, idx) => {
+    const px = startX + idx * (pillW + gap);
+    ctx.save();
+    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(px, statsY, pillW, 210, 20);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = "bold 26px 'Plus Jakarta Sans', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(s.label, px + pillW / 2, statsY + 50);
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "900 44px 'Space Grotesk', sans-serif";
+    ctx.fillText(s.val, px + pillW / 2, statsY + 115);
+
+    ctx.fillStyle = "#64748B";
+    ctx.font = "500 24px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillText(s.sub, px + pillW / 2, statsY + 165);
+    ctx.restore();
+  });
+
+  // Footer Branding & URL
+  ctx.fillStyle = "#F8FAFC";
+  ctx.font = "900 48px 'Space Grotesk', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("beggy", w / 2, 1600);
+
+  ctx.fillStyle = "#94A3B8";
+  ctx.font = "600 32px 'Plus Jakarta Sans', sans-serif";
+  ctx.fillText("Order Nothing. Save Everything.", w / 2, 1655);
+
+  ctx.fillStyle = "#FF5200";
+  ctx.font = "bold 34px 'Plus Jakarta Sans', sans-serif";
+  ctx.fillText("arunachalamvenkatachalapathy-dev.github.io/beggy", w / 2, 1715);
+
+  ctx.fillStyle = "#475569";
+  ctx.font = "500 26px 'Plus Jakarta Sans', sans-serif";
+  ctx.fillText("[100% Simulation • Zero Money Charged]", w / 2, 1775);
+}
+
+// ── Share Actions Handlers ───────────────────────────────────────────────────
+function showShareToast(msg) {
+  if (!scToastMsg) return;
+  scToastMsg.textContent = msg;
+  setTimeout(() => {
+    scToastMsg.textContent = "";
+  }, 4000);
+}
+
+function shareStoryCard() {
+  if (!shareCardCanvas) return;
+  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Food";
+  const amount = state.lastOrderSaved || 340;
+  const caption = `I just defeated a ₹${amount.toFixed(0)} ${dish} craving 😤 ${userState.streak}-day streak with @Beggy. Try it: https://arunachalamvenkatachalapathy-dev.github.io/beggy/`;
+
+  shareCardCanvas.toBlob(blob => {
+    if (!blob) return;
+    const file = new File([blob], "beggy-savings-card.png", { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: "I defeated a food craving with Beggy!",
+        text: caption,
+        files: [file],
+        url: "https://arunachalamvenkatachalapathy-dev.github.io/beggy/"
+      }).catch(err => {
+        if (err.name !== "AbortError") downloadShareCard();
+      });
+    } else {
+      downloadShareCard();
+      copyShareCaption();
+    }
+  }, "image/png");
+}
+
+function downloadShareCard() {
+  if (!shareCardCanvas) return;
+  const link = document.createElement("a");
+  link.download = `beggy-savings-card-${Date.now()}.png`;
+  link.href = shareCardCanvas.toDataURL("image/png");
+  link.click();
+  showShareToast("✓ Savings card PNG downloaded to your device!");
+}
+
+function copyShareCaption() {
+  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Food";
+  const amount = state.lastOrderSaved || 340;
+  const caption = `I just defeated a ₹${amount.toFixed(0)} ${dish} craving 😤 ${userState.streak}-day streak with @Beggy. Try it: https://arunachalamvenkatachalapathy-dev.github.io/beggy/`;
+
+  navigator.clipboard.writeText(caption).then(() => {
+    showShareToast("✓ Caption & link copied to clipboard!");
+  }).catch(() => {
+    showShareToast("✓ Link: https://arunachalamvenkatachalapathy-dev.github.io/beggy/");
+  });
+}
+
+function createFriendChallengeLink() {
+  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Biryani";
+  const amount = state.lastOrderSaved || 340;
+  const challengeUrl = `https://arunachalamvenkatachalapathy-dev.github.io/beggy/?challenge=1&amount=${amount.toFixed(0)}&dish=${encodeURIComponent(dish)}&from=A%20Friend`;
+  const text = `⚔️ I resisted ordering ₹${amount.toFixed(0)} ${dish} and kept the money! Can you beat my save? Try it: ${challengeUrl}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    showShareToast("✓ Challenge link copied to clipboard! Send to your friend on WhatsApp 📲");
+  }).catch(() => {
+    showShareToast("✓ Challenge link created!");
+  });
+}
+
+// ── PASSBOOK MODAL & STREAKS LOGIC (F3) ──────────────────────────────────────
+function openPassbookModal() {
+  updateUserStateUI();
+
+  if (pbBadgesGrid) {
+    pbBadgesGrid.innerHTML = BADGES_CONFIG.map(b => {
+      const unlocked = userState.badges.includes(b.id);
+      return `
+        <div class="pb-badge-item ${unlocked ? 'unlocked' : ''}">
+          <span>${b.icon}</span>
+          <span>${b.title}</span>
+          ${unlocked ? '<span style="color:#10B981;font-weight:900;">✓</span>' : '<span style="opacity:0.4;">🔒</span>'}
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (pbHistoryList) {
+    if (userState.history.length === 0) {
+      pbHistoryList.innerHTML = `<div class="pb-empty-history">No savings recorded yet. Defeat your first craving to start your ledger!</div>`;
+    } else {
+      pbHistoryList.innerHTML = userState.history.map(h => `
+        <div class="pb-history-item">
+          <div class="pb-hi-left">
+            <strong>${h.dish}</strong>
+            <span>${h.date} • ${h.restaurant}</span>
+          </div>
+          <div class="pb-hi-right">+₹${h.amount.toFixed(2)}</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (passbookModal && passbookBackdrop) {
+    passbookModal.classList.add("show");
+    passbookBackdrop.classList.add("show");
+  }
+}
+
+function closePassbookModal() {
+  if (passbookModal && passbookBackdrop) {
+    passbookModal.classList.remove("show");
+    passbookBackdrop.classList.remove("show");
+  }
+}
+
+function resetAllUserData() {
+  if (confirm("Reset all your Beggy savings history and streaks?")) {
+    userState = {
+      totalSaved: 0,
+      cravingsDefeated: 0,
+      streak: 0,
+      bestStreak: 0,
+      lastSaveDate: null,
+      history: [],
+      badges: []
+    };
+    saveUserState();
+    closePassbookModal();
+    showShareToast("✓ All local data reset cleanly.");
+  }
+}
+
+// ── QUICK CRAVING MODE & URL CHALLENGE (F1, F9) ──────────────────────────────
+function switchDiscoveryMode(mode) {
+  state.discoveryMode = mode;
+  if (mode === "quick") {
+    if (tabBrowseRestaurants) tabBrowseRestaurants.classList.remove("active");
+    if (tabQuickCraving) tabQuickCraving.classList.add("active");
+    if (browseKitchensPanel) browseKitchensPanel.style.display = "none";
+    if (quickCravingPanel) quickCravingPanel.style.display = "block";
+  } else {
+    if (tabQuickCraving) tabQuickCraving.classList.remove("active");
+    if (tabBrowseRestaurants) tabBrowseRestaurants.classList.add("active");
+    if (quickCravingPanel) quickCravingPanel.style.display = "none";
+    if (browseKitchensPanel) browseKitchensPanel.style.display = "block";
+  }
+}
+
+function handleSimulateCustomCraving(e) {
+  if (e) e.preventDefault();
+  const dishTitle = (customDishName && customDishName.value.trim()) || "Chicken Dum Biryani";
+  const rawPrice = (customDishPrice && parseFloat(customDishPrice.value)) || 340;
+  const price = Math.max(10, Math.min(rawPrice, 5000));
+
+  const customRest = {
+    id: "custom_kitchen",
+    name: "Craving Central (Indiranagar)",
+    cuisines: "Fast Food, Indian, Tandoor",
+    rating: 4.9,
+    eta: "15–20 mins",
+    priceTwo: `₹${(price * 1.5).toFixed(0)} for two`,
+    distanceKm: 1.2,
+    address: "100ft Road, Indiranagar, Bengaluru",
+    coords: [12.9716, 77.6412],
+    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    discount: "FLAT 100% OFF code: BWIGGY100"
+  };
+
+  const customDish = {
+    id: 9999,
+    restaurantId: "custom_kitchen",
+    category: "custom",
+    diet: "veg",
+    isVeg: true,
+    isBestseller: true,
+    title: dishTitle,
+    price: price,
+    cookPrice: Math.round(price * 0.28),
+    eta: "15–20 mins",
+    calories: 650,
+    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    desc: `Piping hot signature ${dishTitle} cooked fresh with premium spices.`,
+    recipe: {
+      prep: "15 mins",
+      cook: "20 mins",
+      ingredients: [
+        "Fresh ingredients for " + dishTitle,
+        "Pure Desi Cow Ghee / Olive Oil",
+        "Aromatic spices & seasonings",
+        "Garnish & herbs"
+      ],
+      steps: [
+        "Prep and slice fresh ingredients.",
+        "Sauté seasonings in a hot pan.",
+        "Simmer for 15 minutes to lock in authentic flavours.",
+        "Serve hot at home for a fraction of the takeout cost!"
+      ]
+    }
+  };
+
+  state.activeRestaurant = customRest;
+  state.activeRecipeDish = customDish;
+  state.cart = [{ ...customDish, qty: 1 }];
+  state.lastOrderSaved = price;
+
+  updateCartUI();
+  proceedToPayment();
+}
+
+function checkUrlChallenge() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("challenge") === "1") {
+      const from = params.get("from") || "A Friend";
+      const amount = parseFloat(params.get("amount") || "340");
+      const dish = params.get("dish") || "Chicken Dum Biryani";
+
+      state.activeChallenge = { from, amount, dish };
+
+      if (friendChallengeBanner) {
+        friendChallengeBanner.style.display = "flex";
+        if (fcbTitle) fcbTitle.textContent = `⚔️ ${from} Defeated a ₹${amount.toFixed(0)} Craving!`;
+        if (fcbDesc) fcbDesc.textContent = `${from} resisted ordering ${dish} and kept ₹${amount.toFixed(0)}. Can you beat their save?`;
+      }
+
+      switchDiscoveryMode("quick");
+      if (customDishName) customDishName.value = dish;
+      if (customDishPrice) {
+        customDishPrice.value = amount;
+        if (btnCravingAmount) btnCravingAmount.textContent = amount.toFixed(0);
+      }
+    }
+  } catch (e) {
+    console.warn("Challenge parse error:", e);
+  }
 }
 
 // ── Event Handlers ───────────────────────────────────────────────────────────
@@ -1510,6 +2127,64 @@ function setupEventListeners() {
     });
   }
 
+  // Passbook modal triggers (F3)
+  if (passbookTriggerBtn) passbookTriggerBtn.addEventListener("click", openPassbookModal);
+  if (pbCloseBtn) pbCloseBtn.addEventListener("click", closePassbookModal);
+  if (passbookBackdrop) passbookBackdrop.addEventListener("click", closePassbookModal);
+  if (pbBtnDone) pbBtnDone.addEventListener("click", closePassbookModal);
+  if (pbBtnReset) pbBtnReset.addEventListener("click", resetAllUserData);
+
+  // Discovery Mode tabs (F1)
+  if (tabBrowseRestaurants) {
+    tabBrowseRestaurants.addEventListener("click", () => switchDiscoveryMode("browse"));
+  }
+  if (tabQuickCraving) {
+    tabQuickCraving.addEventListener("click", () => switchDiscoveryMode("quick"));
+  }
+
+  // Quick Craving chips
+  if (qcpChipsRow) {
+    qcpChipsRow.addEventListener("click", e => {
+      const chip = e.target.closest(".craving-chip");
+      if (!chip) return;
+      document.querySelectorAll(".craving-chip").forEach(c => c.classList.remove("selected"));
+      chip.classList.add("selected");
+
+      const dish = chip.dataset.dish;
+      const price = chip.dataset.price;
+      if (customDishName) customDishName.value = dish;
+      if (customDishPrice) customDishPrice.value = price;
+      if (btnCravingAmount) btnCravingAmount.textContent = price;
+    });
+  }
+
+  // Custom price input live sync
+  if (customDishPrice) {
+    customDishPrice.addEventListener("input", e => {
+      const val = parseInt(e.target.value, 10);
+      if (btnCravingAmount) btnCravingAmount.textContent = isNaN(val) ? "0" : val;
+    });
+  }
+
+  // Quick Craving form submit
+  if (qcpCustomForm) {
+    qcpCustomForm.addEventListener("submit", handleSimulateCustomCraving);
+  }
+
+  // Friend challenge accept
+  if (fcbAcceptBtn) {
+    fcbAcceptBtn.addEventListener("click", () => {
+      switchDiscoveryMode("quick");
+      if (customDishName) customDishName.focus();
+    });
+  }
+
+  // Share card actions (F2)
+  if (btnScShare) btnScShare.addEventListener("click", shareStoryCard);
+  if (btnScDownload) btnScDownload.addEventListener("click", downloadShareCard);
+  if (btnScCopy) btnScCopy.addEventListener("click", copyShareCaption);
+  if (btnScChallenge) btnScChallenge.addEventListener("click", createFriendChallengeLink);
+
   // Search input
   if (foodSearch) {
     foodSearch.addEventListener("input", e => {
@@ -1544,12 +2219,15 @@ function setupEventListeners() {
 
 // ── App Initialization ───────────────────────────────────────────────────────
 function init() {
+  updateUserStateUI();
   renderRestaurants();
   updateCartUI();
   setupEventListeners();
+  checkUrlChallenge();
 
   // Pre-load default active restaurant dishes in background
   renderRestaurantDishes(RESTAURANTS_DATA[0].id);
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
