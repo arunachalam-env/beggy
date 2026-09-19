@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beggy — Order Food Online • Bengaluru Express Delivery</title>
+  <meta name="description" content="Order food online from top-rated kitchens near you in Bengaluru. Fast 20-min delivery on Bwiggy partner network.">
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS for real-world interactive map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Dopamine Reveal Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Simulated Indian Bank SMS / Push Notification Toast -->
+  <div class="bank-sms-toast" id="bank-sms-toast" aria-live="polite">
+    <div class="sms-header">
+      <div class="sms-sender">
+        <span class="sms-bank-badge">🏦 BHARAT-BANK</span>
+        <span class="sms-time">Just now</span>
+      </div>
+      <button class="sms-close-btn" id="sms-close-btn" aria-label="Close notification">&times;</button>
+    </div>
+    <div class="sms-body">
+      <strong class="sms-amount" id="sms-amount">₹340.00 Credited</strong>
+      <p id="sms-message">A/C **4921 credited with ₹340.00 on 18-Sep-2026 via UPI/Beggy Anti-Spend. Avail Bal: ₹48,990.00. Craving defeated!</p>
+    </div>
+    <div class="sms-badge">✓ Real Savings Transferred</div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <!-- New Brand Logo with Uploaded Beggy Icon -->
+        <a href="#" class="brand-logo" id="nav-brand-home" aria-label="Beggy Home">
+          <img src="logo.jpg" alt="Beggy Logo" class="brand-logo-img" />
+          <div class="logo-text">
+            <span class="logo-title">beggy</span>
+            <span class="logo-sub">smart food delivery</span>
+          </div>
+        </a>
+
+        <!-- Indian Delivery Location Selector -->
+        <div class="address-selector" id="address-selector" title="Change delivery address">
+          <span class="location-pin">📍</span>
+          <div class="address-info">
+            <span class="address-tag">HOME</span>
+            <span class="address-val">Indiranagar, 100ft Road, Bengaluru ▾</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="food-search" placeholder="Search for biryani, butter chicken, dosa, burger..." aria-label="Search food">
+        <button id="clear-search" class="clear-btn" aria-label="Clear search" style="display:none;">&times;</button>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="nav-home-btn" id="nav-home-btn">
+          <span>🍽️ Restaurants</span>
+        </button>
+
+        <!-- Cart Trigger Button -->
+        <button class="cart-trigger-btn" id="cart-trigger-btn" aria-label="View Cart">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Multi-Stage Application Container -->
+  <main class="app-main">
+
+    <!-- ====================================================================
+         STAGE 1: RESTAURANT SELECTION VIEW
+         ==================================================================== -->
+    <section class="app-view active" id="view-restaurants">
+      <!-- Top Offer Strip -->
+      <div class="offer-banner-strip">
+        <div class="strip-left">
+          <span class="swiggy-one-badge">⚡ BWIGGY ONE</span>
+          <span>Free Delivery on all orders above ₹149 in Bengaluru</span>
+        </div>
+        <div class="strip-right">
+          <span>Use Coupon: <strong>BWIGGY100</strong> for 100% OFF your order</span>
+        </div>
+      </div>
+
+      <!-- Cuisine Category Scroller -->
+      <div class="cuisine-scroller-wrap">
+        <h3 class="scroller-title">What's on your mind?</h3>
+        <div class="cuisine-pills-row" id="cuisine-pills-row">
+          <button class="cuisine-pill active" data-cuisine="all">🍽️ All</button>
+          <button class="cuisine-pill" data-cuisine="biryani">🍗 Biryani</button>
+          <button class="cuisine-pill" data-cuisine="north-indian">🍛 North Indian</button>
+          <button class="cuisine-pill" data-cuisine="south-indian">🥞 South Indian</button>
+          <button class="cuisine-pill" data-cuisine="burgers-pizza">🍔 Burgers & Pizza</button>
+          <button class="cuisine-pill" data-cuisine="street-food">🌮 Street Food</button>
+          <button class="cuisine-pill" data-cuisine="chinese">🍜 Chinese</button>
+          <button class="cuisine-pill" data-cuisine="desserts">🍨 Desserts</button>
+        </div>
+      </div>
+
+      <!-- Top Kitchens Feed -->
+      <div class="restaurants-feed-header">
+        <div>
+          <h2 class="section-title">Top Kitchens in Indiranagar & Koramangala</h2>
+          <p class="section-subtitle">Piping hot food delivered in 20–25 minutes from Bengaluru's iconic kitchens.</p>
+        </div>
+        <div class="feed-counter" id="restaurant-count">8 restaurants open now</div>
+      </div>
+
+      <div class="restaurants-grid" id="restaurants-grid">
+        <!-- Injected dynamically via script.js -->
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         STAGE 2: RESTAURANT MENU & FOOD SELECTION VIEW
+         ==================================================================== -->
+    <section class="app-view" id="view-menu" style="display: none;">
+      <!-- Breadcrumb & Back Navigation -->
+      <div class="menu-nav-bar">
+        <button class="btn-back-link" id="btn-back-to-restaurants">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to All Restaurants</span>
+        </button>
+      </div>
+
+      <!-- Restaurant Hero Card -->
+      <div class="restaurant-hero-card" id="restaurant-hero-card">
+        <div class="hero-card-left">
+          <h1 class="rest-title" id="menu-rest-name">Megha's Dum Darbar</h1>
+          <p class="rest-cuisines" id="menu-rest-cuisines">Biryani, Andhra, North Indian</p>
+          <p class="rest-loc" id="menu-rest-address">100ft Road, HAL 2nd Stage, Indiranagar • 1.2 km away</p>
+          <div class="rest-badge-row">
+            <span class="delivery-time-pill" id="menu-rest-eta">⚡ 20–25 mins</span>
+            <span class="price-two-pill" id="menu-rest-price-two">₹500 for two</span>
+            <span class="offer-pill">🏷️ FLAT 100% OFF code: BWIGGY100</span>
+          </div>
+        </div>
+        <div class="hero-card-right">
+          <div class="rating-box">
+            <span class="rating-score" id="menu-rest-rating">★ 4.9</span>
+            <span class="rating-count">1.2K+ ratings</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Category Filter Tabs -->
+      <div class="menu-filters-bar">
+        <div class="dietary-toggles">
+          <button class="diet-btn active" data-diet="all">All Items</button>
+          <button class="diet-btn" data-diet="veg">🟢 Pure Veg</button>
+          <button class="diet-btn" data-diet="non-veg">🔴 Non-Veg</button>
+          <button class="diet-btn" data-diet="bestseller">⭐ Bestsellers</button>
+        </div>
+        <div class="menu-items-count" id="menu-items-count">Showing dishes</div>
+      </div>
+
+      <!-- Food Dishes Grid -->
+      <div class="dishes-list-container" id="dishes-list-container">
+        <!-- Injected dynamically via script.js -->
+      </div>
+
+      <!-- Sticky Floating Bottom Cart Strip (When items added) -->
+      <div class="floating-cart-bar" id="floating-cart-bar" style="display: none;">
+        <div class="floating-cart-info">
+          <span class="fc-count" id="fc-count">1 Item</span>
+          <span class="fc-sep">|</span>
+          <span class="fc-total" id="fc-total">₹340.00</span>
+        </div>
+        <button class="floating-cart-btn" id="fc-proceed-btn">
+          <span>View Cart & Checkout</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         STAGE 3: CHECKOUT & PAYMENT SCREEN VIEW
+         ==================================================================== -->
+    <section class="app-view" id="view-payment" style="display: none;">
+      <div class="menu-nav-bar">
+        <button class="btn-back-link" id="btn-back-to-menu">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to Restaurant Menu</span>
+        </button>
+      </div>
+
+      <div class="checkout-layout-grid">
+        <!-- Left Column: Delivery Address & Payment Selection -->
+        <div class="checkout-left-col">
+          <!-- Delivery Address Box -->
+          <div class="checkout-card address-card">
+            <div class="card-title-row">
+              <span class="step-num">1</span>
+              <div>
+                <h3>Delivery Address</h3>
+                <p>Delivering to your registered home location</p>
+              </div>
+            </div>
+            <div class="address-box-body">
+              <div class="addr-icon">🏠</div>
+              <div class="addr-details">
+                <strong>Home — Indiranagar</strong>
+                <p>742 Evergreen Heights, 100ft Road, HAL 2nd Stage, Indiranagar, Bengaluru - 560038</p>
+                <span class="addr-badge">20–25 MINS DELIVERY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Options Box -->
+          <div class="checkout-card payment-options-card">
+            <div class="card-title-row">
+              <span class="step-num">2</span>
+              <div>
+                <h3>Choose Payment Method</h3>
+                <p>Select your preferred UPI or payment mode</p>
+              </div>
+            </div>
+
+            <div class="payment-methods-list">
+              <label class="payment-option selected" data-method="gpay">
+                <input type="radio" name="payment_method" value="gpay" checked>
+                <div class="pay-logo-badge gpay-badge">GPay</div>
+                <div class="pay-info">
+                  <strong>Google Pay UPI</strong>
+                  <span>Instant payment via your linked bank account</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </label>
+
+              <label class="payment-option" data-method="phonepe">
+                <input type="radio" name="payment_method" value="phonepe">
+                <div class="pay-logo-badge phonepe-badge">PhonePe</div>
+                <div class="pay-info">
+                  <strong>PhonePe UPI</strong>
+                  <span>Fast UPI transaction</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </label>
+
+              <label class="payment-option" data-method="paytm">
+                <input type="radio" name="payment_method" value="paytm">
+                <div class="pay-logo-badge paytm-badge">Paytm</div>
+                <div class="pay-info">
+                  <strong>Paytm / UPI</strong>
+                  <span>Pay via Paytm UPI or Wallet</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </label>
+
+              <label class="payment-option" data-method="bhim">
+                <input type="radio" name="payment_method" value="bhim">
+                <div class="pay-logo-badge bhim-badge">UPI</div>
+                <div class="pay-info">
+                  <strong>Any UPI App / Net Banking</strong>
+                  <span>BHIM, Cred, HDFC, SBI, ICICI</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </label>
+
+              <label class="payment-option" data-method="cod">
+                <input type="radio" name="payment_method" value="cod">
+                <div class="pay-logo-badge cod-badge">💵</div>
+                <div class="pay-info">
+                  <strong>Cash on Delivery</strong>
+                  <span>Pay cash or UPI to rider on arrival</span>
+                </div>
+                <span class="radio-indicator"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Order Bill Summary & Place Order -->
+        <div class="checkout-right-col">
+          <div class="checkout-card bill-summary-card">
+            <h3 class="bill-header">Order Summary</h3>
+            <p class="bill-rest-name" id="checkout-restaurant-name">Megha's Dum Darbar</p>
+
+            <div class="checkout-items-list" id="checkout-items-list">
+              <!-- Injected dynamically -->
+            </div>
+
+            <!-- Applied Coupon Box -->
+            <div class="checkout-coupon-box">
+              <div class="cc-header">
+                <span>🎉 COUPON 'BWIGGY100' APPLIED</span>
+                <strong class="cc-save">-100% OFF</strong>
+              </div>
+              <p class="cc-desc">Anti-spending dopamine special discount applied successfully.</p>
+            </div>
+
+            <!-- Bill Breakdown Lines -->
+            <div class="bill-breakdown">
+              <div class="bill-row">
+                <span>Item Total:</span>
+                <span id="bill-item-total">₹340.00</span>
+              </div>
+              <div class="bill-row">
+                <span>Delivery Partner Fee:</span>
+                <span class="free-badge">₹40 (FREE via Bwiggy One)</span>
+              </div>
+              <div class="bill-row">
+                <span>Govt Taxes & Packaging:</span>
+                <span class="free-badge">₹25 (WAIVED)</span>
+              </div>
+              <div class="bill-row total-row">
+                <span>TO PAY:</span>
+                <strong id="bill-to-pay">₹0.00</strong>
+              </div>
+            </div>
+
+            <!-- Primary Place Order Button -->
+            <button class="btn-pay-and-place-order" id="btn-pay-and-place-order">
+              <span class="pay-btn-main">Pay ₹0.00 & Place Order 🚀</span>
+              <span class="pay-btn-sub">Authentic 20-min express delivery in Bengaluru</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         STAGE 4: LIVE GPS DELIVERY TRACKING & DOPAMINE REVEAL VIEW
+         ==================================================================== -->
+    <section class="app-view" id="view-tracking" style="display: none;">
+      <!-- Tracking Header & Timeline -->
+      <div class="tracking-top-card">
+        <div class="tracking-status-bar">
+          <div class="ts-left">
+            <span class="live-pulse-dot"></span>
+            <div>
+              <h2 class="live-order-title" id="tracking-status-title">Order Confirmed & Preparing</h2>
+              <p class="live-order-subtitle" id="tracking-status-desc">Megha's Dum Darbar is cooking your fresh order. Rider arriving shortly.</p>
+            </div>
+          </div>
+          <div class="ts-right">
+            <div class="eta-pill" id="tracking-eta-pill">ETA: ~18 mins</div>
+            <span class="order-id-badge" id="tracking-order-id">Order #BW-8921</span>
+          </div>
+        </div>
+
+        <!-- 4-Step Order Progress Timeline -->
+        <div class="tracking-stepper">
+          <div class="step-node completed" id="step-node-1">
+            <div class="node-circle">✓</div>
+            <span>Order Placed</span>
+          </div>
+          <div class="step-line completed" id="step-line-1"></div>
+          <div class="step-node active" id="step-node-2">
+            <div class="node-circle">🍳</div>
+            <span>Preparing</span>
+          </div>
+          <div class="step-line" id="step-line-2"></div>
+          <div class="step-node" id="step-node-3">
+            <div class="node-circle">🛵</div>
+            <span>Out for Delivery</span>
+          </div>
+          <div class="step-line" id="step-line-3"></div>
+          <div class="step-node" id="step-node-4">
+            <div class="node-circle">🎉</div>
+            <span>Arrived</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real Leaflet Street Map Container -->
+      <div class="live-map-wrapper">
+        <div class="map-controls-strip">
+          <div class="mc-info">
+            <span class="partner-avatar">🛵</span>
+            <div>
+              <strong>Rider Partner: Suresh K.</strong>
+              <span id="map-partner-distance">1.2 km away from your Indiranagar location</span>
+            </div>
+          </div>
+          <button class="simulate-arrival-btn" id="btn-simulate-arrival">
+            ⚡ Fast-Forward Scooter Arrival
+          </button>
+        </div>
+
+        <div id="real-leaflet-map" class="real-leaflet-map"></div>
+
+        <div class="map-legend-footer">
+          <span>📍 <strong>Your Location:</strong> Indiranagar, 100ft Road</span>
+          <span>🍳 <strong>Kitchen:</strong> <span id="map-kitchen-label">Megha's Dum Darbar</span></span>
+          <span>🛵 <strong>Live Scooter:</strong> Navigating CMH Road</span>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           THE TWIST: DOPAMINE HIT DONE & REAL SAVE HERO SECTION
+           ================================================================ -->
+      <div class="dopamine-reveal-card" id="dopamine-reveal-card" style="display: none;">
+        <div class="dopamine-header">
+          <div class="dopamine-icon">🎉</div>
+          <div class="dopamine-eyebrow">MISSION ACCOMPLISHED!</div>
+          <h2 class="dopamine-title">DOPAMINE HIT DONE!</h2>
+          <p class="dopamine-subtext">Wait... where is your food delivery? 😮</p>
+        </div>
+
+        <div class="dopamine-savings-highlight">
+          <span class="dsh-tag">YOUR FOOD WAS NEVER ORDERED... BUT YOU JUST SAVED:</span>
+          <div class="dsh-amount" id="reveal-saved-amount">₹340.00</div>
+          <p class="dsh-note">
+            You got 100% of the craving excitement, menu browsing thrill, and delivery dopamine rush — <strong>without burning your real bank account money!</strong>
+          </p>
+        </div>
+
+        <!-- THE REQUESTED "REAL SAVE" BUTTON -->
+        <div class="real-save-action-box">
+          <button class="btn-real-save" id="btn-real-save">
+            <div class="rs-icon-wrap">🏦</div>
+            <div class="rs-text-wrap">
+              <strong>Dopamine Hit Done — Let's Do Real Save</strong>
+              <span id="rs-subtext">Transfer <span id="rs-amount-val">₹340.00</span> to Your Dummy Savings Account</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Beggy Savings Account Passbook Card -->
+        <div class="savings-account-card" id="savings-account-card">
+          <div class="sa-top">
+            <div class="sa-bank-label">
+              <span>🏦 BHARAT BANK</span>
+              <span class="sa-type">Digital Savings Account</span>
+            </div>
+            <div class="sa-chip">💳</div>
+          </div>
+          <div class="sa-account-num">A/C **4921 • UPI / Beggy Anti-Spend</div>
+          <div class="sa-balance-wrap">
+            <span class="sa-bal-label">TOTAL ANTI-SPENDING VAULT BALANCE</span>
+            <div class="sa-bal-val" id="sa-balance-val">₹48,990.00</div>
+          </div>
+          <div class="sa-footer">
+            <span>✓ Verified Safe From Takeout Spending</span>
+            <span id="sa-victories-count">14 Cravings Defeated</span>
+          </div>
+        </div>
+
+        <!-- Secret Chef Recipe Card with Natural Amazon Helper Button -->
+        <div class="chef-recipe-box" id="chef-recipe-box">
+          <div class="cr-header">
+            <div>
+              <span class="cr-badge">👨‍🍳 15-Minute Restaurant Recipe</span>
+              <h3 class="cr-title" id="cr-dish-title">Megha's Signature Chicken Dum Biryani</h3>
+              <p class="cr-sub" id="cr-dish-sub">Cook this exact restaurant dish at home for just ₹85 instead of ₹340!</p>
+            </div>
+            <div class="cr-stats">
+              <span id="cr-prep-time">⏱️ 15 mins prep</span>
+              <span id="cr-cook-time">🍳 25 mins cook</span>
+              <span id="cr-home-cost">💰 ₹85 home cost</span>
+            </div>
+          </div>
+
+          <div class="cr-body-grid">
+            <div class="cr-ingredients">
+              <h4>Ingredients Checklist</h4>
+              <ul class="cr-ing-list" id="cr-ing-list">
+                <!-- Injected via script.js -->
+              </ul>
+              <!-- Natural Grocery Helper Button -->
+              <a href="https://link.amazon/B05RiQ3Jy" target="_blank" rel="noopener noreferrer" class="amazon-recipe-btn" id="amazon-recipe-btn">
+                <span class="amz-icon">🛒</span>
+                <span>Get Fresh Ingredients to Cook This on Amazon</span>
+              </a>
+            </div>
+
+            <div class="cr-steps">
+              <h4>Cooking Instructions</h4>
+              <ol class="cr-steps-list" id="cr-steps-list">
+                <!-- Injected via script.js -->
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back to Home / Order Again Button -->
+        <div class="order-again-wrapper">
+          <button class="btn-order-again" id="btn-order-again">
+            <span>Explore Other Restaurants in Bengaluru ➔</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sliding Swiggy-Style Cart Drawer -->
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+    <div class="cart-header">
+      <div class="cart-title-row">
+        <h3>Your Cart 🛒</h3>
+        <button class="close-cart-btn" id="close-cart-btn" aria-label="Close cart">&times;</button>
+      </div>
+      <p class="cart-hint">Delivering to: Indiranagar, 100ft Road • ~20 mins</p>
+    </div>
+
+    <div class="cart-items-container" id="cart-items-container">
+      <div class="empty-cart-state">
+        <span class="empty-icon">🍛</span>
+        <p>Your cart is empty</p>
+        <p class="empty-sub">Select dishes from your favorite Bengaluru kitchens to start your order.</p>
+      </div>
+    </div>
+
+    <div class="cart-footer" id="cart-footer">
+      <div class="swiggy-coupon-box">
+        <div class="coupon-title">
+          <span>🎉 CODE 'BWIGGY100' READY</span>
+          <strong class="coupon-discount">-100% OFF</strong>
+        </div>
+        <p class="coupon-sub">Auto-applied at checkout for instant dopamine rush.</p>
+      </div>
+
+      <div class="cart-summary-line">
+        <span>Item Subtotal:</span>
+        <span id="drawer-subtotal">₹0.00</span>
+      </div>
+      <div class="cart-summary-line highlight-total">
+        <span>ESTIMATED BILL:</span>
+        <strong id="drawer-total">₹0.00</strong>
+      </div>
+
+      <button class="checkout-swiggy-btn" id="drawer-checkout-btn" disabled>
+        <span class="btn-text">Proceed to Checkout ➔</span>
+        <span class="btn-subtext">Select payment method & view GPS radar</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Cart Backdrop Overlay -->
+  <div class="cart-backdrop" id="cart-backdrop"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="logo.jpg" alt="Beggy Logo" class="footer-logo-img" />
+        <span class="footer-logo">beggy</span>
+        <p>The revolutionary anti-spending dopamine platform giving you the full excitement of food delivery while keeping 100% of your money in your savings account.</p>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Beggy. Crafted with ❤️ for India.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- App Script -->
+  <script src="script.js"></script>
+</body>
+</html>
