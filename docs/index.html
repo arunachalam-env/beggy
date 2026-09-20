@@ -785,22 +785,23 @@
   <div class="passbook-backdrop" id="passbook-backdrop"></div>
 
   <!-- ====================================================================
-       10-SECOND CHEF'S RECIPE TAKEOVER OVERLAY (FULL SCREEN BLANKET)
+       5-SECOND CHEF'S RECIPE POPUP WITH CROSS MARK CLOSE
        ==================================================================== -->
   <div class="recipe-takeover-overlay" id="recipe-takeover-overlay" style="display: none;">
     <div class="recipe-takeover-card" id="recipe-takeover-card">
-      <button class="recipe-takeover-back-btn" id="recipe-takeover-back-btn" aria-label="Back to Beggy">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        <span>Back to Beggy</span>
-      </button>
+      <!-- Prominent Cross Mark (X) to Close if not needed -->
+      <button class="recipe-takeover-close-btn" id="recipe-takeover-close-btn" aria-label="Close recipe popup">&times;</button>
+
       <div class="recipe-takeover-content">
         <span class="recipe-takeover-badge">🍳 Secret Chef Recipe &amp; Grocery Kit</span>
         <h3 class="recipe-takeover-title">Get Recipe to Cook Fresh at Home!</h3>
         <p class="recipe-takeover-sub">Why spend ₹340 on restaurant delivery? Cook authentic Bengaluru biryani in 15 minutes for just ₹85.</p>
-        <div class="recipe-takeover-cta-btn">
+        <button class="recipe-takeover-cta-btn" id="recipe-takeover-cta-btn" type="button">
           <span>Get Recipe &amp; Fresh Ingredients on Amazon 🛒</span>
+        </button>
+        <div class="recipe-takeover-footer">
+          <button class="recipe-takeover-dismiss-link" id="recipe-takeover-back-btn" type="button">No thanks, return to Beggy</button>
         </div>
-        <span class="recipe-takeover-hint">Tap anywhere on this page to get recipe &amp; ingredients • Tap 'Back to Beggy' to return</span>
       </div>
     </div>
   </div>

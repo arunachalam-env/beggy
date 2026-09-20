@@ -2997,27 +2997,51 @@ body {
   z-index: 2;
 }
 
-.recipe-takeover-back-btn {
+.recipe-takeover-close-btn {
   position: absolute;
   top: 14px;
-  left: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
   background: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  border-radius: var(--radius-full);
-  padding: 6px 14px;
-  font-size: 0.78rem;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 50%;
+  font-size: 1.4rem;
   font-weight: 700;
+  line-height: 1;
   color: var(--text-700);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
-  z-index: 10;
+  justify-content: center;
+  z-index: 20;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.recipe-takeover-close-btn:hover {
+  background: #EF4444;
+  border-color: #EF4444;
+  color: #FFFFFF;
+  transform: rotate(90deg) scale(1.08);
+}
+
+.recipe-takeover-footer {
+  margin-top: 14px;
+}
+
+.recipe-takeover-dismiss-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
   transition: var(--transition);
 }
 
-.recipe-takeover-back-btn:hover {
-  background: #E5E7EB;
+.recipe-takeover-dismiss-link:hover {
   color: var(--text-900);
 }
 

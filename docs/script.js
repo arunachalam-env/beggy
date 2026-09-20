@@ -2333,39 +2333,56 @@ function setupEventListeners() {
   }
 }
 
-// ── 10-Second Chef's Recipe Hovering Full Blanket Modal ───────────────────────
+// ── 5-Second Chef's Recipe Modal with Cross Mark Close ────────────────────────
 let recipeTakeoverShown = false;
-function init10SecondRecipePopup() {
+function init5SecondRecipePopup() {
   setTimeout(() => {
     if (recipeTakeoverShown) return;
     if (state.currentView === "tracking" || state.currentView === "reveal") return;
 
     const overlay = document.getElementById("recipe-takeover-overlay");
+    const card = document.getElementById("recipe-takeover-card");
+    const closeCrossBtn = document.getElementById("recipe-takeover-close-btn");
     const backBtn = document.getElementById("recipe-takeover-back-btn");
+    const ctaBtn = document.getElementById("recipe-takeover-cta-btn");
 
     if (overlay) {
       overlay.style.display = "flex";
       recipeTakeoverShown = true;
 
-      // Entire full blanket redirects anywhere user clicks, UNLESS they click Back
-      overlay.addEventListener("click", (e) => {
-        if (e.target.closest("#recipe-takeover-back-btn")) {
+      // Clicking cross mark (X) closes if user doesn't need it
+      if (closeCrossBtn) {
+        closeCrossBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           overlay.style.display = "none";
-          return;
-        }
-        window.open(AMAZON_GROCERY_URL, "_blank");
-        overlay.style.display = "none";
-      });
+        });
+      }
 
+      // Clicking 'No thanks' button closes modal
       if (backBtn) {
         backBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           overlay.style.display = "none";
         });
       }
+
+      // Clicking outside the card on the backdrop closes modal
+      overlay.addEventListener("click", (e) => {
+        if (card && !card.contains(e.target)) {
+          overlay.style.display = "none";
+        }
+      });
+
+      // Clicking the CTA button opens Amazon in a new tab
+      if (ctaBtn) {
+        ctaBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.open(AMAZON_GROCERY_URL, "_blank");
+          overlay.style.display = "none";
+        });
+      }
     }
-  }, 10000);
+  }, 5000);
 }
 
 // ── App Initialization ───────────────────────────────────────────────────────
@@ -2375,7 +2392,7 @@ function init() {
   updateCartUI();
   setupEventListeners();
   checkUrlChallenge();
-  init10SecondRecipePopup();
+  init5SecondRecipePopup();
 
   // Reuse cached last craving on next visit
   if (userState.lastCraving && customDishName && customDishPrice) {
