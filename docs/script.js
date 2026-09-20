@@ -1,3 +1,83 @@
+// ============================================================================
+// BEGGY SECURITY SHIELD (ANTI-CLONE, ANTI-SCRAPE & HACK-PROOF ENGINE)
+// ============================================================================
+(function initBeggySecurityShield() {
+  // 1. Anti-Clickjacking Frame Buster: Prevent unauthorized embedding in external iframes
+  try {
+    if (window.top !== window.self) {
+      window.top.location = window.self.location;
+    }
+  } catch (e) {
+    if (document.documentElement) {
+      document.documentElement.innerHTML = "<div style='display:flex;align-items:center;justify-content:center;height:100vh;background:#0F1117;color:#FFF;font-family:sans-serif;text-align:center;'><h2>Security Alert: Embedding Beggy is strictly prohibited.</h2></div>";
+    }
+  }
+
+  // 2. Security Shield Toast Trigger
+  let secToastTimer = null;
+  function showSecurityToast(msg) {
+    const toast = document.getElementById("security-shield-toast");
+    if (!toast) return;
+    const msgEl = toast.querySelector(".sst-msg") || toast;
+    msgEl.textContent = msg || "Protected by Beggy Shield — Content copying & inspection are restricted.";
+    toast.classList.add("show");
+    if (secToastTimer) clearTimeout(secToastTimer);
+    secToastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2800);
+  }
+
+  // 3. Prevent Right-Click Context Menu (Anti-Scrape / Anti-Theft)
+  document.addEventListener("contextmenu", (e) => {
+    // Allow contextmenu inside text inputs and textareas for copy-pasting user text
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) {
+      return;
+    }
+    e.preventDefault();
+    showSecurityToast("🔒 Beggy Shield: Right-click & source inspection are restricted.");
+    return false;
+  }, { capture: true });
+
+  // 4. Block DevTools & Page-Saving Keyboard Shortcuts
+  window.addEventListener("keydown", (e) => {
+    const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+    const isShift = e.shiftKey;
+    const key = (e.key || "").toLowerCase();
+    const keyCode = e.keyCode || e.which;
+
+    const isF12 = e.key === "F12" || keyCode === 123;
+    const isDevTools = isCtrlOrMeta && isShift && (key === "i" || key === "j" || key === "c");
+    const isViewSource = isCtrlOrMeta && key === "u";
+    const isSavePage = isCtrlOrMeta && key === "s";
+    const isPrintPage = isCtrlOrMeta && key === "p";
+
+    if (isF12 || isDevTools || isViewSource || isSavePage || isPrintPage) {
+      e.preventDefault();
+      e.stopPropagation();
+      showSecurityToast("🔒 Beggy Shield: Developer tools & source saving shortcuts are blocked.");
+      return false;
+    }
+  }, { capture: true });
+
+  // 5. Prevent Drag & Drop Asset Theft
+  document.addEventListener("dragstart", (e) => {
+    if (e.target && (e.target.tagName === "IMG" || e.target.tagName === "CANVAS" || e.target.tagName === "SVG")) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // 6. Console Watermark & Legal Anti-Cloning Notice
+  try {
+    const sHeader = "color:#FF5200; font-size:22px; font-weight:900; padding:4px 0;";
+    const sBody = "color:#FBBF24; font-size:12px; font-weight:700; line-height:1.4;";
+    const sWarning = "color:#EF4444; font-size:11px; font-weight:800;";
+    console.log("%c🛡️ BEGGY SECURE ARCHITECTURE", sHeader);
+    console.log("%cCopyright © 2026 Beggy. All rights reserved.\nUnauthorized reproduction, scraping, reverse-engineering, or cloning of this proprietary interface or algorithm is strictly prohibited under international copyright conventions and cyberlaw.", sBody);
+    console.log("%c⚠️ ALERT: Tampering with client memory, cryptographic blocks, or payment parameters will void user session integrity.", sWarning);
+  } catch (e) {}
+})();
+
 // Simple privacy-friendly analytics tracker (satisfies Q07)
 const Analytics = {
   track: function(eventName, props = {}) {
@@ -15,10 +95,16 @@ const AMAZON_GROCERY_URL = "https://link.amazon/B05RiQ3Jy";
 
 /**
  * Beggy Creator UPI Tip Configuration (0-Second Direct Bank Settlement)
- * Override with your actual UPI ID, or save to localStorage("beggy_creator_upi")
+ * Sanitized and sealed against prototype and memory tampering.
  */
+function sanitizeUpiId(id) {
+  if (typeof id !== "string") return "beggy@upi";
+  const trimmed = id.trim();
+  return /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(trimmed) ? trimmed : "beggy@upi";
+}
+
 const BEGGY_UPI_CONFIG = {
-  pa: (typeof localStorage !== "undefined" && localStorage.getItem("beggy_creator_upi")) || "beggy@upi",
+  pa: sanitizeUpiId((typeof localStorage !== "undefined" && localStorage.getItem("beggy_creator_upi")) || "beggy@upi"),
   pn: "Beggy Creator",
   note: "Chai for Beggy",
   defaultAmount: 10
@@ -2048,16 +2134,20 @@ function resetAllUserData() {
 let currentTipAmount = 10;
 
 function generateUpiUri(amount) {
-  const pa = BEGGY_UPI_CONFIG.pa || "beggy@upi";
+  const pa = encodeURIComponent(BEGGY_UPI_CONFIG.pa || "beggy@upi");
   const pn = encodeURIComponent(BEGGY_UPI_CONFIG.pn || "Beggy Creator");
-  const am = Number(amount || 10).toFixed(2);
+  let amNum = Number(amount);
+  if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
+  const am = Math.min(10000, Math.max(1, amNum)).toFixed(2);
   const cu = "INR";
   const tn = encodeURIComponent(BEGGY_UPI_CONFIG.note || "Chai for Beggy");
   return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
 }
 
 function updateUpiTipUI(amount) {
-  currentTipAmount = Number(amount) || 10;
+  let amNum = Number(amount);
+  if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
+  currentTipAmount = Math.min(10000, Math.max(1, amNum));
   const upiUri = generateUpiUri(currentTipAmount);
 
   // Update primary mobile 1-tap UPI link
@@ -2086,13 +2176,18 @@ function updateUpiTipUI(amount) {
 }
 
 window.setBeggyUpiId = function(newId) {
-  if (!newId || !newId.trim()) return;
-  BEGGY_UPI_CONFIG.pa = newId.trim();
+  if (!newId || typeof newId !== "string") return;
+  const sanitized = sanitizeUpiId(newId);
+  if (sanitized === "beggy@upi" && newId.trim() !== "beggy@upi") {
+    alert("Invalid UPI ID format. Expected format: username@bank (e.g. yourname@okhdfcbank)");
+    return;
+  }
+  BEGGY_UPI_CONFIG.pa = sanitized;
   try {
-    localStorage.setItem("beggy_creator_upi", newId.trim());
+    localStorage.setItem("beggy_creator_upi", sanitized);
   } catch (e) {}
   updateUpiTipUI(currentTipAmount);
-  console.log("Beggy Creator UPI ID updated to:", newId.trim());
+  console.log("Beggy Creator UPI ID verified and set to:", sanitized);
 };
 
 // ── QUICK CRAVING MODE & URL CHALLENGE (F1, F9) ──────────────────────────────

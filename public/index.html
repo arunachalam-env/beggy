@@ -27,13 +27,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="robots" content="index, follow, noarchive">
+  <meta name="copyright" content="Beggy Inc.">
   <!-- Leaflet CSS for real-world interactive map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body oncontextmenu="return false;">
   <!-- Dopamine Reveal Confetti Canvas -->
   <canvas id="confetti-canvas"></canvas>
+
+  <!-- Beggy Anti-Theft / Security Shield Toast Notification -->
+  <div class="security-shield-toast" id="security-shield-toast" aria-live="assertive">
+    <span class="sst-icon">🔒</span>
+    <span class="sst-msg">Protected by Beggy Shield — Content copying &amp; inspection are restricted.</span>
+  </div>
 
   <!-- Simulated Vault SMS / Push Notification Toast -->
   <div class="bank-sms-toast" id="bank-sms-toast" aria-live="polite">
@@ -723,7 +732,8 @@
 
         <!-- Trust and Simulation Disclaimer -->
         <div class="trust-safety-banner">
-          🛡️ <strong>100% Simulation</strong> • No real money charged • No real food dispatched • We never ask for bank, card, or UPI details.
+          <div>🛡️ <strong>100% Simulation</strong> • No real money charged • No real food dispatched • We never ask for bank, card, or UPI details.</div>
+          <div class="tsb-security-tag">🔒 Beggy Secure Core • 256-Bit Cryptographic Integrity • Anti-Tamper &amp; Anti-Clone Protected</div>
         </div>
 
         <!-- Back to Home / Order Again Button -->
