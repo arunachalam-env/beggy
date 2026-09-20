@@ -13,6 +13,17 @@ const Analytics = {
 
 const AMAZON_GROCERY_URL = "https://link.amazon/B05RiQ3Jy";
 
+/**
+ * Beggy Creator UPI Tip Configuration (0-Second Direct Bank Settlement)
+ * Override with your actual UPI ID, or save to localStorage("beggy_creator_upi")
+ */
+const BEGGY_UPI_CONFIG = {
+  pa: (typeof localStorage !== "undefined" && localStorage.getItem("beggy_creator_upi")) || "beggy@upi",
+  pn: "Beggy Creator",
+  note: "Chai for Beggy",
+  defaultAmount: 10
+};
+
 // ── 8 Iconic Bengaluru Partner Kitchens (Legally Safe Parodies) ──────────────
 const RESTAURANTS_DATA = [
   {
@@ -968,6 +979,23 @@ const pbHistoryCount = document.getElementById("pb-history-count");
 const pbBtnReset = document.getElementById("pb-btn-reset");
 const pbBtnDone = document.getElementById("pb-btn-done");
 
+// Instant UPI Tip Module Elements ("Chai for Beggy")
+const beggyTipCard = document.getElementById("beggy-tip-card");
+const btcSavedVal = document.getElementById("btc-saved-val");
+const btcPillsRow = document.getElementById("btc-pills-row");
+const btcCustomToggle = document.getElementById("btc-custom-toggle");
+const btcCustomWrap = document.getElementById("btc-custom-wrap");
+const btcCustomInput = document.getElementById("btc-custom-input");
+const btcCustomApplyBtn = document.getElementById("btc-custom-apply-btn");
+const btcPayBtn = document.getElementById("btc-pay-btn");
+const btcPayMainText = document.getElementById("btc-pay-main-text");
+const btcQrImg = document.getElementById("btc-qr-img");
+const btcUpiIdVal = document.getElementById("btc-upi-id-val");
+const btcCopyBtn = document.getElementById("btc-copy-btn");
+const btcCopyBtnText = document.getElementById("btc-copy-btn-text");
+const pbTipBanner = document.getElementById("pb-tip-banner");
+const pbTipBtn = document.getElementById("pb-tip-btn");
+
 // Cart Drawer elements
 const cartDrawer = document.getElementById("cart-drawer");
 const cartBackdrop = document.getElementById("cart-backdrop");
@@ -1615,6 +1643,11 @@ function triggerOrderArrival() {
   revealSavedAmount.textContent = `₹${savedAmount.toFixed(2)}`;
   rsAmountVal.textContent = `₹${savedAmount.toFixed(2)}`;
 
+  if (btcSavedVal) {
+    btcSavedVal.textContent = `₹${savedAmount.toFixed(0)}`;
+  }
+  updateUpiTipUI(currentTipAmount || 10);
+
   // Rotating joke
   if (dopamineJoke) {
     const randomJoke = PUNCHLINES[Math.floor(Math.random() * PUNCHLINES.length)];
@@ -2011,6 +2044,57 @@ function resetAllUserData() {
   }
 }
 
+// ── INSTANT UPI TIP MODULE ("CHAI FOR BEGGY" — DIRECT TO BANK) ─────────────
+let currentTipAmount = 10;
+
+function generateUpiUri(amount) {
+  const pa = BEGGY_UPI_CONFIG.pa || "beggy@upi";
+  const pn = encodeURIComponent(BEGGY_UPI_CONFIG.pn || "Beggy Creator");
+  const am = Number(amount || 10).toFixed(2);
+  const cu = "INR";
+  const tn = encodeURIComponent(BEGGY_UPI_CONFIG.note || "Chai for Beggy");
+  return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
+}
+
+function updateUpiTipUI(amount) {
+  currentTipAmount = Number(amount) || 10;
+  const upiUri = generateUpiUri(currentTipAmount);
+
+  // Update primary mobile 1-tap UPI link
+  if (btcPayBtn) {
+    btcPayBtn.href = upiUri;
+  }
+  if (btcPayMainText) {
+    btcPayMainText.textContent = `Pay ₹${currentTipAmount} via UPI`;
+  }
+
+  // Update dynamic desktop QR code
+  if (btcQrImg) {
+    const encodedUpi = encodeURIComponent(upiUri);
+    btcQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodedUpi}`;
+  }
+
+  // Update displayed UPI ID
+  if (btcUpiIdVal) {
+    btcUpiIdVal.textContent = BEGGY_UPI_CONFIG.pa || "beggy@upi";
+  }
+
+  // Update passbook modal tip button
+  if (pbTipBtn) {
+    pbTipBtn.href = generateUpiUri(10);
+  }
+}
+
+window.setBeggyUpiId = function(newId) {
+  if (!newId || !newId.trim()) return;
+  BEGGY_UPI_CONFIG.pa = newId.trim();
+  try {
+    localStorage.setItem("beggy_creator_upi", newId.trim());
+  } catch (e) {}
+  updateUpiTipUI(currentTipAmount);
+  console.log("Beggy Creator UPI ID updated to:", newId.trim());
+};
+
 // ── QUICK CRAVING MODE & URL CHALLENGE (F1, F9) ──────────────────────────────
 function switchDiscoveryMode(mode) {
   state.discoveryMode = mode;
@@ -2249,6 +2333,82 @@ function setupEventListeners() {
   if (passbookBackdrop) passbookBackdrop.addEventListener("click", closePassbookModal);
   if (pbBtnDone) pbBtnDone.addEventListener("click", closePassbookModal);
   if (pbBtnReset) pbBtnReset.addEventListener("click", resetAllUserData);
+
+  // ── INSTANT UPI TIP MODULE LISTENERS ──
+  if (btcPillsRow) {
+    const pills = btcPillsRow.querySelectorAll(".btc-pill:not(#btc-custom-toggle)");
+    pills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        btcPillsRow.querySelectorAll(".btc-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        if (btcCustomWrap) btcCustomWrap.style.display = "none";
+        const amt = Number(pill.dataset.amount) || 10;
+        updateUpiTipUI(amt);
+      });
+    });
+  }
+
+  if (btcCustomToggle) {
+    btcCustomToggle.addEventListener("click", () => {
+      btcPillsRow.querySelectorAll(".btc-pill").forEach(p => p.classList.remove("active"));
+      btcCustomToggle.classList.add("active");
+      if (btcCustomWrap) {
+        const isHidden = btcCustomWrap.style.display === "none" || !btcCustomWrap.style.display;
+        btcCustomWrap.style.display = isHidden ? "flex" : "none";
+        if (isHidden && btcCustomInput) {
+          btcCustomInput.focus();
+        }
+      }
+    });
+  }
+
+  if (btcCustomApplyBtn && btcCustomInput) {
+    const applyCustomTip = () => {
+      const amt = Math.max(1, Math.min(10000, Number(btcCustomInput.value) || 10));
+      btcCustomInput.value = amt;
+      updateUpiTipUI(amt);
+    };
+    btcCustomApplyBtn.addEventListener("click", applyCustomTip);
+    btcCustomInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyCustomTip();
+      }
+    });
+  }
+
+  if (btcCopyBtn) {
+    btcCopyBtn.addEventListener("click", () => {
+      const idToCopy = BEGGY_UPI_CONFIG.pa || "beggy@upi";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(idToCopy).then(() => {
+          if (btcCopyBtnText) btcCopyBtnText.textContent = "✓ Copied!";
+          setTimeout(() => {
+            if (btcCopyBtnText) btcCopyBtnText.textContent = "📋 Copy";
+          }, 2500);
+        }).catch(() => {
+          prompt("Copy this UPI ID:", idToCopy);
+        });
+      } else {
+        prompt("Copy this UPI ID:", idToCopy);
+      }
+    });
+  }
+
+  if (btcUpiIdVal) {
+    btcUpiIdVal.title = "Click to set creator UPI ID";
+    btcUpiIdVal.style.cursor = "pointer";
+    btcUpiIdVal.addEventListener("click", () => {
+      const custom = prompt("Enter your personal UPI ID for direct bank deposits (e.g. name@okhdfcbank, mobile@paytm):", BEGGY_UPI_CONFIG.pa);
+      if (custom && custom.trim()) {
+        window.setBeggyUpiId(custom);
+        alert(`UPI ID successfully set to: ${custom.trim()}! All tips will now route directly to your account.`);
+      }
+    });
+  }
+
+  // Initialize UPI UI with default amount (₹10 Chai)
+  updateUpiTipUI(10);
 
   // Discovery Mode tabs (F1)
   if (tabBrowseRestaurants) {

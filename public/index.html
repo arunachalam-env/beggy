@@ -547,6 +547,85 @@
           </button>
         </div>
 
+        <!-- ==============================================================
+             INSTANT UPI TIP MODULE ("CHAI FOR BEGGY" — DIRECT TO BANK)
+             ============================================================== -->
+        <div class="beggy-tip-card" id="beggy-tip-card">
+          <div class="btc-header">
+            <div class="btc-badge">☕ KEEP BEGGY 100% FREE</div>
+            <h3 class="btc-title">Saved <span id="btc-saved-val">₹340</span>? Tip ₹10 Chai!</h3>
+            <p class="btc-sub">Swiggy charges a ₹10 platform fee on every delivery. Since Beggy saved your bill today, buy the solo developer a cutting chai with <strong>instant 1-tap UPI</strong>!</p>
+          </div>
+
+          <!-- Quick Tip Amount Selector -->
+          <div class="btc-pills-row" id="btc-pills-row">
+            <button class="btc-pill active" data-amount="10" type="button">
+              <span class="btc-pill-price">₹10</span>
+              <span class="btc-pill-name">Chai ☕</span>
+            </button>
+            <button class="btc-pill" data-amount="20" type="button">
+              <span class="btc-pill-price">₹20</span>
+              <span class="btc-pill-name">Filter Coffee ☕</span>
+            </button>
+            <button class="btc-pill" data-amount="50" type="button">
+              <span class="btc-pill-price">₹50</span>
+              <span class="btc-pill-name">Masala Dosa 🥞</span>
+            </button>
+            <button class="btc-pill" data-amount="100" type="button">
+              <span class="btc-pill-price">₹100</span>
+              <span class="btc-pill-name">Beggy Hero 👑</span>
+            </button>
+            <button class="btc-pill btc-pill-custom-toggle" id="btc-custom-toggle" type="button">
+              <span class="btc-pill-price">✏️</span>
+              <span class="btc-pill-name">Custom</span>
+            </button>
+          </div>
+
+          <!-- Custom Amount Input Field (hidden by default) -->
+          <div class="btc-custom-wrap" id="btc-custom-wrap" style="display: none;">
+            <div class="btc-custom-input-box">
+              <span class="btc-custom-currency">₹</span>
+              <input type="number" id="btc-custom-input" min="1" max="10000" step="1" placeholder="Enter tip amount" value="10">
+            </div>
+            <button class="btc-custom-apply-btn" id="btc-custom-apply-btn" type="button">Apply</button>
+          </div>
+
+          <!-- Primary Mobile 1-Tap UPI Button -->
+          <div class="btc-action-wrap">
+            <a href="upi://pay?pa=beggy@upi&pn=Beggy%20Creator&am=10&cu=INR&tn=Chai%20for%20Beggy" class="btc-pay-btn" id="btc-pay-btn">
+              <div class="btc-pay-glow"></div>
+              <span class="btc-pay-icon">⚡</span>
+              <div class="btc-pay-labels">
+                <span class="btc-pay-main" id="btc-pay-main-text">Pay ₹10 via UPI</span>
+                <span class="btc-pay-apps">GPay • PhonePe • Paytm • CRED • BHIM</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Desktop QR Code & Copy UPI Section -->
+          <div class="btc-desktop-section" id="btc-desktop-section">
+            <div class="btc-divider">
+              <span>OR SCAN WITH PHONE CAMERA / UPI APP</span>
+            </div>
+            <div class="btc-desktop-content">
+              <div class="btc-qr-frame">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi%3A%2F%2Fpay%3Fpa%3Dbeggy%40upi%26pn%3DBeggy%2520Creator%26am%3D10%26cu%3DINR%26tn%3DChai%2520for%2520Beggy" alt="Scan UPI QR Code to Tip" id="btc-qr-img" class="btc-qr-img" />
+              </div>
+              <div class="btc-desktop-info">
+                <div class="btc-scan-tip">📱 Open Google Pay, PhonePe, Paytm or Camera &amp; point here</div>
+                <div class="btc-copy-box">
+                  <span class="btc-upi-label">UPI ID:</span>
+                  <code class="btc-upi-id" id="btc-upi-id-val">beggy@upi</code>
+                  <button class="btc-copy-btn" id="btc-copy-btn" type="button" title="Copy UPI ID">
+                    <span id="btc-copy-btn-text">📋 Copy</span>
+                  </button>
+                </div>
+                <div class="btc-settlement-note">✓ 100% direct bank settlement • 0-second transfer • Zero platform commission</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Beggy Savings Account Passbook Card -->
         <div class="savings-account-card" id="savings-account-card">
           <div class="sa-top">
@@ -749,6 +828,20 @@
           <strong class="pb-stat-val" id="pb-stat-cravings">0</strong>
           <span class="pb-stat-sub">Takeouts resisted</span>
         </div>
+      </div>
+
+      <!-- Support Beggy Creator Passbook Tip Banner -->
+      <div class="pb-tip-banner" id="pb-tip-banner">
+        <div class="pb-tip-left">
+          <span class="pb-tip-icon">☕</span>
+          <div class="pb-tip-text">
+            <strong>Enjoying your Beggy savings?</strong>
+            <p>Buy the developer a ₹10 Chai with 1-tap UPI to keep this simulator 100% ad-free &amp; free forever!</p>
+          </div>
+        </div>
+        <a href="upi://pay?pa=beggy@upi&pn=Beggy%20Creator&am=10&cu=INR&tn=Chai%20from%20Beggy%20Vault" class="pb-tip-btn" id="pb-tip-btn">
+          <span>Tip ₹10 ☕</span>
+        </a>
       </div>
 
       <!-- Milestone Badges Grid -->

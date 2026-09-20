@@ -33,9 +33,9 @@
   --amazon-orange: #FF9900;
   --amazon-hover: #E68A00;
 
-  /* Typography Scale */
+  /* Typography Scale — Modern Plus Jakarta Sans across the entire application */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Radii & Shadows */
   --radius-xs: 4px;
@@ -781,7 +781,7 @@ body {
   flex-direction: column;
   transition: var(--transition);
   position: relative;
-  /* NOTE: No overflow:hidden here — the +ADD button hangs -18px below image */
+  /* NOTE: No overflow:hidden here — the +ADD button hangs -16px below image */
 }
 
 .dish-card:hover {
@@ -793,9 +793,10 @@ body {
 .dish-img-wrap {
   position: relative;
   width: 100%;
-  height: 180px;
+  height: 220px;
   background: #E2E8F0;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden; /* clips image only — NOT the parent card */
 }
 
 .dish-img {
@@ -3343,4 +3344,460 @@ body {
   }
 }
 
+/* ====================================================================
+   INSTANT UPI TIP MODULE ("CHAI FOR BEGGY" — 0-SECOND SETTLEMENT)
+   ==================================================================== */
+.beggy-tip-card {
+  background: linear-gradient(180deg, rgba(28, 32, 42, 0.96) 0%, rgba(20, 23, 30, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 20px rgba(245, 158, 11, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 22px 20px;
+  margin: 22px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.beggy-tip-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #FF5200, #F59E0B, #10B981);
+}
+
+.btc-header {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.btc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.btc-title {
+  font-size: 1.32rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.25;
+  margin: 0 0 6px;
+}
+
+.btc-title span {
+  color: #10B981;
+}
+
+.btc-sub {
+  font-size: 0.86rem;
+  color: #9CA3AF;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.btc-sub strong {
+  color: #F3F4F6;
+}
+
+/* ── Tip Amount Pills ── */
+.btc-pills-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+  scrollbar-width: none;
+}
+
+.btc-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.btc-pill {
+  flex: 1;
+  min-width: 68px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 10px;
+  color: #F3F4F6;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btc-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-1px);
+}
+
+.btc-pill.active {
+  background: linear-gradient(135deg, rgba(255, 82, 0, 0.22), rgba(245, 158, 11, 0.28));
+  border-color: #FF5200;
+  box-shadow: 0 0 14px rgba(255, 82, 0, 0.35);
+}
+
+.btc-pill-price {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.btc-pill-name {
+  font-size: 0.7rem;
+  color: #9CA3AF;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.btc-pill.active .btc-pill-name {
+  color: #FDBA74;
+  font-weight: 700;
+}
+
+/* ── Custom Amount Wrap ── */
+.btc-custom-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.btc-custom-input-box {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  flex: 1;
+}
+
+.btc-custom-currency {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #10B981;
+  margin-right: 6px;
+}
+
+.btc-custom-input-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: 700;
+  width: 100%;
+}
+
+.btc-custom-apply-btn {
+  background: #FF5200;
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btc-custom-apply-btn:hover {
+  opacity: 0.9;
+}
+
+/* ── Primary Mobile 1-Tap UPI Button ── */
+.btc-action-wrap {
+  margin-bottom: 16px;
+}
+
+.btc-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #FF5200 0%, #EA580C 50%, #D97706 100%);
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 14px;
+  padding: 15px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(255, 82, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btc-pay-btn:hover {
+  box-shadow: 0 10px 30px rgba(255, 82, 0, 0.45);
+  transform: translateY(-2px);
+}
+
+.btc-pay-btn:active {
+  transform: scale(0.98);
+}
+
+.btc-pay-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-20deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20% { left: 200%; }
+  100% { left: 200%; }
+}
+
+.btc-pay-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.btc-pay-labels {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.btc-pay-main {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+}
+
+.btc-pay-apps {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ── Desktop QR Code & Copy Section ── */
+.btc-desktop-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.btc-divider {
+  text-align: center;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.btc-divider span {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  background: #181B23;
+  padding: 0 10px;
+}
+
+.btc-desktop-content {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.btc-qr-frame {
+  background: #FFFFFF;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btc-qr-img {
+  width: 130px;
+  height: 130px;
+  display: block;
+}
+
+.btc-desktop-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  max-width: 300px;
+}
+
+.btc-scan-tip {
+  font-size: 0.82rem;
+  color: #E5E7EB;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.btc-copy-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.btc-upi-label {
+  font-size: 0.74rem;
+  color: #9CA3AF;
+  font-weight: 600;
+}
+
+.btc-upi-id {
+  font-family: monospace;
+  font-size: 0.84rem;
+  color: #FBBF24;
+  font-weight: 700;
+  flex: 1;
+  word-break: break-all;
+}
+
+.btc-copy-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btc-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #F59E0B;
+}
+
+.btc-settlement-note {
+  font-size: 0.72rem;
+  color: #10B981;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ── Passbook Tip Banner ── */
+.pb-tip-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(255, 82, 0, 0.08));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin: 16px 0;
+}
+
+.pb-tip-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pb-tip-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.pb-tip-text strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #FBBF24;
+}
+
+.pb-tip-text p {
+  font-size: 0.76rem;
+  color: #D1D5DB;
+  margin: 2px 0 0;
+  line-height: 1.35;
+}
+
+.pb-tip-btn {
+  background: #F59E0B;
+  color: #111827;
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.pb-tip-btn:active {
+  transform: scale(0.96);
+}
+
+/* ── Mobile Viewport Tweaks for Tip Card ── */
+@media (max-width: 600px) {
+  .beggy-tip-card {
+    padding: 18px 14px;
+    margin: 18px 0;
+  }
+
+  .btc-title {
+    font-size: 1.18rem;
+  }
+
+  .btc-desktop-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .btc-desktop-info {
+    text-align: center;
+    align-items: center;
+  }
+
+  .pb-tip-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .pb-tip-left {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .pb-tip-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
 
