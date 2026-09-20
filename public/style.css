@@ -771,12 +771,12 @@ body {
   background: var(--bg-surface);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   transition: var(--transition);
   position: relative;
+  /* NOTE: No overflow:hidden here — the +ADD button hangs -18px below image */
 }
 
 .dish-card:hover {
@@ -1290,6 +1290,53 @@ body {
 .pay-btn-sub {
   font-size: 0.72rem;
   opacity: 0.9;
+}
+
+/* ── 🧪 CHECKOUT SIMULATION BANNER (P0 Trust Fix) ─────────────────────────── */
+.checkout-sim-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #FFF8E1;
+  border: 1.5px solid #F9A825;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.sim-banner-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.sim-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sim-banner-text strong {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: #E65100;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sim-banner-text span {
+  font-size: 0.77rem;
+  color: #5D4037;
+  line-height: 1.45;
+}
+
+.checkout-trust-tagline {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 10px;
+  letter-spacing: 0.01em;
 }
 
 /* ── STAGE 4: LIVE TRACKING & GPS MAP VIEW ───────────────────────────────── */
