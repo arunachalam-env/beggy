@@ -6,7 +6,7 @@
   <title>Beggy — Crave It. Simulate It. Save the Bill.</title>
   <meta name="description" content="Feel the full dopamine rush of ordering takeout in Bengaluru for ₹0, track the rider live, and turn the bill into real personal savings.">
   <meta name="theme-color" content="#FF5200">
-  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="icon" type="image/png" href="logo.png">
 
   <link rel="canonical" href="https://beggy.vercel.app/">
 
@@ -15,18 +15,18 @@
   <meta property="og:url" content="https://beggy.vercel.app/">
   <meta property="og:title" content="Beggy — Crave It. Simulate It. Save the Bill.">
   <meta property="og:description" content="Feel the full ordering thrill for ₹0, watch the rider move, and turn the food bill into real personal savings. The 45-second craving killer.">
-  <meta property="og:image" content="https://beggy.vercel.app/logo.jpg">
+  <meta property="og:image" content="https://beggy.vercel.app/logo.png">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://beggy.vercel.app/">
   <meta name="twitter:title" content="Beggy — Order Nothing. Save Everything.">
   <meta name="twitter:description" content="Turn midnight impulse food cravings into a visible savings score. 100% simulated, 100% money saved.">
-  <meta name="twitter:image" content="https://beggy.vercel.app/logo.jpg">
+  <meta name="twitter:image" content="https://beggy.vercel.app/logo.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
   <meta name="keywords" content="Beggy, anti-spending app, food delivery simulator, Bengaluru food delivery savings, Swiggy craving killer, Zomato impulse craving, save money takeout, dopamine food simulator, Bangalore biryani savings">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="robots" content="index, follow">
@@ -91,7 +91,7 @@
       <div class="brand-group">
         <!-- New Brand Logo with Uploaded Beggy Icon -->
         <a href="#" class="brand-logo" id="nav-brand-home" aria-label="Beggy Home">
-          <img src="logo.jpg" alt="Beggy Logo" class="brand-logo-img" />
+          <img src="logo.png" alt="Beggy Logo" class="brand-logo-img" />
           <div class="logo-text">
             <span class="logo-title">beggy</span>
             <span class="logo-sub">smart food delivery</span>
@@ -306,19 +306,6 @@
       <div class="dishes-list-container" id="dishes-list-container">
         <!-- Injected dynamically via script.js -->
       </div>
-
-      <!-- Sticky Floating Bottom Cart Strip (When items added) -->
-      <div class="floating-cart-bar" id="floating-cart-bar" style="display: none;">
-        <div class="floating-cart-info">
-          <span class="fc-count" id="fc-count">1 Item</span>
-          <span class="fc-sep">|</span>
-          <span class="fc-total" id="fc-total">₹340.00</span>
-        </div>
-        <button class="floating-cart-btn" id="fc-proceed-btn">
-          <span>View Cart & Checkout</span>
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </button>
-      </div>
     </section>
 
     <!-- ====================================================================
@@ -478,6 +465,17 @@
             </p>
           </div>
         </div>
+      </div>
+
+      <!-- Mobile Sticky Place Order Bar (Always accessible at bottom on mobile checkout) -->
+      <div class="mobile-sticky-pay-bar" id="mobile-sticky-pay-bar">
+        <div class="msp-info">
+          <span class="msp-label">TO PAY</span>
+          <span class="msp-amount" id="msp-to-pay">₹0.00</span>
+        </div>
+        <button class="msp-pay-btn" id="msp-pay-btn" type="button">
+          <span>Pay &amp; Place Order 🚀</span>
+        </button>
       </div>
     </section>
 
@@ -826,6 +824,19 @@
       </div>
     </section>
 
+    <!-- Global Sticky Floating Bottom Cart Strip (Available whenever items added) -->
+    <div class="floating-cart-bar" id="floating-cart-bar" style="display: none;">
+      <div class="floating-cart-info">
+        <span class="fc-count" id="fc-count">1 Item</span>
+        <span class="fc-sep">|</span>
+        <span class="fc-total" id="fc-total">₹340.00</span>
+      </div>
+      <button class="floating-cart-btn" id="fc-proceed-btn" type="button">
+        <span>View Cart &amp; Checkout</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+
   </main>
 
   <!-- Sliding Beggy Cart Drawer -->
@@ -878,7 +889,7 @@
   <footer class="app-footer">
     <div class="footer-container">
       <div class="footer-brand">
-        <img src="logo.jpg" alt="Beggy Logo" class="footer-logo-img" />
+        <img src="logo.png" alt="Beggy Logo" class="footer-logo-img" />
         <span class="footer-logo">beggy</span>
         <p>The revolutionary anti-spending dopamine platform giving you the full excitement of food delivery while keeping 100% of your money in your savings account.</p>
       </div>
@@ -967,29 +978,6 @@
   </div>
 
   <div class="passbook-backdrop" id="passbook-backdrop"></div>
-
-
-  <!-- ====================================================================
-       AMAZON SLIDE BANNER (5-SECOND LANDING — SUBTLE, VALUE-FIRST)
-       ==================================================================== -->
-  <div class="asb-banner" id="amazon-slide-banner" style="display: none;" role="complementary">
-    <div class="asb-inner">
-      <div class="asb-content">
-        <span class="asb-icon">👨‍🍳</span>
-        <div class="asb-text">
-          <strong>Cook any restaurant dish at home for ₹85!</strong>
-          <span>Gourmet spices, basmati rice, ghee & more on Amazon</span>
-        </div>
-      </div>
-      <div class="asb-actions">
-        <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" target="_blank" rel="noopener noreferrer" class="asb-cta" id="asb-cta-btn">
-          🛒 Shop Fresh Ingredients →
-        </a>
-        <button class="asb-close" id="asb-close-btn" aria-label="Close banner" type="button">&times;</button>
-      </div>
-    </div>
-    <p class="asb-disclosure">*As an Amazon Associate, Beggy earns from qualifying purchases.</p>
-  </div>
 
   <!-- ====================================================================
        POST-DELIVERY MODAL (AMAZON ONLY — EARNED, NOT BEGGING)

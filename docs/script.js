@@ -1349,6 +1349,16 @@ function switchView(viewName) {
       if (map) map.invalidateSize();
     }, 200);
   }
+
+  // Refresh floating cart bar visibility across views
+  try { updateFloatingCartBar(); } catch (e) {}
+
+  // Sync mobile sticky pay bar amount when entering payment view
+  if (viewName === "payment") {
+    const mspToPay = document.getElementById("msp-to-pay");
+    const billToPay = document.getElementById("bill-to-pay");
+    if (mspToPay && billToPay) mspToPay.textContent = billToPay.textContent;
+  }
 }
 
 // ── STAGE 1: Render Restaurants ──────────────────────────────────────────────
@@ -1507,7 +1517,8 @@ function updateCartUI() {
 }
 
 function updateFloatingCartBar() {
-  if (state.cart.length === 0 || state.currentView !== "menu") {
+  if (!floatingCartBar) return;
+  if (state.cart.length === 0 || (state.currentView !== "restaurants" && state.currentView !== "menu")) {
     floatingCartBar.style.display = "none";
     return;
   }
@@ -1515,8 +1526,8 @@ function updateFloatingCartBar() {
   const totalCount = state.cart.reduce((sum, i) => sum + i.qty, 0);
   const subtotal = state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
-  fcCount.textContent = `${totalCount} ${totalCount === 1 ? 'Item' : 'Items'}`;
-  fcTotal.textContent = `₹${subtotal.toFixed(2)}`;
+  if (fcCount) fcCount.textContent = `${totalCount} ${totalCount === 1 ? 'Item' : 'Items'}`;
+  if (fcTotal) fcTotal.textContent = `₹${subtotal.toFixed(2)}`;
   floatingCartBar.style.display = "flex";
 }
 
@@ -1538,9 +1549,12 @@ function proceedToPayment() {
   const subtotal = state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
   state.lastOrderSaved = subtotal;
 
-  checkoutRestaurantName.textContent = state.activeRestaurant.name;
+  checkoutRestaurantName.textContent = (state.activeRestaurant && state.activeRestaurant.name) || "Megha's Dum Darbar";
   billItemTotal.textContent = `₹${subtotal.toFixed(2)}`;
   billToPay.textContent = "₹0.00"; // BEGGY100 auto-applied
+
+  const mspToPay = document.getElementById("msp-to-pay");
+  if (mspToPay) mspToPay.textContent = "₹0.00";
 
   checkoutItemsList.innerHTML = state.cart.map(item => `
     <div class="checkout-item-line">
@@ -1556,6 +1570,12 @@ function proceedToPayment() {
 function handlePlaceOrder() {
   if (state.cart.length === 0) return;
 
+  const mspPayBtn = document.getElementById("msp-pay-btn");
+  if (mspPayBtn) {
+    mspPayBtn.disabled = true;
+    mspPayBtn.innerHTML = "<span>Processing UPI Payment...</span>";
+  }
+
   btnPayAndPlaceOrder.disabled = true;
   btnPayAndPlaceOrder.querySelector(".pay-btn-main").textContent = "Processing UPI Payment...";
   btnPayAndPlaceOrder.querySelector(".pay-btn-sub").textContent = "Connecting to bank gateway...";
@@ -1568,6 +1588,11 @@ function handlePlaceOrder() {
     btnPayAndPlaceOrder.disabled = false;
     btnPayAndPlaceOrder.querySelector(".pay-btn-main").textContent = "Pay ₹0.00 & Place Order 🚀";
     btnPayAndPlaceOrder.querySelector(".pay-btn-sub").textContent = "Authentic 20-min express delivery in Bengaluru";
+
+    if (mspPayBtn) {
+      mspPayBtn.disabled = false;
+      mspPayBtn.innerHTML = "<span>Pay &amp; Place Order 🚀</span>";
+    }
 
     // Clear cart
     state.cart = [];
@@ -2549,6 +2574,10 @@ function setupEventListeners() {
   if (btnPayAndPlaceOrder) {
     btnPayAndPlaceOrder.addEventListener("click", handlePlaceOrder);
   }
+  const mspPayBtn = document.getElementById("msp-pay-btn");
+  if (mspPayBtn) {
+    mspPayBtn.addEventListener("click", handlePlaceOrder);
+  }
 
   // Fast-Forward Arrival button on Map
   if (btnSimulateArrival) {
@@ -2788,53 +2817,9 @@ function setupEventListeners() {
   }
 }
 
-// ── AMAZON SLIDE BANNER (5-SEC LANDING — SUBTLE, VALUE-FIRST) ─────────────────
-function showAmazonSlideBanner() {
-  const banner = document.getElementById("amazon-slide-banner");
-  if (!banner) return;
-  banner.style.display = "block";
-  // Force reflow before adding animation class
-  banner.offsetHeight;
-  banner.classList.add("show");
-}
-
-function setupAmazonSlideBanner() {
-  const banner = document.getElementById("amazon-slide-banner");
-  const closeBtn = document.getElementById("asb-close-btn");
-  const ctaBtn = document.getElementById("asb-cta-btn");
-
-  if (!banner) return;
-
-  const dismissBanner = () => {
-    banner.classList.remove("show");
-    setTimeout(() => { banner.style.display = "none"; }, 400);
-    try { sessionStorage.setItem("beggy_asb_dismissed", "1"); } catch (e) {}
-  };
-
-  if (closeBtn) closeBtn.addEventListener("click", dismissBanner);
-  if (ctaBtn) ctaBtn.addEventListener("click", () => { dismissBanner(); });
-
-  // Only show if not already dismissed this session
-  try {
-    if (sessionStorage.getItem("beggy_asb_dismissed") === "1") return;
-  } catch (e) {}
-
-  // 5-second delay on landing — only when user hasn't started ordering
-  setTimeout(() => {
-    if (state.currentView === "tracking" || state.currentView === "reveal") return;
-    try {
-      if (sessionStorage.getItem("beggy_asb_dismissed") === "1") return;
-    } catch (e) {}
-    showAmazonSlideBanner();
-
-    // Auto-dismiss after 15 seconds if user doesn't interact
-    setTimeout(() => {
-      if (banner.classList.contains("show")) {
-        dismissBanner();
-      }
-    }, 15000);
-  }, 5000);
-}
+// ── LANDING SLIDE BANNER (DISABLED PER USER FEEDBACK — NO SCREEN-BLOCKING POPUP) ─
+function showAmazonSlideBanner() {}
+function setupAmazonSlideBanner() {}
 
 // ── POST-DELIVERY MODAL (AMAZON ONLY — EARNED, NOT BEGGING) ──────────────────
 function showPostDeliveryModal(dish, savedAmount) {
