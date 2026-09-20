@@ -1182,9 +1182,9 @@ function renderRestaurantDishes(restId) {
           <span class="${dish.isVeg ? 'veg-icon' : 'nonveg-icon'}"></span>
         </div>
         <span class="dish-eta-badge">⚡ ${dish.eta}</span>
-        <div class="add-btn-wrap">
-          <button class="add-btn" data-add-dish="${dish.id}">+ ADD</button>
-        </div>
+      </div>
+      <div class="add-btn-wrap">
+        <button class="add-btn" data-add-dish="${dish.id}">+ ADD</button>
       </div>
       <div class="dish-card-body">
         <h3 class="dish-title">${dish.title}</h3>
@@ -1346,6 +1346,57 @@ let courierMarker = null;
 let routePolyline = null;
 let courierTimer = null;
 
+// ── Free Real Street Routing API (OSRM) & Navigation Map Helpers ───────────────
+async function fetchOsrmRoute(startCoords, endCoords) {
+  // OSRM expects [lng, lat]
+  const url = `https://router.project-osrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson`;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const resp = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) throw new Error("OSRM status " + resp.status);
+    const data = await resp.json();
+    if (data.routes && data.routes.length > 0 && data.routes[0].geometry) {
+      // GeoJSON coordinates are [lng, lat], Leaflet expects [lat, lng]
+      return data.routes[0].geometry.coordinates.map(pt => [pt[1], pt[0]]);
+    }
+  } catch (err) {
+    console.warn("OSRM routing fallback:", err);
+  }
+  return null;
+}
+
+function getPointAlongPolyline(points, fraction) {
+  if (!points || points.length === 0) return null;
+  if (points.length === 1 || fraction <= 0) return points[0];
+  if (fraction >= 1) return points[points.length - 1];
+
+  const distances = [0];
+  let totalDist = 0;
+  for (let i = 0; i < points.length - 1; i++) {
+    const dLat = points[i + 1][0] - points[i][0];
+    const dLng = points[i + 1][1] - points[i][1];
+    const d = Math.sqrt(dLat * dLat + dLng * dLng);
+    totalDist += d;
+    distances.push(totalDist);
+  }
+
+  if (totalDist === 0) return points[0];
+  const targetDist = fraction * totalDist;
+
+  for (let i = 0; i < distances.length - 1; i++) {
+    if (targetDist >= distances[i] && targetDist <= distances[i + 1]) {
+      const segDist = distances[i + 1] - distances[i];
+      const segFraction = segDist > 0 ? (targetDist - distances[i]) / segDist : 0;
+      const lat = points[i][0] + (points[i + 1][0] - points[i][0]) * segFraction;
+      const lng = points[i][1] + (points[i + 1][1] - points[i][1]) * segFraction;
+      return [lat, lng];
+    }
+  }
+  return points[points.length - 1];
+}
+
 function initLeafletMap() {
   if (typeof L === 'undefined') return;
 
@@ -1360,28 +1411,33 @@ function initLeafletMap() {
   // Create Leaflet map centered at Bengaluru Home
   map = L.map('real-leaflet-map', {
     center: HOME_COORDS,
-    zoom: 13,
+    zoom: 14,
     zoomControl: true
   });
 
-  // CartoDB Dark Matter tiles
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+  // Swiggy-Style Food Delivery Navigation Tiles (CartoDB Voyager: Free, crisp, high-contrast Bengaluru streets)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  // Home marker
+  // Home Delivery Marker with pulsing radar ring
   const homeIcon = L.divIcon({
     className: 'custom-leaflet-pin',
-    html: '<div style="width:16px;height:16px;background:#10B981;border:3px solid #FFFFFF;border-radius:50%;box-shadow:0 0 10px #10B981;"></div>',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10]
+    html: `
+      <div style="position:relative;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;width:34px;height:34px;background:rgba(16,185,129,0.25);border:2px solid #10B981;border-radius:50%;animation:pulsePin 1.8s infinite;"></div>
+        <div style="width:18px;height:18px;background:#10B981;border:3px solid #FFFFFF;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);position:relative;z-index:2;"></div>
+      </div>
+    `,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17]
   });
 
   homeMarker = L.marker(HOME_COORDS, { icon: homeIcon })
     .addTo(map)
-    .bindPopup('<strong>Delivery Location</strong><br>Indiranagar 100ft Road, Bengaluru');
+    .bindPopup('<strong>📍 Delivery Location</strong><br>Indiranagar 100ft Road, HAL 2nd Stage, Bengaluru');
 }
 
 function startLiveTracking() {
@@ -1404,7 +1460,7 @@ function startLiveTracking() {
   document.getElementById("step-node-4").className = "step-node";
 
   trackingStatusTitle.textContent = "Kitchen Preparing Your Order";
-  trackingStatusDesc = `${r.name} is cooking your fresh dishes. Rider arriving shortly.`;
+  trackingStatusDesc.textContent = `${r.name} is cooking your fresh dishes. Rider arriving shortly.`;
 
   setTimeout(() => {
     setupMapRouteAndScooter(r);
@@ -1415,12 +1471,12 @@ function startLiveTracking() {
     document.getElementById("step-node-2").className = "step-node completed";
     document.getElementById("step-line-2").className = "step-line completed";
     document.getElementById("step-node-3").className = "step-node active";
-    trackingStatusTitle.textContent = "Rider on the Way!";
-    trackingStatusDesc.textContent = "Manjunath picked up your piping hot order and is on CMH Road.";
+    trackingStatusTitle.textContent = "Rider On The Way! 🛵";
+    trackingStatusDesc.textContent = "Manjunath picked up your order and is navigating 100ft Road.";
   }, 3500);
 }
 
-function setupMapRouteAndScooter(r) {
+async function setupMapRouteAndScooter(r) {
   if (!map) initLeafletMap();
   if (!map) return;
 
@@ -1429,53 +1485,86 @@ function setupMapRouteAndScooter(r) {
   if (routePolyline) map.removeLayer(routePolyline);
   if (courierTimer) clearInterval(courierTimer);
 
-  // Kitchen Pin
+  // Kitchen Pin with clean badge
   const kitchenIcon = L.divIcon({
     className: 'custom-leaflet-pin',
-    html: '<span style="font-size:1.5rem; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.8));">🍳</span>',
-    iconSize: [30, 30],
-    iconAnchor: [15, 15]
+    html: `<div style="background:#FFFFFF;border:2px solid #FF5200;border-radius:20px;padding:4px 10px;box-shadow:0 3px 10px rgba(0,0,0,0.18);display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:800;color:#0F172A;white-space:nowrap;">🍳 <span>${r.name}</span></div>`,
+    iconSize: [140, 32],
+    iconAnchor: [70, 16]
   });
-  kitchenMarker = L.marker(r.coords, { icon: kitchenIcon }).addTo(map);
+  kitchenMarker = L.marker(r.coords, { icon: kitchenIcon })
+    .addTo(map)
+    .bindPopup(`<strong>${r.name}</strong><br>${r.address}`);
 
-  // Route Polyline
-  const midLat = (r.coords[0] + HOME_COORDS[0]) / 2 + 0.002;
-  const midLng = (r.coords[1] + HOME_COORDS[1]) / 2 - 0.0025;
-  const routePoints = [r.coords, [midLat, midLng], HOME_COORDS];
+  // Fetch real road coordinates via OSRM Driving API (100% Free, real street routing)
+  let routePoints = await fetchOsrmRoute(r.coords, HOME_COORDS);
 
+  // Fallback to realistic Bengaluru road waypoints if offline or blocked
+  if (!routePoints || routePoints.length < 2) {
+    const lat1 = r.coords[0], lng1 = r.coords[1];
+    const lat2 = HOME_COORDS[0], lng2 = HOME_COORDS[1];
+    routePoints = [
+      [lat1, lng1],
+      [lat1 + (lat2 - lat1) * 0.25, lng1 + 0.001],
+      [lat1 + (lat2 - lat1) * 0.50, lng1 + (lng2 - lng1) * 0.40],
+      [lat1 + (lat2 - lat1) * 0.75, lng2 - 0.001],
+      [lat2, lng2]
+    ];
+  }
+
+  // Draw vibrant delivery route polyline along real roads
   routePolyline = L.polyline(routePoints, {
     color: '#FF5200',
-    weight: 4,
-    opacity: 0.85,
-    dashArray: '6, 8'
+    weight: 5,
+    opacity: 0.9,
+    dashArray: '8, 8',
+    lineJoin: 'round'
   }).addTo(map);
 
-  // Scooter Marker
+  // Fit bounds so both kitchen and home are perfectly visible
+  try {
+    map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
+  } catch (e) {}
+
+  // Animated Scooter Marker with vibrant delivery glow
   const scooterIcon = L.divIcon({
     className: 'custom-leaflet-pin scooter-pin',
-    html: '<span style="font-size:1.8rem; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.9));">🛵</span>',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18]
+    html: `<div style="background:#FF5200;width:42px;height:42px;border-radius:50%;border:3px solid #FFFFFF;box-shadow:0 4px 14px rgba(255,82,0,0.6);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🛵</div>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22]
   });
-  courierMarker = L.marker(r.coords, { icon: scooterIcon }).addTo(map);
+  courierMarker = L.marker(routePoints[0], { icon: scooterIcon }).addTo(map);
 
-  // Smooth animation
+  // Smooth turn-by-turn waypoint animation along real Bengaluru roads
   let progress = 0;
+  const totalDurationMs = 12000;
+  const intervalMs = 100;
+  const step = intervalMs / totalDurationMs;
+
   courierTimer = setInterval(() => {
-    progress += 0.02;
-    if (progress >= 0.92) {
+    progress += step;
+    if (progress >= 0.98) {
       clearInterval(courierTimer);
       triggerOrderArrival();
       return;
     }
 
-    const curLat = r.coords[0] + (HOME_COORDS[0] - r.coords[0]) * progress;
-    const curLng = r.coords[1] + (HOME_COORDS[1] - r.coords[1]) * progress;
-    courierMarker.setLatLng([curLat, curLng]);
+    const curPos = getPointAlongPolyline(routePoints, progress);
+    if (curPos && courierMarker) {
+      courierMarker.setLatLng(curPos);
+    }
 
     const remainingMins = Math.max(Math.round((1 - progress) * 18), 1);
     trackingEtaPill.textContent = `ETA: ~${remainingMins} mins`;
-  }, 400);
+
+    if (progress > 0.3 && progress < 0.6) {
+      trackingStatusTitle.textContent = "Rider On 100ft Road 🛵";
+      trackingStatusDesc.textContent = "Manjunath picked up your piping hot order and is on 100ft Road.";
+    } else if (progress >= 0.6 && progress < 0.9) {
+      trackingStatusTitle.textContent = "Turning Into Your Lane 📍";
+      trackingStatusDesc.textContent = "Rider is 300m away, turning towards HAL 2nd Stage.";
+    }
+  }, intervalMs);
 }
 
 // ── Rotating Comedic Second-Beat Punchlines (F4) ──────────────────────────────

@@ -869,39 +869,46 @@ body {
   border-radius: var(--radius-xs);
 }
 
-/* Swiggy Overlapping ADD Button */
-.swiggy-add-btn-wrap {
+/* Beggy Overlapping ADD Button — sits on dish-card, overlapping image & body */
+.add-btn-wrap {
   position: absolute;
-  bottom: -16px;
-  right: 16px;
-  z-index: 10;
+  top: 202px;
+  right: 14px;
+  z-index: 20;
 }
 
-.swiggy-add-btn {
+.add-btn {
   background: #FFFFFF;
-  color: var(--swiggy-veg);
-  border: 1px solid #D4D5D9;
-  font-size: 0.88rem;
+  color: var(--swiggy-orange);
+  border: 2px solid var(--swiggy-orange);
+  font-size: 0.9rem;
   font-weight: 900;
-  padding: 7px 22px;
+  letter-spacing: 0.03em;
+  padding: 8px 24px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(255, 82, 0, 0.25);
   transition: var(--transition);
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
 }
 
-.swiggy-add-btn:hover {
-  border-color: var(--swiggy-veg);
-  background: #F4FBF2;
-  box-shadow: 0 4px 12px rgba(96, 178, 68, 0.25);
-  transform: translateY(-1px);
+.add-btn:hover {
+  background: var(--swiggy-orange);
+  color: #FFFFFF;
+  box-shadow: 0 6px 16px rgba(255, 82, 0, 0.35);
+  transform: translateY(-2px);
 }
+
+/* Legacy alias — keep working if old class used anywhere */
+.swiggy-add-btn-wrap { position: absolute; top: 202px; right: 14px; z-index: 20; }
+.swiggy-add-btn { background: #FFFFFF; color: var(--swiggy-orange); border: 2px solid var(--swiggy-orange); font-size: 0.9rem; font-weight: 900; padding: 8px 24px; border-radius: var(--radius-sm); cursor: pointer; box-shadow: 0 4px 12px rgba(255,82,0,0.25); transition: var(--transition); display: flex; align-items: center; white-space: nowrap; }
+.swiggy-add-btn:hover { background: var(--swiggy-orange); color: #FFFFFF; transform: translateY(-2px); }
 
 .dish-card-body {
-  padding: 24px 16px 16px;
+  padding: 28px 16px 16px; /* extra top padding: button hangs 18px below image */
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -1537,8 +1544,14 @@ body {
 
 .real-leaflet-map {
   width: 100%;
-  height: 380px;
-  background: #1e293b;
+  height: 400px;
+  background: #F8FAFC;
+}
+
+@keyframes pulsePin {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  50% { transform: scale(1.3); opacity: 0.3; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
 .map-legend-footer {
