@@ -2322,11 +2322,9 @@ function setupEventListeners() {
 // ── 10-Second Chef's Recipe Hovering Modal ────────────────────────────────────
 let recipeTakeoverShown = false;
 function init10SecondRecipePopup() {
-  if (sessionStorage.getItem("beggy_recipe_popup_seen")) return;
-
   setTimeout(() => {
     if (recipeTakeoverShown) return;
-    if (state.currentView !== "restaurants" && state.currentView !== "menu") return;
+    if (state.currentView === "tracking" || state.currentView === "reveal") return;
 
     const overlay = document.getElementById("recipe-takeover-overlay");
     const backBtn = document.getElementById("recipe-takeover-back-btn");
@@ -2335,7 +2333,6 @@ function init10SecondRecipePopup() {
     if (overlay && card) {
       overlay.style.display = "flex";
       recipeTakeoverShown = true;
-      sessionStorage.setItem("beggy_recipe_popup_seen", "1");
 
       card.addEventListener("click", (e) => {
         if (e.target.closest("#recipe-takeover-back-btn")) {
