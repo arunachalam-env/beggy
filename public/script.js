@@ -2212,6 +2212,13 @@ function closePassbookModal() {
     passbookModal.classList.remove("show");
     passbookBackdrop.classList.remove("show");
   }
+  // As requested: if user was directed to tipping area from post-delivery and cancels/closes, advance to WhatsApp sharing
+  if (state.pendingShareModalAfterTip) {
+    state.pendingShareModalAfterTip = false;
+    setTimeout(() => {
+      showWhatsAppShareModal();
+    }, 200);
+  }
 }
 
 function resetAllUserData() {
@@ -2251,14 +2258,22 @@ function setupPassbookFounderSupport() {
   const pbCustomInput = document.getElementById("pb-custom-input");
   const pbCustomApplyBtn = document.getElementById("pb-custom-apply-btn");
   const pbTipCtaBtn = document.getElementById("pb-tip-cta-btn");
+  const pbQrToggleBtn = document.getElementById("pb-qr-toggle-btn");
+  const pbQrBox = document.getElementById("pb-qr-box");
+  const pbQrImg = document.getElementById("pb-qr-img");
+  const pbCopyUpiBtn = document.getElementById("pb-copy-upi-btn");
 
   let selectedAmount = 10;
 
   function updatePassbookTip(amount) {
-    selectedAmount = Math.max(1, Math.min(500, Number(amount) || 10));
+    selectedAmount = Math.max(1, Math.min(50000, Number(amount) || 10));
+    const upiUri = generateUpiUri(selectedAmount, "Fund the young founder");
     if (pbTipCtaBtn) {
-      pbTipCtaBtn.href = generateUpiUri(selectedAmount, "Fund the young founder");
+      pbTipCtaBtn.href = upiUri;
       pbTipCtaBtn.innerHTML = `<span>⚡ Fund ₹${selectedAmount} via UPI</span>`;
+    }
+    if (pbQrImg) {
+      pbQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiUri)}`;
     }
   }
 
@@ -2293,7 +2308,7 @@ function setupPassbookFounderSupport() {
 
   if (pbCustomApplyBtn && pbCustomInput) {
     const applyCustom = () => {
-      const amt = Math.max(1, Math.min(500, Number(pbCustomInput.value) || 50));
+      const amt = Math.max(1, Math.min(50000, Number(pbCustomInput.value) || 100));
       pbCustomInput.value = amt;
       updatePassbookTip(amt);
     };
@@ -2303,6 +2318,28 @@ function setupPassbookFounderSupport() {
         e.preventDefault();
         applyCustom();
       }
+    });
+  }
+
+  if (pbQrToggleBtn && pbQrBox) {
+    pbQrToggleBtn.addEventListener("click", () => {
+      const isHidden = pbQrBox.style.display === "none" || !pbQrBox.style.display;
+      pbQrBox.style.display = isHidden ? "flex" : "none";
+      pbQrToggleBtn.textContent = isHidden ? "✕ Hide QR Code" : "💻 On Laptop? Click to Scan UPI QR Code";
+    });
+  }
+
+  if (pbCopyUpiBtn) {
+    pbCopyUpiBtn.addEventListener("click", () => {
+      const upiId = (BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi").trim();
+      navigator.clipboard.writeText(upiId).then(() => {
+        pbCopyUpiBtn.textContent = "✓ UPI ID Copied!";
+        setTimeout(() => {
+          pbCopyUpiBtn.textContent = "📋 Copy UPI ID";
+        }, 2500);
+      }).catch(() => {
+        prompt("Copy UPI ID:", upiId);
+      });
     });
   }
 
@@ -2738,6 +2775,7 @@ function setupPostDeliveryModal() {
   const nextBtn = document.getElementById("pdm-next-btn");
   const dismissBtn = document.getElementById("pdm-dismiss-btn");
   const amazonBtn = document.getElementById("pdm-amazon-btn");
+  const founderBtn = document.getElementById("pdm-founder-btn");
 
   if (!modal) return;
 
@@ -2748,6 +2786,27 @@ function setupPostDeliveryModal() {
       showWhatsAppShareModal();
     }, 150);
   };
+
+  // Top Layer: Fund the Young Founder link
+  if (founderBtn) {
+    founderBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      state.pendingShareModalAfterTip = true;
+      openPassbookModal();
+      const supportDetails = document.getElementById("pb-support-details");
+      if (supportDetails) {
+        supportDetails.open = true;
+        supportDetails.classList.add("pb-highlight-pulse");
+        setTimeout(() => {
+          supportDetails.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 120);
+        setTimeout(() => {
+          supportDetails.classList.remove("pb-highlight-pulse");
+        }, 3000);
+      }
+      Analytics.track("post_delivery_founder_clicked");
+    });
+  }
 
   if (closeBtn) closeBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
   if (nextBtn) nextBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
@@ -2773,7 +2832,7 @@ function setupPostDeliveryModal() {
   });
 }
 
-// ── POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP VIRAL SHARE ───────────────────
+// ── POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP & SOCIAL VIRAL SHARE ───────────
 function showWhatsAppShareModal() {
   const modal = document.getElementById("whatsapp-share-modal");
   if (!modal) return;
@@ -2810,6 +2869,11 @@ function setupWhatsAppShareModal() {
   const waBtn = document.getElementById("wsm-btn-whatsapp");
   const copyBtn = document.getElementById("wsm-btn-copy");
   const downloadBtn = document.getElementById("wsm-btn-download");
+  const twitterBtn = document.getElementById("wsm-btn-twitter");
+  const instagramBtn = document.getElementById("wsm-btn-instagram");
+  const telegramBtn = document.getElementById("wsm-btn-telegram");
+  const linkedinBtn = document.getElementById("wsm-btn-linkedin");
+  const nativeShareBtn = document.getElementById("wsm-btn-native-share");
 
   if (!modal) return;
 
@@ -2840,6 +2904,102 @@ function setupWhatsAppShareModal() {
       const { text } = getChallengeLinkData();
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
       Analytics.track("whatsapp_share_modal_shared");
+    });
+  }
+
+  // 𝕏 (Twitter) Share
+  if (twitterBtn) {
+    twitterBtn.addEventListener("click", () => {
+      const { challengeUrl, dish, amount } = getChallengeLinkData();
+      const tweetText = `🍗❌ Craved ${dish}? It was never ordered, but I just kept ₹${Math.round(amount)} in my bank with @BeggyApp! Can you beat my savings streak?\n\nTry it:`;
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(challengeUrl)}`, "_blank", "noopener,noreferrer");
+      Analytics.track("share_modal_twitter");
+    });
+  }
+
+  // Instagram Story Share
+  if (instagramBtn) {
+    instagramBtn.addEventListener("click", () => {
+      const { text } = getChallengeLinkData();
+      downloadShareCard();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+      showShareToast("📥 Story card downloaded & challenge text copied! Opening Instagram...");
+      setTimeout(() => {
+        window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+      }, 1200);
+      Analytics.track("share_modal_instagram");
+    });
+  }
+
+  // Telegram Share
+  if (telegramBtn) {
+    telegramBtn.addEventListener("click", () => {
+      const { challengeUrl, text } = getChallengeLinkData();
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(challengeUrl)}&text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      Analytics.track("share_modal_telegram");
+    });
+  }
+
+  // LinkedIn Share
+  if (linkedinBtn) {
+    linkedinBtn.addEventListener("click", () => {
+      const { challengeUrl } = getChallengeLinkData();
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(challengeUrl)}`, "_blank", "noopener,noreferrer");
+      Analytics.track("share_modal_linkedin");
+    });
+  }
+
+  // Native Share Sheet (Snapchat, SMS, Reddit, etc.)
+  if (nativeShareBtn) {
+    nativeShareBtn.addEventListener("click", async () => {
+      const { challengeUrl, text } = getChallengeLinkData();
+      if (navigator.share) {
+        try {
+          if (shareCardCanvas && navigator.canShare) {
+            shareCardCanvas.toBlob(async (blob) => {
+              try {
+                if (blob && navigator.canShare({ files: [new File([blob], "beggy-savings.png", { type: "image/png" })] })) {
+                  const file = new File([blob], "beggy-savings.png", { type: "image/png" });
+                  await navigator.share({
+                    title: "Beggy Savings Challenge",
+                    text: text,
+                    files: [file]
+                  });
+                } else {
+                  await navigator.share({
+                    title: "Beggy Savings Challenge",
+                    text: text,
+                    url: challengeUrl
+                  });
+                }
+              } catch (err) {
+                if (err && err.name !== "AbortError") {
+                  showShareToast(`✓ Challenge link: ${challengeUrl}`);
+                }
+              }
+            }, "image/png");
+          } else {
+            await navigator.share({
+              title: "Beggy Savings Challenge",
+              text: text,
+              url: challengeUrl
+            });
+          }
+          Analytics.track("share_modal_native_shared");
+        } catch (err) {
+          if (err && err.name !== "AbortError") {
+            showShareToast(`✓ Challenge link: ${challengeUrl}`);
+          }
+        }
+      } else {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            showShareToast("✓ Challenge text & link copied!");
+          });
+        }
+      }
     });
   }
 

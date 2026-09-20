@@ -818,20 +818,30 @@
           <p class="pss-desc">Support the solo student creator with direct 1-tap UPI to keep Beggy 100% ad-free &amp; free forever.</p>
           <div class="pb-tip-pills" id="pb-tip-pills">
             <button class="pb-tip-pill active" data-amount="10" type="button">₹10</button>
-            <button class="pb-tip-pill" data-amount="50" type="button">₹50</button>
             <button class="pb-tip-pill" data-amount="100" type="button">₹100</button>
+            <button class="pb-tip-pill" data-amount="1000" type="button">₹1000</button>
+            <button class="pb-tip-pill" data-amount="2000" type="button">₹2000</button>
             <button class="pb-tip-pill pb-pill-any" id="pb-any-toggle" type="button">Any</button>
           </div>
           <div class="pb-custom-wrap" id="pb-custom-wrap" style="display: none;">
             <div class="pb-custom-input-box">
               <span>₹</span>
-              <input type="number" id="pb-custom-input" min="1" max="500" step="1" placeholder="Max 500" value="50">
+              <input type="number" id="pb-custom-input" min="1" max="50000" step="1" placeholder="Enter amount" value="100">
             </div>
             <button class="pb-custom-apply-btn" id="pb-custom-apply-btn" type="button">Set</button>
           </div>
           <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20founder" class="pb-tip-cta-btn" id="pb-tip-cta-btn">
             <span>⚡ Fund ₹10 via UPI</span>
           </a>
+          <!-- Desktop QR Code Fallback & Copy UPI ID -->
+          <div class="pb-desktop-qr-area">
+            <button class="pb-qr-toggle-btn" id="pb-qr-toggle-btn" type="button">💻 On Laptop? Click to Scan UPI QR Code</button>
+            <div class="pb-qr-box" id="pb-qr-box" style="display: none;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3Darunking156-2%40oksbi%26pn%3DArunachalam%2520Venkatachalapathy%26am%3D10%26cu%3DINR%26tn%3DFund%2520the%2520young%2520founder" alt="Scan UPI QR" class="pb-qr-img" id="pb-qr-img" />
+              <div class="pb-qr-sub">Scan with GPay, PhonePe, Paytm, or any UPI app</div>
+              <button class="pb-copy-upi-btn" id="pb-copy-upi-btn" type="button">📋 Copy UPI ID</button>
+            </div>
+          </div>
           <div class="pb-direct-settle">✓ Direct bank settlement via UPI • 0% platform fee</div>
         </div>
       </details>
@@ -887,6 +897,24 @@
       </div>
 
       <div class="pdm-body">
+        <!-- TOP LAYER: FUND THE YOUNG FOUNDER -->
+        <div class="pdm-section pdm-founder-section" id="pdm-founder-section">
+          <div class="pdm-sec-header">
+            <span class="pdm-sec-tag pdm-founder-tag">💖 SUPPORT THE CREATOR</span>
+            <h4 class="pdm-sec-title">Fund the Young Founder</h4>
+            <p class="pdm-sec-desc">Saved your bill? Support the young student building Beggy with direct 1-tap UPI.</p>
+          </div>
+
+          <button class="pdm-founder-btn" id="pdm-founder-btn" type="button">
+            <span class="pdm-founder-btn-icon">⚡</span>
+            <div class="pdm-founder-btn-text">
+              <strong>Fund the Young Founder</strong>
+              <span>₹10, ₹100, ₹1000, ₹2000 or Any • 1-Tap UPI</span>
+            </div>
+            <span class="pdm-founder-btn-arrow">➔</span>
+          </button>
+        </div>
+
         <!-- AMAZON GOURMET FOOD RECIPE KIT DEAL -->
         <div class="pdm-section pdm-amazon-section">
           <div class="pdm-sec-header">
@@ -918,7 +946,7 @@
   </div>
 
   <!-- ====================================================================
-       POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP VIRAL SHARE
+       POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP & SOCIAL VIRAL SHARE
        ==================================================================== -->
   <div class="pdm-overlay" id="whatsapp-share-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wsm-title">
     <div class="pdm-card wsm-card" id="wsm-card">
@@ -928,10 +956,10 @@
         <div class="pdm-step-badge wsm-step-badge">
           <span class="pdm-step-num">STEP 2 OF 2</span>
           <span class="pdm-step-sep">•</span>
-          <span>WHATSAPP VIRAL SHARE 🔥</span>
+          <span>WHATSAPP &amp; SOCIAL SHARE 🔥</span>
         </div>
         <h3 class="pdm-title" id="wsm-title">Flex Your ₹<span id="wsm-saved-amount">340</span> Save!</h3>
-        <p class="pdm-sub">Share your craving victory directly to WhatsApp status or challenge your friends.</p>
+        <p class="pdm-sub">Share your craving victory directly to WhatsApp status or social networks.</p>
       </div>
 
       <div class="wsm-body">
@@ -947,6 +975,31 @@
             <strong>Share on WhatsApp Status &amp; Friends</strong>
             <span>Send story card &amp; challenge link with 1 tap</span>
           </div>
+        </button>
+
+        <!-- Other Social Media Channels Grid -->
+        <div class="wsm-social-grid">
+          <button class="wsm-social-btn wsm-btn-twitter" id="wsm-btn-twitter" type="button" title="Post on X (Twitter)">
+            <span class="wsm-social-icon">𝕏</span>
+            <span class="wsm-social-label">Post on X</span>
+          </button>
+          <button class="wsm-social-btn wsm-btn-instagram" id="wsm-btn-instagram" type="button" title="Share on Instagram Story">
+            <span class="wsm-social-icon">📸</span>
+            <span class="wsm-social-label">Instagram</span>
+          </button>
+          <button class="wsm-social-btn wsm-btn-telegram" id="wsm-btn-telegram" type="button" title="Share on Telegram">
+            <span class="wsm-social-icon">✈️</span>
+            <span class="wsm-social-label">Telegram</span>
+          </button>
+          <button class="wsm-social-btn wsm-btn-linkedin" id="wsm-btn-linkedin" type="button" title="Share on LinkedIn">
+            <span class="wsm-social-icon">💼</span>
+            <span class="wsm-social-label">LinkedIn</span>
+          </button>
+        </div>
+
+        <!-- System Share Sheet for Mobile (Snapchat / SMS / etc.) -->
+        <button class="wsm-social-native-btn" id="wsm-btn-native-share" type="button">
+          <span>📲 Share to Other Apps (Snapchat, Reddit, SMS...)</span>
         </button>
 
         <!-- Secondary Action Buttons -->
