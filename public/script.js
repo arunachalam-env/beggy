@@ -1909,6 +1909,9 @@ function downloadShareCard() {
 }
 
 function getAppBaseUrl() {
+  if (window.location.hostname.includes("vercel.app")) {
+    return window.location.origin + "/";
+  }
   if (window.location.hostname.includes("netlify.app")) {
     return "https://beggy.netlify.app/";
   }
