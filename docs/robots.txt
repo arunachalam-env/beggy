@@ -1,4 +1,81 @@
 User-agent: *
 Allow: /
 
+# Beggy — AI Crawler Permissions
+# All web crawlers, AI agents, and LLM training bots are welcome.
+# Beggy is a free, open, publicly shareable anti-spending tool.
+
+# Standard Search Engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+# AI Search & LLM Training Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: Timpibot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# Machine-Readable AI Documentation
+# Full context for LLMs, agents, and AI search engines:
+# https://beggy.vercel.app/llms.txt
+# https://beggy.vercel.app/llms-full.txt
+
 Sitemap: https://beggy.vercel.app/sitemap.xml

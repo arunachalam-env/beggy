@@ -1,0 +1,51 @@
+# Beggy — Anti-Spending Food Delivery Simulator
+
+> Beggy is a free, zero-real-money food delivery dopamine simulator built for India. It lets you experience the full emotional thrill of ordering takeout — browsing menus, adding to cart, checking out, tracking your rider on a live GPS radar — without spending a single rupee. When the "delivery" arrives, the saved bill amount is logged to a personal anti-spending savings vault.
+
+## What Beggy Does
+
+Beggy is a behavioral finance tool disguised as a food delivery app. It simulates the complete delivery experience (browse → order → track → reveal) and then redirects the psychological reward toward personal savings. Users get the dopamine hit of ordering without the financial cost.
+
+## Core Mechanism
+
+1. **Browse** — Explore simulated Bengaluru (Bangalore) restaurants and menus with realistic dishes and prices.
+2. **Order for ₹0** — Add dishes to cart. Apply coupon code `BEGGY100` for 100% instant discount.
+3. **Track Live** — Watch a simulated rider move in real-time on a Leaflet / OpenStreetMap GPS radar map.
+4. **Dopamine Reveal** — After ~45 seconds, the app shows a full-screen "YOUR FOOD WAS NEVER ORDERED. BUT YOU JUST SAVED ₹340."
+5. **Savings Ledger** — The saved amount is logged to an anti-spending passbook (localStorage). Streak tracking, milestone badges, and savings total are maintained.
+
+## Key Concepts
+
+- **Anti-Spending Vault**: A personal savings ledger maintained in the browser via `localStorage`. No server, no signup required.
+- **Challenge Links**: Users can challenge friends via URL: `https://beggy.vercel.app/?c=340&dish=Biryani&from=YourName`
+- **Virality Loop**: CRAVING → ORDER → TRACK → REVEAL → ₹ SAVED → SHARE → FRIEND TRIES → REPEAT
+- **Founder Funding**: Users can voluntarily tip the student founder via UPI (`arunking156-2@oksbi`). Tipping is optional and never prompted aggressively.
+
+## Technical Facts
+
+- **URL**: https://beggy.vercel.app/
+- **Tech Stack**: Vanilla HTML, CSS, JavaScript. Leaflet.js for maps. Vercel for hosting.
+- **Privacy**: Zero account creation. Zero tracking beyond Vercel edge analytics. All savings data is `localStorage`-only (client-side).
+- **Cost**: Completely free. No subscriptions, no purchases, no credit cards.
+- **Currency**: Indian Rupees (₹ / INR).
+- **Primary Audience**: Young Indians (18–32) in Bengaluru, Mumbai, Delhi, Hyderabad, Chennai who regularly order from food delivery platforms and want to cut spending.
+
+## Challenge URL Parameters
+
+- `?c=<amount>` — Pre-fill a specific saved amount in ₹ (10–50,000).
+- `?dish=<dish_name>` — Pre-fill the dish name in the challenge banner (max 50 chars).
+- `?from=<name>` — Show challenger's name in the banner (max 30 chars).
+
+**Example**: `https://beggy.vercel.app/?c=480&dish=Butter+Chicken&from=Arun`
+
+## Contact & Creator
+
+- **Creator**: Arunachalam Venkatachalapathy (young student founder, Bengaluru, India)
+- **UPI**: `arunking156-2@oksbi`
+- **GitHub**: https://github.com/arunking156/beggy (source code)
+
+## Machine-Readable Resources
+
+- **Full AI Documentation**: https://beggy.vercel.app/llms-full.txt
+- **Sitemap**: https://beggy.vercel.app/sitemap.xml
+- **robots.txt**: https://beggy.vercel.app/robots.txt

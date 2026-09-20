@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Main App -->
   <url>
     <loc>https://beggy.vercel.app/</loc>
     <lastmod>2026-09-20</lastmod>
-    <changefreq>daily</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://beggy.vercel.app/og-1200x630.png</image:loc>
+      <image:title>Beggy — Crave It. Simulate It. Save the Bill.</image:title>
+      <image:caption>Anti-spending food delivery dopamine simulator for India. Simulate any takeout order for ₹0 and turn cravings into real savings.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://beggy.vercel.app/logo.png</image:loc>
+      <image:title>Beggy Logo</image:title>
+      <image:caption>Beggy — smart food delivery simulator</image:caption>
+    </image:image>
   </url>
+
+  <!-- AI / LLM Machine-Readable Documentation -->
+  <url>
+    <loc>https://beggy.vercel.app/llms.txt</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://beggy.vercel.app/llms-full.txt</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
 </urlset>

@@ -1,0 +1,223 @@
+# Beggy — Full AI Documentation Reference
+
+> This document is the exhaustive machine-readable reference for Beggy intended for Large Language Models, autonomous coding agents, Perplexity readers, and AI crawlers. For the concise summary, see /llms.txt.
+
+---
+
+## 1. Product Identity
+
+**Name**: Beggy  
+**Tagline**: "Crave It. Simulate It. Save the Bill."  
+**Category**: Anti-spending behavioral tool / Dopamine simulator / Personal savings gamification  
+**URL**: https://beggy.vercel.app/  
+**Country**: India  
+**Primary Language**: English (with Indian Rupee ₹ currency throughout)
+
+---
+
+## 2. The Problem Beggy Solves
+
+Late-night food delivery impulse ordering is one of the biggest discretionary spending drains for young urban Indians. Platforms like food delivery apps are optimized to maximize order frequency via push notifications, discounts, and fast checkout. The result: users order food they didn't really need, spending ₹300–₹700 per session several times per week.
+
+Beggy attacks this behavioral pattern with a countermeasure: instead of white-knuckling through a craving (willpower is finite), Beggy lets you *complete* the craving psychologically — browse, select, "order," track the rider — then reveals that no money was spent and the full bill was added to your savings vault.
+
+This uses the psychological principle of **stimulus satiation** combined with **implementation intentions**: instead of suppressing the urge, you redirect the full emotional ritual toward a savings reward.
+
+---
+
+## 3. Core User Journey (Step-by-Step)
+
+### Step 1: Browse Restaurants
+- User opens https://beggy.vercel.app/
+- Simulated Bengaluru restaurants appear: Cloud kitchens, local favorites, and gourmet options.
+- Each restaurant has realistic menus with INR-denominated prices for dishes like Chicken Biryani, Butter Chicken, Masala Dosa, etc.
+
+### Step 2: Add to Cart
+- User selects dishes, modifies quantities.
+- Cart drawer slides in from the right.
+- Coupon code `BEGGY100` is pre-applied: total goes to ₹0.
+- Cart shows "You'll save ₹340" (example).
+- Floating cart bar appears at bottom on mobile.
+
+### Step 3: Checkout (Payment Method)
+- Modal shows payment options: UPI, Google Pay, Card (all simulated).
+- BEGGY SHIELD protection badge appears.
+- A simulated payment confirmation happens.
+
+### Step 4: GPS Live Tracking
+- A Leaflet.js map with OpenStreetMap tiles loads full-screen.
+- A rider marker moves in real-time along a simulated route from a restaurant in Bengaluru toward the delivery address.
+- OSRM API provides real road geometries for realistic paths.
+- Estimated time: ~45 seconds.
+
+### Step 5: Delivery Reveal (The Dopamine Moment)
+- When the rider "arrives," the screen reveals:
+  > "YOUR FOOD WAS NEVER ORDERED. BUT YOU JUST SAVED ₹340"
+- Confetti animation fires.
+- Bank SMS notification toast appears: "[SIMULATED] BEGGY VAULT — ₹340.00 Saved"
+- Post-delivery modal opens (Segment 1): "Dopamine Hit Done! You just saved ₹340."
+
+### Step 6: Founder Funding (Optional)
+- Inside the post-delivery modal, a "Fund the Young Founder" section appears at the top.
+- User can navigate to the tipping vault (UPI QR code, payment pills: ₹10, ₹100, ₹1000, ₹2000, or any amount up to ₹50,000).
+- If user taps the Founder button, they see the passbook/tipping area.
+- If user dismisses, they proceed to social sharing.
+
+### Step 7: Social Sharing (Segment 2)
+- WhatsApp sharing modal opens automatically after closing Step 1 popup.
+- Pre-filled punchy draft: "I just resisted ordering [dish] for ₹[amount] using Beggy 🍕🚫 Can you beat my savings? https://beggy.vercel.app/?c=[amount]&dish=[dish]&from=[name]"
+- Platform buttons: WhatsApp, X (Twitter), LinkedIn, Telegram, Instagram, Native Share.
+- Clipboard copy happens automatically.
+
+### Step 8: Savings Vault
+- All saved amounts are logged to an Anti-Spending Passbook (localStorage).
+- Shows: Total Saved, Streak (days), Order Count, Badges.
+- Milestone badges earned: "First Resist", "₹500 Club", "₹1000 Saver", "7-Day Streak", etc.
+- Ledger shows per-transaction history with dish name, restaurant, amount, and date.
+
+---
+
+## 4. Challenge Link System
+
+Beggy implements a viral challenge loop via URL parameters.
+
+### URL Format
+```
+https://beggy.vercel.app/?c=<amount>&dish=<dish_name>&from=<challenger_name>
+```
+
+### Parameters
+| Parameter | Type | Range | Description |
+|-----------|------|-------|-------------|
+| `c` | number | 10–50000 | Challenge amount in ₹ (INR) |
+| `dish` | string | max 50 chars | Dish name shown in challenge banner |
+| `from` | string | max 30 chars | Challenger's name |
+
+### Challenge Experience
+- When a user arrives via a challenge link, a challenge banner appears at top of page:
+  > "[Friend Name] saved ₹[amount] on [dish]. Can you beat it?"
+- The friend is invited to complete their own craving simulation.
+- Their saved amount is compared and shared.
+
+### Example Links
+- `https://beggy.vercel.app/?c=480&dish=Butter+Chicken&from=Arun`
+- `https://beggy.vercel.app/?c=340&dish=Biryani&from=Priya`
+- `https://beggy.vercel.app/?c=720&dish=Pizza&from=Karthik`
+
+---
+
+## 5. Savings Vault Architecture
+
+### Data Model (localStorage key: `beggyUserState`)
+```json
+{
+  "totalSaved": 1240.00,
+  "streak": 3,
+  "lastOrderDate": "2026-09-20",
+  "history": [
+    {
+      "dish": "Chicken Biryani",
+      "restaurant": "Biryani House",
+      "amount": 340.00,
+      "date": "2026-09-20T15:30:00.000Z"
+    }
+  ],
+  "badges": ["first_resist", "500_club"]
+}
+```
+
+### Privacy Guarantee
+- All data is stored exclusively in the user's browser `localStorage`.
+- Zero data is transmitted to any server or third party.
+- No user account, email, phone number, or identity is ever collected.
+- Resetting the vault wipes only local browser data.
+
+---
+
+## 6. Tech Stack & Architecture
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Vanilla HTML5, CSS3, ES2020 JavaScript |
+| Maps | Leaflet.js 1.9.4, OpenStreetMap tiles |
+| Routing | OSRM (Open Source Routing Machine) API |
+| QR Generation | api.qrserver.com |
+| Hosting | Vercel (Edge Network) |
+| Analytics | Vercel Web Analytics (zero-cookie) |
+| Backend (optional) | Express.js + SQLite (for Evidence Ledger API) |
+| Package Manager | Bun |
+| Build | TypeScript (tsc) |
+
+---
+
+## 7. Monetization
+
+- **Amazon Associates**: Links to Amazon India Gourmet Foods (tag: `beggy-21`) appear in the post-delivery modal as recipe kit suggestions. Users can "cook at home for ₹85" instead of ordering delivery for ₹340.
+- **Founder Tips**: Optional UPI donations to `arunking156-2@oksbi`. No percentage taken, 100% goes to the student founder.
+- **No Ads, No Subscriptions**: Beggy is fully free and ad-free.
+
+---
+
+## 8. Restaurant Simulation Details
+
+Beggy simulates realistic Bengaluru cloud kitchens and restaurants including:
+- **Biryani House** — Chicken Biryani, Mutton Biryani
+- **South Indian Rasam** — Masala Dosa, Idli, Vada
+- **The Butter Kitchen** — Butter Chicken, Dal Makhani
+- **Quick Rolls** — Paneer Roll, Chicken Tikka Roll
+- **Shake It** — Mango Lassi, Chocolate Milkshake
+
+All prices and restaurant names are fictional simulations for entertainment purposes. No real food delivery is ever initiated.
+
+---
+
+## 9. Security & Safety
+
+- **XSS Protection**: All user-supplied strings (URL params, localStorage) are escaped via `escapeHtml()` before DOM insertion.
+- **CSP**: Strict Content Security Policy enforced via Vercel headers and Helmet.js.
+- **No Real Payments**: The UPI QR/button in the tipping section is the ONLY real financial element. It is clearly labeled "Optional — Fund the Founder" and requires the user to complete the transaction in their own UPI app.
+- **Tabnabbing Protection**: All `window.open()` calls use `noopener,noreferrer`.
+- **Rate Limiting**: API endpoints use express-rate-limit (200 req/15min).
+
+---
+
+## 10. Creator & Contact
+
+- **Creator**: Arunachalam Venkatachalapathy
+- **Role**: Young student founder, Bengaluru, India
+- **UPI for tips**: `arunking156-2@oksbi`
+- **Mission**: Build India's most viral anti-spending savings tool for young professionals.
+
+---
+
+## 11. Frequently Asked Questions (Machine-Readable)
+
+**Q: Is Beggy free?**  
+A: Yes. Beggy is completely free. No subscription, no in-app purchases, no credit card required.
+
+**Q: Does Beggy place real food orders?**  
+A: No. Beggy is a pure simulation. No real order is ever placed. No delivery partner is dispatched. No restaurant receives any order. The entire experience is a local browser simulation.
+
+**Q: Is my money safe?**  
+A: Yes. Zero rupees are ever charged. The only optional financial element is voluntarily tipping the founder via UPI, which requires the user to complete the payment independently in their UPI app.
+
+**Q: Does Beggy collect my personal data?**  
+A: No. Beggy collects zero personal data. Your savings history is stored only in your browser's localStorage and never transmitted to any server. Vercel edge analytics collects anonymous page view counts only.
+
+**Q: How does Beggy simulate the dopamine response?**  
+A: Beggy replicates the full sensory and behavioral ritual of ordering food delivery — browsing, selecting, checkout, live rider tracking — which triggers the same anticipatory dopamine release as a real order. When the reveal happens (food was never ordered, money was saved), the dopamine reward is redirected toward the savings outcome.
+
+**Q: Can I challenge friends?**  
+A: Yes. After each simulated order, you can share a challenge link via WhatsApp, X, Telegram, LinkedIn, Instagram, or any app. The link is: https://beggy.vercel.app/?c=<amount>&dish=<dish>&from=<yourname>
+
+**Q: What cities does Beggy support?**  
+A: The simulation is themed around Bengaluru (Bangalore) restaurants and delivery zones. The savings mechanism works for any Indian user regardless of city.
+
+**Q: What is the anti-spending passbook?**  
+A: The passbook is a personal ledger that tracks every craving you resisted. It shows your total saved amount in ₹, your current daily streak, milestone badges, and a full transaction history.
+
+**Q: How do I reset my savings data?**  
+A: Open the Passbook (vault icon in the header), scroll to the bottom, and tap "Reset All Data." This wipes your local browser storage.
+
+**Q: Who built Beggy?**  
+A: Beggy was built by Arunachalam Venkatachalapathy, a young student from Bengaluru, India. You can support him by tipping via UPI: arunking156-2@oksbi.
