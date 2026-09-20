@@ -2176,9 +2176,17 @@ function setupEventListeners() {
     });
   }
 
-  // Floating cart bar proceed
+  // Floating cart bar and proceed button
   if (fcProceedBtn) {
-    fcProceedBtn.addEventListener("click", proceedToPayment);
+    fcProceedBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openCartDrawer();
+    });
+  }
+  if (floatingCartBar) {
+    floatingCartBar.addEventListener("click", () => {
+      openCartDrawer();
+    });
   }
 
   // Cart Drawer open/close
@@ -2325,7 +2333,7 @@ function setupEventListeners() {
   }
 }
 
-// ── 10-Second Chef's Recipe Hovering Modal ────────────────────────────────────
+// ── 10-Second Chef's Recipe Hovering Full Blanket Modal ───────────────────────
 let recipeTakeoverShown = false;
 function init10SecondRecipePopup() {
   setTimeout(() => {
@@ -2334,14 +2342,15 @@ function init10SecondRecipePopup() {
 
     const overlay = document.getElementById("recipe-takeover-overlay");
     const backBtn = document.getElementById("recipe-takeover-back-btn");
-    const card = document.getElementById("recipe-takeover-card");
 
-    if (overlay && card) {
+    if (overlay) {
       overlay.style.display = "flex";
       recipeTakeoverShown = true;
 
-      card.addEventListener("click", (e) => {
+      // Entire full blanket redirects anywhere user clicks, UNLESS they click Back
+      overlay.addEventListener("click", (e) => {
         if (e.target.closest("#recipe-takeover-back-btn")) {
+          e.stopPropagation();
           overlay.style.display = "none";
           return;
         }

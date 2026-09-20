@@ -2963,21 +2963,23 @@ body {
   background: #2563EB;
 }
 
-/* ── 10-Second Chef's Recipe Hovering Modal ── */
+/* ── 10-Second Chef's Recipe Hovering Full Blanket Modal ── */
 .recipe-takeover-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(8px);
-  z-index: 99990;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   animation: fadeIn 0.3s ease;
+  cursor: pointer; /* Entire blanket is clickable! */
 }
 
 .recipe-takeover-card {
@@ -2985,13 +2987,14 @@ body {
   border-radius: var(--radius-xl);
   max-width: 480px;
   width: 100%;
-  padding: 32px 24px 24px;
+  padding: 34px 24px 24px;
   position: relative;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
   border: 2px solid var(--swiggy-orange);
   text-align: center;
   cursor: pointer;
   transition: var(--transition);
+  z-index: 2;
 }
 
 .recipe-takeover-back-btn {
@@ -3009,7 +3012,7 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  z-index: 2;
+  z-index: 10;
   transition: var(--transition);
 }
 
@@ -3070,4 +3073,250 @@ body {
   color: var(--text-muted);
   margin-top: 12px;
 }
+
+/* ==========================================================================
+   Comprehensive Mobile & Tablet Responsive Architecture (max-width: 768px & 480px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  /* ── Header Responsive ── */
+  .header-container {
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .brand-group {
+    gap: 10px;
+  }
+
+  .brand-logo-img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-title {
+    font-size: 1.25rem;
+  }
+
+  .logo-sub {
+    display: none;
+  }
+
+  .address-selector {
+    padding: 4px 10px;
+    max-width: 140px;
+  }
+
+  .address-val {
+    max-width: 90px;
+    font-size: 0.72rem;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .passbook-trigger-btn {
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+
+  .passbook-trigger-btn span:first-of-type {
+    display: none;
+  }
+
+  .nav-home-btn {
+    display: none;
+  }
+
+  .cart-trigger-btn {
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .cart-label {
+    display: inline-block;
+  }
+
+  /* Search bar moves to clean second line on mobile */
+  .search-wrapper {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 2px;
+  }
+
+  .search-wrapper input {
+    padding: 9px 36px 9px 38px;
+    font-size: 0.84rem;
+  }
+
+  /* ── Main Container ── */
+  .app-main {
+    padding: 14px 12px 90px;
+  }
+
+  /* ── Restaurant Hero Card ── */
+  .restaurant-hero-card {
+    padding: 16px;
+    margin-bottom: 18px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    border-radius: var(--radius-lg);
+  }
+
+  .rest-title {
+    font-size: 1.4rem;
+  }
+
+  .rating-box {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 14px;
+  }
+
+  /* ── Grids & Cards: Clean single column on mobile, zero squeezing ── */
+  .restaurants-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dishes-list-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .dish-card {
+    border-radius: var(--radius-md);
+  }
+
+  .dish-img-wrap {
+    height: 190px;
+  }
+
+  .dish-card .add-btn-wrap {
+    top: 172px;
+    right: 12px;
+  }
+
+  .dish-card-body {
+    padding: 24px 14px 14px;
+  }
+
+  .dish-title {
+    font-size: 1rem;
+  }
+
+  /* ── Floating Bottom Cart Strip ── */
+  .floating-cart-bar {
+    width: calc(100% - 24px);
+    left: 12px;
+    transform: none;
+    bottom: 14px;
+    padding: 10px 16px;
+    min-width: 0;
+    gap: 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  .floating-cart-btn {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+
+  /* ── Cart Drawer on Mobile: Full Screen Sheet ── */
+  .cart-drawer {
+    width: 100vw;
+    max-width: 100vw;
+    right: -100vw;
+  }
+
+  .cart-drawer.open {
+    right: 0;
+  }
+
+  /* ── Checkout Grid ── */
+  .checkout-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* ── Passbook Modal on Mobile ── */
+  .passbook-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .passbook-modal-box {
+    padding: 18px 14px;
+  }
+
+  .pb-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* ── Recipe Full Blanket Overlay on Mobile ── */
+  .recipe-takeover-card {
+    padding: 28px 16px 20px;
+    max-width: 94vw;
+  }
+
+  .recipe-takeover-title {
+    font-size: 1.18rem;
+  }
+
+  .recipe-takeover-sub {
+    font-size: 0.82rem;
+    margin-bottom: 16px;
+  }
+
+  .recipe-takeover-cta-btn {
+    padding: 12px 16px;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    padding: 8px 10px;
+  }
+
+  .brand-logo-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .logo-title {
+    font-size: 1.15rem;
+  }
+
+  .address-selector {
+    display: none;
+  }
+
+  .cart-trigger-btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+
+  .passbook-trigger-btn {
+    padding: 6px 8px;
+  }
+}
+
 
