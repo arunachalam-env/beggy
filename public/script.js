@@ -1415,11 +1415,10 @@ function initLeafletMap() {
     zoomControl: true
   });
 
-  // Swiggy-Style Food Delivery Navigation Tiles (CartoDB Voyager: Free, crisp, high-contrast Bengaluru streets)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: 'abcd',
-    maxZoom: 19
+  // Clean, High-Contrast Bengaluru Street Navigation Tiles (Esri World Street Map: 100% Free, No Watermarks)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri, OpenStreetMap contributors',
+    maxZoom: 18
   }).addTo(map);
 
   // Home Delivery Marker with pulsing radar ring
@@ -1756,7 +1755,7 @@ function renderShareCard(dishTitle, savedAmount) {
   amountGrad.addColorStop(0, "#34D399");
   amountGrad.addColorStop(1, "#10B981");
   ctx.fillStyle = amountGrad;
-  ctx.font = "900 170px 'Space Grotesk', sans-serif";
+  ctx.font = "900 170px 'Plus Jakarta Sans', sans-serif";
   ctx.textAlign = "center";
   ctx.shadowColor = "rgba(16, 185, 129, 0.4)";
   ctx.shadowBlur = 35;
@@ -1798,7 +1797,7 @@ function renderShareCard(dishTitle, savedAmount) {
   ctx.stroke();
 
   ctx.fillStyle = "#FBBF24";
-  ctx.font = "900 70px 'Space Grotesk', sans-serif";
+  ctx.font = "900 70px 'Plus Jakarta Sans', sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("BEGGY SAVED IT 💰", 0, 0);
@@ -1839,7 +1838,7 @@ function renderShareCard(dishTitle, savedAmount) {
     ctx.fillText(s.label, px + pillW / 2, statsY + 50);
 
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "900 44px 'Space Grotesk', sans-serif";
+    ctx.font = "900 44px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText(s.val, px + pillW / 2, statsY + 115);
 
     ctx.fillStyle = "#64748B";
@@ -1850,7 +1849,7 @@ function renderShareCard(dishTitle, savedAmount) {
 
   // Footer Branding & URL
   ctx.fillStyle = "#F8FAFC";
-  ctx.font = "900 48px 'Space Grotesk', sans-serif";
+  ctx.font = "900 48px 'Plus Jakarta Sans', sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("beggy", w / 2, 1600);
 
