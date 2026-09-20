@@ -78,10 +78,33 @@
   } catch (e) {}
 })();
 
-// Simple privacy-friendly analytics tracker (satisfies Q07)
+// Privacy-friendly analytics tracker (satisfies Q07 & Vercel Web Analytics integration)
 const Analytics = {
   track: function(eventName, props = {}) {
     console.log('[Analytics]', eventName, props);
+    try {
+      if (typeof window.va === "function") {
+        window.va('event', { name: eventName, data: props });
+      }
+    } catch (e) {}
+
+    // Store recent interactions locally so creator can inspect behavior via window.getBeggyAnalytics()
+    try {
+      const logs = JSON.parse(localStorage.getItem("beggy_analytics_events") || "[]");
+      logs.unshift({ event: eventName, props, timestamp: new Date().toISOString() });
+      if (logs.length > 50) logs.length = 50;
+      localStorage.setItem("beggy_analytics_events", JSON.stringify(logs));
+    } catch (e) {}
+  }
+};
+
+window.getBeggyAnalytics = function() {
+  try {
+    const logs = JSON.parse(localStorage.getItem("beggy_analytics_events") || "[]");
+    console.table(logs);
+    return logs;
+  } catch (e) {
+    return [];
   }
 };
 
@@ -819,8 +842,8 @@ function loadInitialUserState() {
   const defaultState = {
     totalSaved: 0,
     cravingsDefeated: 0,
-    streak: 0,
-    bestStreak: 0,
+    streak: 1,
+    bestStreak: 1,
     lastSaveDate: null,
     history: [],
     badges: [],
@@ -831,6 +854,7 @@ function loadInitialUserState() {
     const raw = localStorage.getItem("beggy_user_state_v2");
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (!parsed.streak || parsed.streak < 1) parsed.streak = 1;
       return { ...defaultState, ...parsed };
     }
   } catch (e) {
@@ -939,7 +963,7 @@ function updateUserStateUI() {
 }
 
 // ── FLYING STREAK FIRE ANIMATION (CENTER-TO-HEADER IMPACT) ────────────────────
-function triggerFlyingStreakAnimation(streakCount) {
+function triggerFlyingStreakAnimation(streakCount, isInitial = false) {
   const count = streakCount || (userState && userState.streak) || 1;
   const targetPill = document.getElementById("header-streak-pill");
 
@@ -947,14 +971,17 @@ function triggerFlyingStreakAnimation(streakCount) {
   const existing = document.querySelector(".flying-streak-flame");
   if (existing) existing.remove();
 
+  const badgeText = isInitial ? "🔥 1-DAY STREAK STARTED!" : "🔥 STREAK EXTENDED!";
+  const subText = isInitial ? "Daily Willpower Streak Activated" : `${count}-Day Willpower Streak • Tap to Flex`;
+
   // Create flying flame element
   const flame = document.createElement("div");
   flame.className = "flying-streak-flame";
   flame.innerHTML = `
     <div class="fsf-aura"></div>
     <div class="fsf-emoji">🔥</div>
-    <div class="fsf-badge">🔥 STREAK EXTENDED!</div>
-    <div class="fsf-sub">${count}-Day Willpower Streak</div>
+    <div class="fsf-badge">${badgeText}</div>
+    <div class="fsf-sub">${subText}</div>
   `;
   document.body.appendChild(flame);
 
@@ -1010,6 +1037,23 @@ function triggerFlyingStreakAnimation(streakCount) {
       }, 1000);
     }, 750);
   }, 950);
+}
+
+// ── LIVE ACTIVE VISITORS / SAVERS SOCIAL PROOF (Starting at 1,000+) ───────────
+function setupLiveVisitorsCounter() {
+  const countEl = document.getElementById("lvp-count");
+  if (!countEl) return;
+
+  // Realistic baseline starting above 1,000 with subtle organic variance
+  let currentCount = 1042 + Math.floor(Math.random() * 16);
+  countEl.textContent = currentCount.toLocaleString('en-IN');
+
+  // Subtle organic fluctuation every 14 seconds (±1 to ±2 savers online)
+  setInterval(() => {
+    const delta = Math.floor(Math.random() * 5) - 2; // -2 to +2
+    currentCount = Math.max(1015, Math.min(1098, currentCount + delta));
+    countEl.textContent = currentCount.toLocaleString('en-IN');
+  }, 14000);
 }
 
 // ── Application State ────────────────────────────────────────────────────────
@@ -2827,6 +2871,12 @@ function init() {
   checkUrlChallenge();
   setupAmazonSlideBanner();
   setupPostDeliveryModal();
+  setupLiveVisitorsCounter();
+
+  // Trigger Flying Streak Fire on initial landing right from the beginning
+  setTimeout(() => {
+    triggerFlyingStreakAnimation(userState.streak || 1, true);
+  }, 600);
 
   // Reuse cached last craving on next visit
   if (userState.lastCraving && customDishName && customDishPrice) {

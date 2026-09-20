@@ -2204,6 +2204,57 @@ body {
   }
 }
 
+/* ── LIVE ACTIVE VISITORS SOCIAL PROOF PILL (1,000+) ──────────────────────── */
+.live-visitors-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #10B981;
+  white-space: nowrap;
+  cursor: default;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.live-visitors-pill:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.55);
+}
+
+.lvp-dot {
+  width: 7px;
+  height: 7px;
+  background: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10B981;
+  animation: radarGreenPulse 2s infinite ease-in-out;
+}
+
+.lvp-count {
+  font-weight: 900;
+  color: #065F46;
+}
+
+.lvp-label {
+  font-size: 0.7rem;
+  color: #047857;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@keyframes radarGreenPulse {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
 /* ── PASSBOOK HEADER BUTTON & STREAK PILL ────────────────────────────────── */
 .passbook-trigger-btn {
   background: #FFF7ED;
@@ -3617,6 +3668,15 @@ body {
 
   .passbook-trigger-btn {
     padding: 6px 8px;
+  }
+
+  .live-visitors-pill {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+  }
+
+  .lvp-label {
+    display: none;
   }
 }
 
