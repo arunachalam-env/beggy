@@ -3291,7 +3291,167 @@ body {
 .pdm-tip-tag {
   color: #F59E0B;
   background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.3);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Amount Pills Row in Post-Delivery Modal */
+.pdm-pills-row {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 10px;
+  justify-content: space-between;
+}
+
+.pdm-pill {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  color: #E5E7EB;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.pdm-pill:hover {
+  background: rgba(255, 82, 0, 0.2);
+  border-color: #FF5200;
+  color: #FFFFFF;
+}
+
+.pdm-pill.active {
+  background: linear-gradient(135deg, #FF5200, #EA580C);
+  border-color: #FF5200;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(255, 82, 0, 0.4);
+}
+
+.pdm-custom-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pdm-custom-input-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1.5px solid rgba(255, 82, 0, 0.5);
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.pdm-custom-currency {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #FF5200;
+  margin-right: 4px;
+}
+
+.pdm-custom-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 6px 0;
+  outline: none;
+}
+
+.pdm-custom-apply-btn {
+  background: #FF5200;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdm-custom-apply-btn:hover {
+  background: #EA580C;
+}
+
+/* Desktop QR & Copy Quick Reveal */
+.pdm-desktop-pay {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pdm-qr-toggle-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s ease;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pdm-qr-toggle-btn:hover {
+  color: #F59E0B;
+}
+
+.pdm-qr-box {
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+.pdm-qr-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  padding: 6px;
+}
+
+.pdm-qr-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdm-qr-info span {
+  font-size: 0.68rem;
+  color: #9CA3AF;
+  text-align: center;
+}
+
+.pdm-copy-upi-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdm-copy-upi-btn:hover {
+  background: #10B981;
+  border-color: #10B981;
 }
 
 .pdm-upi-btn {

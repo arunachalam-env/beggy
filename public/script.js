@@ -129,7 +129,7 @@ function sanitizeUpiId(id) {
 const BEGGY_UPI_CONFIG = {
   pa: "arunking156-2@oksbi",
   pn: "Arunachalam Venkatachalapathy",
-  note: "Chai for Beggy",
+  note: "Fund the young founder",
   defaultAmount: 10
 };
 
@@ -2258,32 +2258,34 @@ function resetAllUserData() {
   }
 }
 
-// ── INSTANT UPI TIP MODULE ("CHAI FOR BEGGY" — DIRECT TO BANK) ─────────────
+// ── INSTANT UPI TIP MODULE ("FUND THE YOUNG FOUNDER" — DIRECT TO BANK) ───────
 let currentTipAmount = 10;
+let pdmTipAmount = 10;
 
-function generateUpiUri(amount) {
-  const pa = encodeURIComponent(BEGGY_UPI_CONFIG.pa || "beggy@upi");
-  const pn = encodeURIComponent(BEGGY_UPI_CONFIG.pn || "Beggy Creator");
+function generateUpiUri(amount = 10, note = "Fund the young founder") {
+  // CRITICAL: pa must have literal @. DO NOT use encodeURIComponent on the @ sign!
+  const pa = (BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi").trim();
+  const pn = encodeURIComponent(BEGGY_UPI_CONFIG.pn || "Arunachalam Venkatachalapathy");
   let amNum = Number(amount);
   if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
-  const am = Math.min(10000, Math.max(1, amNum)).toFixed(2);
+  const am = Number.isInteger(amNum) ? String(amNum) : amNum.toFixed(2);
   const cu = "INR";
-  const tn = encodeURIComponent(BEGGY_UPI_CONFIG.note || "Chai for Beggy");
+  const tn = encodeURIComponent(note || BEGGY_UPI_CONFIG.note || "Fund the young founder");
   return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
 }
 
 function updateUpiTipUI(amount) {
   let amNum = Number(amount);
   if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
-  currentTipAmount = Math.min(10000, Math.max(1, amNum));
-  const upiUri = generateUpiUri(currentTipAmount);
+  currentTipAmount = Math.min(50000, Math.max(1, amNum));
+  const upiUri = generateUpiUri(currentTipAmount, "Fund the young founder");
 
   // Update primary mobile 1-tap UPI link
   if (btcPayBtn) {
     btcPayBtn.href = upiUri;
   }
   if (btcPayMainText) {
-    btcPayMainText.textContent = `Pay ₹${currentTipAmount} via UPI`;
+    btcPayMainText.textContent = `Fund the Young Founder • ₹${currentTipAmount.toLocaleString('en-IN')}`;
   }
 
   // Update dynamic desktop QR code
@@ -2294,12 +2296,34 @@ function updateUpiTipUI(amount) {
 
   // Update displayed UPI ID
   if (btcUpiIdVal) {
-    btcUpiIdVal.textContent = BEGGY_UPI_CONFIG.pa || "beggy@upi";
+    btcUpiIdVal.textContent = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
   }
 
   // Update passbook modal tip button
   if (pbTipBtn) {
-    pbTipBtn.href = generateUpiUri(10);
+    pbTipBtn.href = generateUpiUri(10, "Fund the young founder");
+  }
+}
+
+function updatePdmTipUI(amount) {
+  let amNum = Number(amount);
+  if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
+  pdmTipAmount = Math.min(50000, Math.max(1, amNum));
+  const uri = generateUpiUri(pdmTipAmount, "Fund the young founder");
+
+  const upiBtn = document.getElementById("pdm-upi-btn");
+  const upiMain = document.getElementById("pdm-upi-btn-main");
+  const qrImg = document.getElementById("pdm-qr-img");
+
+  if (upiBtn) {
+    upiBtn.href = uri;
+  }
+  if (upiMain) {
+    upiMain.textContent = `Fund the Young Founder • ₹${pdmTipAmount.toLocaleString('en-IN')}`;
+  }
+  if (qrImg) {
+    const encoded = encodeURIComponent(uri);
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encoded}`;
   }
 }
 
@@ -2647,7 +2671,38 @@ function setupEventListeners() {
     });
   }
 
-  // Initialize UPI UI with default amount (₹10 Chai)
+  if (btcPayBtn) {
+    btcPayBtn.addEventListener("click", (e) => {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (!isMobile) {
+        e.preventDefault();
+        const desktopSec = document.getElementById("btc-desktop-section");
+        if (desktopSec) {
+          desktopSec.scrollIntoView({ behavior: "smooth", block: "center" });
+          desktopSec.style.outline = "2px solid #FF5200";
+          setTimeout(() => { desktopSec.style.outline = "none"; }, 2000);
+        }
+      }
+    });
+  }
+
+  if (pbTipBtn) {
+    pbTipBtn.addEventListener("click", (e) => {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (!isMobile) {
+        e.preventDefault();
+        const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
+        try {
+          navigator.clipboard.writeText(idToCopy);
+          alert("📱 On Desktop? UPI ID " + idToCopy + " copied to clipboard! Open GPay, PhonePe, or Paytm on your phone to fund.");
+        } catch (err) {
+          prompt("Copy UPI ID:", idToCopy);
+        }
+      }
+    });
+  }
+
+  // Initialize UPI UI with default amount (₹10)
   updateUpiTipUI(10);
 
   // Discovery Mode tabs (F1)
@@ -2802,9 +2857,20 @@ function showPostDeliveryModal(dish, savedAmount) {
   const amazonBtn = document.getElementById("pdm-amazon-btn");
   if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
 
-  // 1-Tap UPI link (raw ID is not exposed in UI)
-  const upiBtn = document.getElementById("pdm-upi-btn");
-  if (upiBtn) upiBtn.href = generateUpiUri(10);
+  // Reset tip amount to 10 and sync UI
+  updatePdmTipUI(10);
+
+  // Reset pills active state to ₹10
+  const pdmPillsRow = document.getElementById("pdm-pills-row");
+  if (pdmPillsRow) {
+    pdmPillsRow.querySelectorAll(".pdm-pill").forEach(p => {
+      p.classList.toggle("active", p.dataset.amount === "10");
+    });
+  }
+  const pdmCustomWrap = document.getElementById("pdm-custom-wrap");
+  if (pdmCustomWrap) pdmCustomWrap.style.display = "none";
+  const pdmQrBox = document.getElementById("pdm-qr-box");
+  if (pdmQrBox) pdmQrBox.style.display = "none";
 
   // Dismiss the landing banner if still visible
   const slideBanner = document.getElementById("amazon-slide-banner");
@@ -2823,6 +2889,14 @@ function setupPostDeliveryModal() {
   const dismissBtn = document.getElementById("pdm-dismiss-btn");
   const amazonBtn = document.getElementById("pdm-amazon-btn");
   const upiBtn = document.getElementById("pdm-upi-btn");
+  const pdmPillsRow = document.getElementById("pdm-pills-row");
+  const pdmAnyToggle = document.getElementById("pdm-any-toggle");
+  const pdmCustomWrap = document.getElementById("pdm-custom-wrap");
+  const pdmCustomInput = document.getElementById("pdm-custom-input");
+  const pdmCustomApplyBtn = document.getElementById("pdm-custom-apply-btn");
+  const pdmQrToggleBtn = document.getElementById("pdm-qr-toggle-btn");
+  const pdmQrBox = document.getElementById("pdm-qr-box");
+  const pdmCopyUpiBtn = document.getElementById("pdm-copy-upi-btn");
 
   if (!modal) return;
 
@@ -2847,10 +2921,94 @@ function setupPostDeliveryModal() {
     }
   });
 
-  // UPI button closes modal upon click
+  // Amount pills selection: 10, 100, 1000, 2000
+  if (pdmPillsRow) {
+    const pills = pdmPillsRow.querySelectorAll(".pdm-pill:not(#pdm-any-toggle)");
+    pills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        pdmPillsRow.querySelectorAll(".pdm-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        if (pdmCustomWrap) pdmCustomWrap.style.display = "none";
+        const amt = Number(pill.dataset.amount) || 10;
+        updatePdmTipUI(amt);
+      });
+    });
+  }
+
+  // Any / Custom toggle
+  if (pdmAnyToggle) {
+    pdmAnyToggle.addEventListener("click", () => {
+      if (pdmPillsRow) {
+        pdmPillsRow.querySelectorAll(".pdm-pill").forEach(p => p.classList.remove("active"));
+      }
+      pdmAnyToggle.classList.add("active");
+      if (pdmCustomWrap) {
+        const isHidden = pdmCustomWrap.style.display === "none" || !pdmCustomWrap.style.display;
+        pdmCustomWrap.style.display = isHidden ? "flex" : "none";
+        if (isHidden && pdmCustomInput) {
+          pdmCustomInput.focus();
+          const amt = Number(pdmCustomInput.value) || 500;
+          updatePdmTipUI(amt);
+        }
+      }
+    });
+  }
+
+  // Custom apply button & input
+  if (pdmCustomApplyBtn && pdmCustomInput) {
+    pdmCustomApplyBtn.addEventListener("click", () => {
+      const amt = Math.max(1, Math.min(50000, Number(pdmCustomInput.value) || 500));
+      pdmCustomInput.value = amt;
+      updatePdmTipUI(amt);
+    });
+    pdmCustomInput.addEventListener("input", () => {
+      const val = Number(pdmCustomInput.value);
+      if (val && val > 0) updatePdmTipUI(Math.min(50000, val));
+    });
+  }
+
+  // Desktop QR code toggle
+  if (pdmQrToggleBtn && pdmQrBox) {
+    pdmQrToggleBtn.addEventListener("click", () => {
+      const isHidden = pdmQrBox.style.display === "none" || !pdmQrBox.style.display;
+      pdmQrBox.style.display = isHidden ? "flex" : "none";
+    });
+  }
+
+  // Copy UPI ID button
+  if (pdmCopyUpiBtn) {
+    pdmCopyUpiBtn.addEventListener("click", () => {
+      const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
+      navigator.clipboard.writeText(idToCopy).then(() => {
+        pdmCopyUpiBtn.textContent = "✓ Copied to Clipboard!";
+        setTimeout(() => { pdmCopyUpiBtn.textContent = "📋 Copy UPI ID"; }, 2500);
+      }).catch(() => {
+        alert("UPI ID: " + idToCopy);
+      });
+    });
+  }
+
+  // UPI Link click handler (bulletproof for both mobile & desktop)
   if (upiBtn) {
-    upiBtn.addEventListener("click", () => {
-      setTimeout(closeModal, 600);
+    upiBtn.addEventListener("click", (e) => {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const uri = generateUpiUri(pdmTipAmount, "Fund the young founder");
+
+      if (isMobile) {
+        // Direct mobile app intent
+        window.location.href = uri;
+        setTimeout(closeModal, 1500);
+      } else {
+        // Desktop / Laptop handling
+        e.preventDefault();
+        if (pdmQrBox) pdmQrBox.style.display = "flex";
+        const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
+        try {
+          navigator.clipboard.writeText(idToCopy);
+          if (pdmCopyUpiBtn) pdmCopyUpiBtn.textContent = "✓ Copied to Clipboard!";
+          setTimeout(() => { if (pdmCopyUpiBtn) pdmCopyUpiBtn.textContent = "📋 Copy UPI ID"; }, 2500);
+        } catch (err) {}
+      }
     });
   }
 
