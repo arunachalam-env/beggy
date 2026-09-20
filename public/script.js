@@ -98,14 +98,14 @@ const AMAZON_GROCERY_URL = "https://link.amazon/B05RiQ3Jy";
  * Sanitized and sealed against prototype and memory tampering.
  */
 function sanitizeUpiId(id) {
-  if (typeof id !== "string") return "beggy@upi";
+  if (typeof id !== "string") return "arunking156-2@oksbi";
   const trimmed = id.trim();
-  return /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(trimmed) ? trimmed : "beggy@upi";
+  return /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(trimmed) ? trimmed : "arunking156-2@oksbi";
 }
 
 const BEGGY_UPI_CONFIG = {
-  pa: sanitizeUpiId((typeof localStorage !== "undefined" && localStorage.getItem("beggy_creator_upi")) || "beggy@upi"),
-  pn: "Beggy Creator",
+  pa: "arunking156-2@oksbi",
+  pn: "Arunachalam Venkatachalapathy",
   note: "Chai for Beggy",
   defaultAmount: 10
 };
