@@ -1182,8 +1182,8 @@ function renderRestaurantDishes(restId) {
           <span class="${dish.isVeg ? 'veg-icon' : 'nonveg-icon'}"></span>
         </div>
         <span class="dish-eta-badge">⚡ ${dish.eta}</span>
-        <div class="swiggy-add-btn-wrap">
-          <button class="swiggy-add-btn" data-add-dish="${dish.id}">+ ADD</button>
+        <div class="add-btn-wrap">
+          <button class="add-btn" data-add-dish="${dish.id}">+ ADD</button>
         </div>
       </div>
       <div class="dish-card-body">

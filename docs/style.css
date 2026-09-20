@@ -424,7 +424,7 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-.swiggy-one-badge {
+.beggy-one-badge, .swiggy-one-badge {
   background: linear-gradient(90deg, #F59E0B, #FF5200);
   color: #FFFFFF;
   font-weight: 900;
@@ -2058,7 +2058,7 @@ body {
   gap: 10px;
 }
 
-.swiggy-coupon-box {
+.beggy-coupon-box, .swiggy-coupon-box {
   background: #ECFDF5;
   border: 1px dashed var(--swiggy-veg);
   padding: 10px 12px;
@@ -2100,7 +2100,7 @@ body {
   font-size: 1.35rem;
 }
 
-.checkout-swiggy-btn {
+.checkout-beggy-btn, .checkout-swiggy-btn {
   width: 100%;
   background: var(--swiggy-orange);
   color: #FFFFFF;
@@ -2117,12 +2117,12 @@ body {
   box-shadow: var(--shadow-orange);
 }
 
-.checkout-swiggy-btn:hover:not(:disabled) {
+.checkout-beggy-btn:hover, .checkout-swiggy-btn:hover:not(:disabled) {
   background: var(--swiggy-orange-hover);
   transform: translateY(-2px);
 }
 
-.checkout-swiggy-btn:disabled {
+.checkout-beggy-btn:disabled, .checkout-swiggy-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(1);
