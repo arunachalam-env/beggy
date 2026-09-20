@@ -949,7 +949,31 @@
       </div>
 
       <div class="pdm-body">
-        <div class="pdm-section">
+        <!-- TIER 1: 1-TAP UPI TIP (NO RAW UPI ID EXPOSED) -->
+        <div class="pdm-section pdm-tip-section">
+          <div class="pdm-sec-header">
+            <span class="pdm-sec-tag pdm-tip-tag">☕ KEEP BEGGY 100% FREE</span>
+            <h4 class="pdm-sec-title">Saved your bill? Tip ₹10 Cutting Chai!</h4>
+            <p class="pdm-sec-desc">Swiggy charges a ₹10 platform fee on every order. Buy the solo developer a chai with 1 tap!</p>
+          </div>
+
+          <!-- 1-Tap UPI CTA Button (Raw ID is never shown in UI text) -->
+          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Chai%20for%20Beggy" class="pdm-upi-btn" id="pdm-upi-btn">
+            <span class="pdm-btn-icon">⚡</span>
+            <div class="pdm-btn-text">
+              <strong>Tip ₹10 with any UPI App</strong>
+              <span>1-Tap • GPay, PhonePe, Paytm, CRED &amp; BHIM</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Sleek Visual Divider -->
+        <div class="pdm-divider">
+          <span>OR COOK FRESH AT HOME</span>
+        </div>
+
+        <!-- TIER 2: AMAZON GOURMET FOOD DEAL -->
+        <div class="pdm-section pdm-amazon-section">
           <div class="pdm-sec-header">
             <span class="pdm-sec-tag">👨‍🍳 15-Minute Recipe Kit</span>
             <h4 class="pdm-sec-title" id="pdm-dish-title">Cook Biryani at Home for ₹85!</h4>

@@ -2670,6 +2670,10 @@ function showPostDeliveryModal(dish, savedAmount) {
   const amazonBtn = document.getElementById("pdm-amazon-btn");
   if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
 
+  // 1-Tap UPI link (raw ID is not exposed in UI)
+  const upiBtn = document.getElementById("pdm-upi-btn");
+  if (upiBtn) upiBtn.href = generateUpiUri(10);
+
   // Dismiss the landing banner if still visible
   const slideBanner = document.getElementById("amazon-slide-banner");
   if (slideBanner) {
@@ -2686,6 +2690,7 @@ function setupPostDeliveryModal() {
   const closeBtn = document.getElementById("pdm-close-btn");
   const dismissBtn = document.getElementById("pdm-dismiss-btn");
   const amazonBtn = document.getElementById("pdm-amazon-btn");
+  const upiBtn = document.getElementById("pdm-upi-btn");
 
   if (!modal) return;
 
@@ -2709,6 +2714,13 @@ function setupPostDeliveryModal() {
       closeModal();
     }
   });
+
+  // UPI button closes modal upon click
+  if (upiBtn) {
+    upiBtn.addEventListener("click", () => {
+      setTimeout(closeModal, 600);
+    });
+  }
 
   // Amazon button closes modal upon click
   if (amazonBtn) {

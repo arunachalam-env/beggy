@@ -3232,6 +3232,63 @@ body {
   margin: 0;
 }
 
+.pdm-tip-section {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 82, 0, 0.04) 100%);
+}
+
+.pdm-tip-tag {
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.pdm-upi-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #FF5200 0%, #EA580C 100%);
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(255, 82, 0, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pdm-upi-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(255, 82, 0, 0.5);
+}
+
+.pdm-upi-btn .pdm-btn-text strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.pdm-upi-btn .pdm-btn-text span {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+.pdm-divider {
+  text-align: center;
+  position: relative;
+  margin: 2px 0;
+}
+
+.pdm-divider span {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #6B7280;
+  text-transform: uppercase;
+  background: #171B24;
+  padding: 0 10px;
+}
+
 .pdm-amazon-btn {
   display: flex;
   align-items: center;
