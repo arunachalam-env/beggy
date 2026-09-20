@@ -1909,6 +1909,9 @@ function downloadShareCard() {
 }
 
 function getAppBaseUrl() {
+  if (window.location.hostname.includes("netlify.app")) {
+    return "https://beggy.netlify.app/";
+  }
   if (window.location.hostname.includes("beggy.io")) {
     return "https://www.beggy.io/";
   }
