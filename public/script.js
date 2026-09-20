@@ -1,82 +1,9 @@
 // ============================================================================
-// BEGGY SECURITY SHIELD (ANTI-CLONE, ANTI-SCRAPE & HACK-PROOF ENGINE)
+// BEGGY — Crave It. Simulate It. Save the Bill. (Open Source)
 // ============================================================================
-(function initBeggySecurityShield() {
-  // 1. Anti-Clickjacking Frame Buster: Prevent unauthorized embedding in external iframes
-  try {
-    if (window.top !== window.self) {
-      window.top.location = window.self.location;
-    }
-  } catch (e) {
-    if (document.documentElement) {
-      document.documentElement.innerHTML = "<div style='display:flex;align-items:center;justify-content:center;height:100vh;background:#0F1117;color:#FFF;font-family:sans-serif;text-align:center;'><h2>Security Alert: Embedding Beggy is strictly prohibited.</h2></div>";
-    }
-  }
+console.log("%c🎉 BEGGY — Dopamine Food Delivery & Anti-Spending Vault", "color:#FF5722; font-size:16px; font-weight:800;");
+console.log("Open source (MIT): https://github.com/arunachalamvenkatachalapathy-dev/beggy");
 
-  // 2. Security Shield Toast Trigger
-  let secToastTimer = null;
-  function showSecurityToast(msg) {
-    const toast = document.getElementById("security-shield-toast");
-    if (!toast) return;
-    const msgEl = toast.querySelector(".sst-msg") || toast;
-    msgEl.textContent = msg || "Protected by Beggy Shield — Content copying & inspection are restricted.";
-    toast.classList.add("show");
-    if (secToastTimer) clearTimeout(secToastTimer);
-    secToastTimer = setTimeout(() => {
-      toast.classList.remove("show");
-    }, 2800);
-  }
-
-  // 3. Prevent Right-Click Context Menu (Anti-Scrape / Anti-Theft)
-  document.addEventListener("contextmenu", (e) => {
-    // Allow contextmenu inside text inputs and textareas for copy-pasting user text
-    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) {
-      return;
-    }
-    e.preventDefault();
-    showSecurityToast("🔒 Beggy Shield: Right-click & source inspection are restricted.");
-    return false;
-  }, { capture: true });
-
-  // 4. Block DevTools & Page-Saving Keyboard Shortcuts
-  window.addEventListener("keydown", (e) => {
-    const isCtrlOrMeta = e.ctrlKey || e.metaKey;
-    const isShift = e.shiftKey;
-    const key = (e.key || "").toLowerCase();
-    const keyCode = e.keyCode || e.which;
-
-    const isF12 = e.key === "F12" || keyCode === 123;
-    const isDevTools = isCtrlOrMeta && isShift && (key === "i" || key === "j" || key === "c");
-    const isViewSource = isCtrlOrMeta && key === "u";
-    const isSavePage = isCtrlOrMeta && key === "s";
-    const isPrintPage = isCtrlOrMeta && key === "p";
-
-    if (isF12 || isDevTools || isViewSource || isSavePage || isPrintPage) {
-      e.preventDefault();
-      e.stopPropagation();
-      showSecurityToast("🔒 Beggy Shield: Developer tools & source saving shortcuts are blocked.");
-      return false;
-    }
-  }, { capture: true });
-
-  // 5. Prevent Drag & Drop Asset Theft
-  document.addEventListener("dragstart", (e) => {
-    if (e.target && (e.target.tagName === "IMG" || e.target.tagName === "CANVAS" || e.target.tagName === "SVG")) {
-      e.preventDefault();
-      return false;
-    }
-  });
-
-  // 6. Console Watermark & Legal Anti-Cloning Notice
-  try {
-    const sHeader = "color:#FF5200; font-size:22px; font-weight:900; padding:4px 0;";
-    const sBody = "color:#FBBF24; font-size:12px; font-weight:700; line-height:1.4;";
-    const sWarning = "color:#EF4444; font-size:11px; font-weight:800;";
-    console.log("%c🛡️ BEGGY SECURE ARCHITECTURE", sHeader);
-    console.log("%cCopyright © 2026 Beggy. All rights reserved.\nUnauthorized reproduction, scraping, reverse-engineering, or cloning of this proprietary interface or algorithm is strictly prohibited under international copyright conventions and cyberlaw.", sBody);
-    console.log("%c⚠️ ALERT: Tampering with client memory, cryptographic blocks, or payment parameters will void user session integrity.", sWarning);
-  } catch (e) {}
-})();
 
 // Privacy-friendly analytics tracker (satisfies Q07 & Vercel Web Analytics integration)
 const Analytics = {
@@ -1710,7 +1637,7 @@ function startLiveTracking() {
   const r = state.activeRestaurant;
   mapKitchenLabel.textContent = r.name;
   mapPartnerDistance.textContent = `${r.distanceKm} km away from your Indiranagar location`;
-  trackingOrderId.textContent = `Order #BW-${Math.floor(1000 + Math.random() * 9000)}`;
+  trackingOrderId.textContent = `Order #BG-${Math.floor(1000 + Math.random() * 9000)}`;
   trackingEtaPill.textContent = "ETA: ~18 mins";
 
   // Hide any previous dopamine reveal card
@@ -1870,12 +1797,14 @@ function triggerOrderArrival() {
   const savedAmount = state.lastOrderSaved || 340.00;
 
   revealSavedAmount.textContent = `₹${savedAmount.toFixed(2)}`;
-  rsAmountVal.textContent = `₹${savedAmount.toFixed(2)}`;
+  const revealDishNameEl = document.getElementById("reveal-dish-name");
+  if (revealDishNameEl) revealDishNameEl.textContent = dish.title;
+  const revealDishSpentEl = document.getElementById("reveal-dish-spent");
+  if (revealDishSpentEl) revealDishSpentEl.innerHTML = `₹${savedAmount.toFixed(0)} spent → <strong>₹0 charged</strong>`;
+  const cfcSavedValEl = document.getElementById("cfc-saved-val");
+  if (cfcSavedValEl) cfcSavedValEl.textContent = `₹${savedAmount.toFixed(0)}`;
 
-  if (btcSavedVal) {
-    btcSavedVal.textContent = `₹${savedAmount.toFixed(0)}`;
-  }
-  updateUpiTipUI(currentTipAmount || 10);
+  if (rsAmountVal) rsAmountVal.textContent = `₹${savedAmount.toFixed(2)}`;
 
   // Rotating joke
   if (dopamineJoke) {
@@ -1897,10 +1826,14 @@ function triggerOrderArrival() {
   playBankChime();
 
   // Mark "Real Save" button as already recorded
-  btnRealSave.disabled = false;
-  btnRealSave.querySelector("strong").textContent = `✓ Recorded ₹${savedAmount.toFixed(2)} in Your Savings Vault!`;
-  btnRealSave.querySelector("#rs-subtext").textContent = "100% of your money remains safely in your bank account!";
-  btnRealSave.style.background = "linear-gradient(135deg, #059669, #047857)";
+  if (btnRealSave) {
+    btnRealSave.disabled = false;
+    const strongEl = btnRealSave.querySelector("strong");
+    if (strongEl) strongEl.textContent = `✓ Saved ₹${savedAmount.toFixed(2)} in Vault • View Passbook ➔`;
+    const subEl = btnRealSave.querySelector("#rs-subtext");
+    if (subEl) subEl.textContent = "100% of your money kept in your bank • View your ledger & streaks";
+    btnRealSave.style.background = "linear-gradient(135deg, #059669, #047857)";
+  }
 
   // Trigger Slide-Down Bank SMS Notification Toast
   const availBalStr = userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2125,11 +2058,11 @@ function renderShareCard(dishTitle, savedAmount) {
 
   ctx.fillStyle = "#94A3B8";
   ctx.font = "600 32px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("Order Nothing. Save Everything.", w / 2, 1655);
+  ctx.fillText("Crave It. Simulate It. Save the Bill.", w / 2, 1655);
 
-  ctx.fillStyle = "#FF5200";
+  ctx.fillStyle = "#FF5722";
   ctx.font = "bold 34px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("arunachalamvenkatachalapathy-dev.github.io/beggy", w / 2, 1715);
+  ctx.fillText("beggy.vercel.app", w / 2, 1715);
 
   ctx.fillStyle = "#475569";
   ctx.font = "500 26px 'Plus Jakarta Sans', sans-serif";
@@ -2145,11 +2078,25 @@ function showShareToast(msg) {
   }, 4000);
 }
 
+function getAppBaseUrl() {
+  if (window.location.hostname.includes("vercel.app")) {
+    return "https://beggy.vercel.app/";
+  }
+  return window.location.origin + window.location.pathname;
+}
+
+function getChallengeLinkData() {
+  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Takeout Craving";
+  const amount = state.lastOrderSaved || 340;
+  const baseUrl = getAppBaseUrl();
+  const challengeUrl = `${baseUrl}?c=${Math.round(amount)}&dish=${encodeURIComponent(dish)}`;
+  const text = `⚔️ I resisted ordering ₹${Math.round(amount)} ${dish} and kept 100% of the money on Beggy! Can you beat my save? Try it: ${challengeUrl}`;
+  return { challengeUrl, text, amount, dish };
+}
+
 function shareStoryCard() {
   if (!shareCardCanvas) return;
-  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Food";
-  const amount = state.lastOrderSaved || 340;
-  const caption = `I just defeated a ₹${amount.toFixed(0)} ${dish} craving 😤 ${userState.streak}-day streak with @Beggy. Try it: https://arunachalamvenkatachalapathy-dev.github.io/beggy/`;
+  const { challengeUrl, text, amount, dish } = getChallengeLinkData();
 
   shareCardCanvas.toBlob(blob => {
     if (!blob) return;
@@ -2158,9 +2105,9 @@ function shareStoryCard() {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       navigator.share({
         title: "I defeated a food craving with Beggy!",
-        text: caption,
+        text: text,
         files: [file],
-        url: "https://arunachalamvenkatachalapathy-dev.github.io/beggy/"
+        url: challengeUrl
       }).catch(err => {
         if (err.name !== "AbortError") downloadShareCard();
       });
@@ -2180,43 +2127,21 @@ function downloadShareCard() {
   showShareToast("✓ Savings card PNG downloaded to your device!");
 }
 
-function getAppBaseUrl() {
-  if (window.location.hostname.includes("vercel.app")) {
-    return window.location.origin + "/";
-  }
-  if (window.location.hostname.includes("netlify.app")) {
-    return "https://beggy.netlify.app/";
-  }
-  if (window.location.hostname.includes("beggy.io")) {
-    return "https://www.beggy.io/";
-  }
-  return window.location.origin + window.location.pathname;
-}
-
 function copyShareCaption() {
-  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Food";
-  const amount = state.lastOrderSaved || 340;
-  const baseUrl = getAppBaseUrl();
-  const caption = `I just defeated a ₹${amount.toFixed(0)} ${dish} craving 😤 ${userState.streak}-day streak with @Beggy. Try it: ${baseUrl}`;
-
-  navigator.clipboard.writeText(caption).then(() => {
+  const { text, challengeUrl } = getChallengeLinkData();
+  navigator.clipboard.writeText(text).then(() => {
     showShareToast("✓ Caption & link copied to clipboard!");
   }).catch(() => {
-    showShareToast(`✓ Link: ${baseUrl}`);
+    showShareToast(`✓ Link: ${challengeUrl}`);
   });
 }
 
 function createFriendChallengeLink() {
-  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Biryani";
-  const amount = state.lastOrderSaved || 340;
-  const baseUrl = getAppBaseUrl();
-  const challengeUrl = `${baseUrl}?challenge=1&amount=${amount.toFixed(0)}&dish=${encodeURIComponent(dish)}&from=A%20Friend`;
-  const text = `⚔️ I resisted ordering ₹${amount.toFixed(0)} ${dish} and kept the money! Can you beat my save? Try it: ${challengeUrl}`;
-
+  const { challengeUrl, text } = getChallengeLinkData();
   navigator.clipboard.writeText(text).then(() => {
-    showShareToast("✓ Challenge link copied to clipboard! Send to your friend on WhatsApp 📲");
+    showShareToast("✓ Challenge link copied to clipboard! Send to your friends on WhatsApp 📲");
   }).catch(() => {
-    showShareToast("✓ Challenge link created!");
+    showShareToast(`✓ Challenge link: ${challengeUrl}`);
   });
 }
 
@@ -2283,12 +2208,9 @@ function resetAllUserData() {
   }
 }
 
-// ── INSTANT UPI TIP MODULE ("FUND THE YOUNG FOUNDER" — DIRECT TO BANK) ───────
-let currentTipAmount = 10;
-let pdmTipAmount = 10;
-
+// ── SINGLE FOUNDER SUPPORT PLACEMENT (COLLAPSED IN PASSBOOK) ─────────────────
 function generateUpiUri(amount = 10, note = "Fund the young founder") {
-  // CRITICAL: pa must have literal @. DO NOT use encodeURIComponent on the @ sign!
+  // pa must have literal @. DO NOT use encodeURIComponent on the @ sign!
   const pa = (BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi").trim();
   const pn = encodeURIComponent(BEGGY_UPI_CONFIG.pn || "Arunachalam Venkatachalapathy");
   let amNum = Number(amount);
@@ -2299,73 +2221,70 @@ function generateUpiUri(amount = 10, note = "Fund the young founder") {
   return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
 }
 
-function updateUpiTipUI(amount) {
-  let amNum = Number(amount);
-  if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
-  currentTipAmount = Math.min(50000, Math.max(1, amNum));
-  const upiUri = generateUpiUri(currentTipAmount, "Fund the young founder");
+function setupPassbookFounderSupport() {
+  const pbTipPills = document.getElementById("pb-tip-pills");
+  const pbAnyToggle = document.getElementById("pb-any-toggle");
+  const pbCustomWrap = document.getElementById("pb-custom-wrap");
+  const pbCustomInput = document.getElementById("pb-custom-input");
+  const pbCustomApplyBtn = document.getElementById("pb-custom-apply-btn");
+  const pbTipCtaBtn = document.getElementById("pb-tip-cta-btn");
 
-  // Update primary mobile 1-tap UPI link
-  if (btcPayBtn) {
-    btcPayBtn.href = upiUri;
-  }
-  if (btcPayMainText) {
-    btcPayMainText.textContent = `Fund the Young Founder • ₹${currentTipAmount.toLocaleString('en-IN')}`;
-  }
+  let selectedAmount = 10;
 
-  // Update dynamic desktop QR code
-  if (btcQrImg) {
-    const encodedUpi = encodeURIComponent(upiUri);
-    btcQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodedUpi}`;
+  function updatePassbookTip(amount) {
+    selectedAmount = Math.max(1, Math.min(500, Number(amount) || 10));
+    if (pbTipCtaBtn) {
+      pbTipCtaBtn.href = generateUpiUri(selectedAmount, "Fund the young founder");
+      pbTipCtaBtn.innerHTML = `<span>⚡ Fund ₹${selectedAmount} via UPI</span>`;
+    }
   }
 
-  // Update displayed UPI ID
-  if (btcUpiIdVal) {
-    btcUpiIdVal.textContent = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
+  if (pbTipPills) {
+    const pills = pbTipPills.querySelectorAll(".pb-tip-pill:not(#pb-any-toggle)");
+    pills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        pbTipPills.querySelectorAll(".pb-tip-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        if (pbCustomWrap) pbCustomWrap.style.display = "none";
+        const amt = Number(pill.dataset.amount) || 10;
+        updatePassbookTip(amt);
+      });
+    });
   }
 
-  // Update passbook modal tip button
-  if (pbTipBtn) {
-    pbTipBtn.href = generateUpiUri(10, "Fund the young founder");
+  if (pbAnyToggle) {
+    pbAnyToggle.addEventListener("click", () => {
+      if (pbTipPills) {
+        pbTipPills.querySelectorAll(".pb-tip-pill").forEach(p => p.classList.remove("active"));
+      }
+      pbAnyToggle.classList.add("active");
+      if (pbCustomWrap) {
+        const isHidden = pbCustomWrap.style.display === "none" || !pbCustomWrap.style.display;
+        pbCustomWrap.style.display = isHidden ? "flex" : "none";
+        if (isHidden && pbCustomInput) {
+          pbCustomInput.focus();
+        }
+      }
+    });
   }
+
+  if (pbCustomApplyBtn && pbCustomInput) {
+    const applyCustom = () => {
+      const amt = Math.max(1, Math.min(500, Number(pbCustomInput.value) || 50));
+      pbCustomInput.value = amt;
+      updatePassbookTip(amt);
+    };
+    pbCustomApplyBtn.addEventListener("click", applyCustom);
+    pbCustomInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyCustom();
+      }
+    });
+  }
+
+  updatePassbookTip(10);
 }
-
-function updatePdmTipUI(amount) {
-  let amNum = Number(amount);
-  if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
-  pdmTipAmount = Math.min(50000, Math.max(1, amNum));
-  const uri = generateUpiUri(pdmTipAmount, "Fund the young founder");
-
-  const upiBtn = document.getElementById("pdm-upi-btn");
-  const upiMain = document.getElementById("pdm-upi-btn-main");
-  const qrImg = document.getElementById("pdm-qr-img");
-
-  if (upiBtn) {
-    upiBtn.href = uri;
-  }
-  if (upiMain) {
-    upiMain.textContent = `Fund the Young Founder • ₹${pdmTipAmount.toLocaleString('en-IN')}`;
-  }
-  if (qrImg) {
-    const encoded = encodeURIComponent(uri);
-    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encoded}`;
-  }
-}
-
-window.setBeggyUpiId = function(newId) {
-  if (!newId || typeof newId !== "string") return;
-  const sanitized = sanitizeUpiId(newId);
-  if (sanitized === "beggy@upi" && newId.trim() !== "beggy@upi") {
-    alert("Invalid UPI ID format. Expected format: username@bank (e.g. yourname@okhdfcbank)");
-    return;
-  }
-  BEGGY_UPI_CONFIG.pa = sanitized;
-  try {
-    localStorage.setItem("beggy_creator_upi", sanitized);
-  } catch (e) {}
-  updateUpiTipUI(currentTipAmount);
-  console.log("Beggy Creator UPI ID verified and set to:", sanitized);
-};
 
 // ── QUICK CRAVING MODE & URL CHALLENGE (F1, F9) ──────────────────────────────
 function switchDiscoveryMode(mode) {
@@ -2447,17 +2366,18 @@ function handleSimulateCustomCraving(e) {
 function checkUrlChallenge() {
   try {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("challenge") === "1") {
-      const from = params.get("from") || "A Friend";
-      const amount = parseFloat(params.get("amount") || "340");
-      const dish = params.get("dish") || "Chicken Dum Biryani";
+    const cParam = params.get("c") || (params.get("challenge") === "1" ? params.get("amount") : null);
+    if (cParam) {
+      const from = params.get("from") || "A friend";
+      const amount = parseFloat(cParam) || 340;
+      const dish = params.get("dish") || "Takeout Craving";
 
       state.activeChallenge = { from, amount, dish };
 
       if (friendChallengeBanner) {
         friendChallengeBanner.style.display = "flex";
-        if (fcbTitle) fcbTitle.textContent = `⚔️ ${from} Defeated a ₹${amount.toFixed(0)} Craving!`;
-        if (fcbDesc) fcbDesc.textContent = `${from} resisted ordering ${dish} and kept ₹${amount.toFixed(0)}. Can you beat their save?`;
+        if (fcbTitle) fcbTitle.textContent = `⚔️ Friend Challenge: Can you save ₹${amount.toFixed(0)}?`;
+        if (fcbDesc) fcbDesc.textContent = `${from} challenged you to resist ordering ${dish} and save ₹${amount.toFixed(0)}. Can you resist your craving?`;
       }
 
       switchDiscoveryMode("quick");
@@ -2465,6 +2385,10 @@ function checkUrlChallenge() {
       if (customDishPrice) {
         customDishPrice.value = amount;
         if (btnCravingAmount) btnCravingAmount.textContent = amount.toFixed(0);
+      }
+    } else {
+      if (friendChallengeBanner) {
+        friendChallengeBanner.style.display = "none";
       }
     }
   } catch (e) {
@@ -2619,120 +2543,50 @@ function setupEventListeners() {
   if (pbBtnDone) pbBtnDone.addEventListener("click", closePassbookModal);
   if (pbBtnReset) pbBtnReset.addEventListener("click", resetAllUserData);
 
-  // ── INSTANT UPI TIP MODULE LISTENERS ──
-  if (btcPillsRow) {
-    const pills = btcPillsRow.querySelectorAll(".btc-pill:not(#btc-custom-toggle)");
-    pills.forEach(pill => {
-      pill.addEventListener("click", () => {
-        btcPillsRow.querySelectorAll(".btc-pill").forEach(p => p.classList.remove("active"));
-        pill.classList.add("active");
-        if (btcCustomWrap) btcCustomWrap.style.display = "none";
-        const amt = Number(pill.dataset.amount) || 10;
-        updateUpiTipUI(amt);
+  // ── SINGLE FOUNDER SUPPORT IN PASSBOOK MODAL ──
+  setupPassbookFounderSupport();
+
+  // ── VIRAL SHARE & CHALLENGE A FRIEND ACTIONS ──
+  const btnScWhatsapp = document.getElementById("btn-sc-whatsapp");
+  if (btnScWhatsapp) {
+    btnScWhatsapp.addEventListener("click", () => {
+      const { text } = getChallengeLinkData();
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+      Analytics.track("share_card_whatsapp");
+    });
+  }
+
+  const btnCfcWhatsapp = document.getElementById("btn-cfc-whatsapp");
+  const btnCfcCopy = document.getElementById("btn-cfc-copy");
+  if (btnCfcWhatsapp) {
+    btnCfcWhatsapp.addEventListener("click", () => {
+      const { text } = getChallengeLinkData();
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+      Analytics.track("challenge_whatsapp");
+    });
+  }
+  if (btnCfcCopy) {
+    btnCfcCopy.addEventListener("click", () => {
+      const { challengeUrl, text } = getChallengeLinkData();
+      const btnText = document.getElementById("btn-cfc-copy-text");
+      navigator.clipboard.writeText(text).then(() => {
+        showShareToast("✓ Challenge link copied! Share with friends on WhatsApp 📲");
+        if (btnText) btnText.textContent = "✓ Copied Link!";
+        setTimeout(() => {
+          if (btnText) btnText.textContent = "Copy Challenge Link";
+        }, 3000);
+      }).catch(() => {
+        showShareToast(`✓ Challenge link: ${challengeUrl}`);
       });
+      Analytics.track("challenge_copied");
     });
   }
 
-  if (btcCustomToggle) {
-    btcCustomToggle.addEventListener("click", () => {
-      btcPillsRow.querySelectorAll(".btc-pill").forEach(p => p.classList.remove("active"));
-      btcCustomToggle.classList.add("active");
-      if (btcCustomWrap) {
-        const isHidden = btcCustomWrap.style.display === "none" || !btcCustomWrap.style.display;
-        btcCustomWrap.style.display = isHidden ? "flex" : "none";
-        if (isHidden && btcCustomInput) {
-          btcCustomInput.focus();
-        }
-      }
+  if (btnRealSave) {
+    btnRealSave.addEventListener("click", () => {
+      openPassbookModal();
     });
   }
-
-  if (btcCustomApplyBtn && btcCustomInput) {
-    const applyCustomTip = () => {
-      const amt = Math.max(1, Math.min(10000, Number(btcCustomInput.value) || 10));
-      btcCustomInput.value = amt;
-      updateUpiTipUI(amt);
-    };
-    btcCustomApplyBtn.addEventListener("click", applyCustomTip);
-    btcCustomInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        applyCustomTip();
-      }
-    });
-  }
-
-  if (btcCopyBtn) {
-    btcCopyBtn.addEventListener("click", () => {
-      const idToCopy = BEGGY_UPI_CONFIG.pa || "beggy@upi";
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(idToCopy).then(() => {
-          if (btcCopyBtnText) btcCopyBtnText.textContent = "✓ Copied!";
-          setTimeout(() => {
-            if (btcCopyBtnText) btcCopyBtnText.textContent = "📋 Copy";
-          }, 2500);
-        }).catch(() => {
-          prompt("Copy this UPI ID:", idToCopy);
-        });
-      } else {
-        prompt("Copy this UPI ID:", idToCopy);
-      }
-    });
-  }
-
-  if (btcUpiIdVal) {
-    btcUpiIdVal.title = "Click to copy UPI ID";
-    btcUpiIdVal.style.cursor = "pointer";
-    btcUpiIdVal.addEventListener("click", () => {
-      const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(idToCopy).then(() => {
-          if (btcCopyBtnText) btcCopyBtnText.textContent = "✓ Copied!";
-          setTimeout(() => {
-            if (btcCopyBtnText) btcCopyBtnText.textContent = "📋 Copy";
-          }, 2500);
-        }).catch(() => {
-          prompt("Copy this UPI ID:", idToCopy);
-        });
-      } else {
-        prompt("Copy this UPI ID:", idToCopy);
-      }
-    });
-  }
-
-  if (btcPayBtn) {
-    btcPayBtn.addEventListener("click", (e) => {
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (!isMobile) {
-        e.preventDefault();
-        const desktopSec = document.getElementById("btc-desktop-section");
-        if (desktopSec) {
-          desktopSec.scrollIntoView({ behavior: "smooth", block: "center" });
-          desktopSec.style.outline = "2px solid #FF5200";
-          setTimeout(() => { desktopSec.style.outline = "none"; }, 2000);
-        }
-      }
-    });
-  }
-
-  if (pbTipBtn) {
-    pbTipBtn.addEventListener("click", (e) => {
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (!isMobile) {
-        e.preventDefault();
-        const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
-        try {
-          navigator.clipboard.writeText(idToCopy);
-          alert("📱 On Desktop? UPI ID " + idToCopy + " copied to clipboard! Open GPay, PhonePe, or Paytm on your phone to fund.");
-        } catch (err) {
-          prompt("Copy UPI ID:", idToCopy);
-        }
-      }
-    });
-  }
-
-  // Initialize UPI UI with default amount (₹10)
-  updateUpiTipUI(10);
 
   // Discovery Mode tabs (F1)
   if (tabBrowseRestaurants) {
@@ -2842,28 +2696,6 @@ function showPostDeliveryModal(dish, savedAmount) {
   const amazonBtn = document.getElementById("pdm-amazon-btn");
   if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
 
-  // Reset tip amount to 10 and sync UI
-  updatePdmTipUI(10);
-
-  // Reset pills active state to ₹10
-  const pdmPillsRow = document.getElementById("pdm-pills-row");
-  if (pdmPillsRow) {
-    pdmPillsRow.querySelectorAll(".pdm-pill").forEach(p => {
-      p.classList.toggle("active", p.dataset.amount === "10");
-    });
-  }
-  const pdmCustomWrap = document.getElementById("pdm-custom-wrap");
-  if (pdmCustomWrap) pdmCustomWrap.style.display = "none";
-  const pdmQrBox = document.getElementById("pdm-qr-box");
-  if (pdmQrBox) pdmQrBox.style.display = "none";
-
-  // Dismiss the landing banner if still visible
-  const slideBanner = document.getElementById("amazon-slide-banner");
-  if (slideBanner) {
-    slideBanner.classList.remove("show");
-    setTimeout(() => { slideBanner.style.display = "none"; }, 400);
-  }
-
   modal.style.display = "flex";
 }
 
@@ -2873,15 +2705,6 @@ function setupPostDeliveryModal() {
   const closeBtn = document.getElementById("pdm-close-btn");
   const dismissBtn = document.getElementById("pdm-dismiss-btn");
   const amazonBtn = document.getElementById("pdm-amazon-btn");
-  const upiBtn = document.getElementById("pdm-upi-btn");
-  const pdmPillsRow = document.getElementById("pdm-pills-row");
-  const pdmAnyToggle = document.getElementById("pdm-any-toggle");
-  const pdmCustomWrap = document.getElementById("pdm-custom-wrap");
-  const pdmCustomInput = document.getElementById("pdm-custom-input");
-  const pdmCustomApplyBtn = document.getElementById("pdm-custom-apply-btn");
-  const pdmQrToggleBtn = document.getElementById("pdm-qr-toggle-btn");
-  const pdmQrBox = document.getElementById("pdm-qr-box");
-  const pdmCopyUpiBtn = document.getElementById("pdm-copy-upi-btn");
 
   if (!modal) return;
 
@@ -2891,6 +2714,7 @@ function setupPostDeliveryModal() {
 
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   if (dismissBtn) dismissBtn.addEventListener("click", closeModal);
+  if (amazonBtn) amazonBtn.addEventListener("click", closeModal);
 
   // Click outside card on backdrop closes modal
   modal.addEventListener("click", (e) => {
@@ -2905,104 +2729,6 @@ function setupPostDeliveryModal() {
       closeModal();
     }
   });
-
-  // Amount pills selection: 10, 100, 1000, 2000
-  if (pdmPillsRow) {
-    const pills = pdmPillsRow.querySelectorAll(".pdm-pill:not(#pdm-any-toggle)");
-    pills.forEach(pill => {
-      pill.addEventListener("click", () => {
-        pdmPillsRow.querySelectorAll(".pdm-pill").forEach(p => p.classList.remove("active"));
-        pill.classList.add("active");
-        if (pdmCustomWrap) pdmCustomWrap.style.display = "none";
-        const amt = Number(pill.dataset.amount) || 10;
-        updatePdmTipUI(amt);
-      });
-    });
-  }
-
-  // Any / Custom toggle
-  if (pdmAnyToggle) {
-    pdmAnyToggle.addEventListener("click", () => {
-      if (pdmPillsRow) {
-        pdmPillsRow.querySelectorAll(".pdm-pill").forEach(p => p.classList.remove("active"));
-      }
-      pdmAnyToggle.classList.add("active");
-      if (pdmCustomWrap) {
-        const isHidden = pdmCustomWrap.style.display === "none" || !pdmCustomWrap.style.display;
-        pdmCustomWrap.style.display = isHidden ? "flex" : "none";
-        if (isHidden && pdmCustomInput) {
-          pdmCustomInput.focus();
-          const amt = Number(pdmCustomInput.value) || 500;
-          updatePdmTipUI(amt);
-        }
-      }
-    });
-  }
-
-  // Custom apply button & input
-  if (pdmCustomApplyBtn && pdmCustomInput) {
-    pdmCustomApplyBtn.addEventListener("click", () => {
-      const amt = Math.max(1, Math.min(50000, Number(pdmCustomInput.value) || 500));
-      pdmCustomInput.value = amt;
-      updatePdmTipUI(amt);
-    });
-    pdmCustomInput.addEventListener("input", () => {
-      const val = Number(pdmCustomInput.value);
-      if (val && val > 0) updatePdmTipUI(Math.min(50000, val));
-    });
-  }
-
-  // Desktop QR code toggle
-  if (pdmQrToggleBtn && pdmQrBox) {
-    pdmQrToggleBtn.addEventListener("click", () => {
-      const isHidden = pdmQrBox.style.display === "none" || !pdmQrBox.style.display;
-      pdmQrBox.style.display = isHidden ? "flex" : "none";
-    });
-  }
-
-  // Copy UPI ID button
-  if (pdmCopyUpiBtn) {
-    pdmCopyUpiBtn.addEventListener("click", () => {
-      const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
-      navigator.clipboard.writeText(idToCopy).then(() => {
-        pdmCopyUpiBtn.textContent = "✓ Copied to Clipboard!";
-        setTimeout(() => { pdmCopyUpiBtn.textContent = "📋 Copy UPI ID"; }, 2500);
-      }).catch(() => {
-        alert("UPI ID: " + idToCopy);
-      });
-    });
-  }
-
-  // UPI Link click handler (bulletproof for both mobile & desktop)
-  if (upiBtn) {
-    upiBtn.addEventListener("click", (e) => {
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const uri = generateUpiUri(pdmTipAmount, "Fund the young founder");
-
-      if (isMobile) {
-        // Direct mobile app intent
-        window.location.href = uri;
-        setTimeout(closeModal, 1500);
-      } else {
-        // Desktop / Laptop handling
-        e.preventDefault();
-        if (pdmQrBox) pdmQrBox.style.display = "flex";
-        const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
-        try {
-          navigator.clipboard.writeText(idToCopy);
-          if (pdmCopyUpiBtn) pdmCopyUpiBtn.textContent = "✓ Copied to Clipboard!";
-          setTimeout(() => { if (pdmCopyUpiBtn) pdmCopyUpiBtn.textContent = "📋 Copy UPI ID"; }, 2500);
-        } catch (err) {}
-      }
-    });
-  }
-
-  // Amazon button closes modal upon click
-  if (amazonBtn) {
-    amazonBtn.addEventListener("click", () => {
-      closeModal();
-    });
-  }
 }
 
 // ── App Initialization ───────────────────────────────────────────────────────

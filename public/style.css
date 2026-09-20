@@ -1,18 +1,19 @@
 /* ==========================================================================
    Beggy — Official Design System & Multi-Stage Delivery Architecture
    Bengaluru, India Edition
-   Brand Colors: Swiggy Orange #FF5200 | Salt #FFEDE3 | Veg #60B244 | Non-Veg #E43B4F
+   Brand Colors: Beggy Orange #FF5200 | Salt #FFEDE3 | Veg #60B244 | Non-Veg #E43B4F
    ========================================================================== */
 
 :root {
   /* Brand Tokens */
-  --swiggy-orange: #FF5200;
-  --swiggy-orange-hover: #E04800;
-  --swiggy-orange-light: #FFF0E6;
-  --swiggy-salt: #FFEDE3;
-  --swiggy-veg: #60B244;
-  --swiggy-nonveg: #E43B4F;
-  --swiggy-rating: #3D9B6D;
+  --beggy-orange: #FF5722;
+  --brand-orange: #FF5722;
+  --beggy-orange-hover: #E04800;
+  --beggy-orange-light: #FFF0E6;
+  --beggy-salt: #FFEDE3;
+  --beggy-veg: #60B244;
+  --beggy-nonveg: #E43B4F;
+  --beggy-rating: #3D9B6D;
 
   /* Surfaces & Neutrals */
   --bg-page: #F3F4F6;
@@ -177,7 +178,7 @@ body {
   color: #10B981;
 }
 
-/* ── APP HEADER (SWIGGY NAVBAR) ─────────────────────────────────────────── */
+/* ── APP HEADER (BEGGY NAVBAR) ─────────────────────────────────────────── */
 .app-header {
   position: sticky;
   top: 0;
@@ -233,7 +234,7 @@ body {
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   letter-spacing: -0.03em;
   line-height: 1;
 }
@@ -259,8 +260,8 @@ body {
 }
 
 .address-selector:hover {
-  border-color: var(--swiggy-orange);
-  background: var(--swiggy-salt);
+  border-color: var(--beggy-orange);
+  background: var(--beggy-salt);
 }
 
 .location-pin {
@@ -319,7 +320,7 @@ body {
 
 .search-wrapper input:focus {
   background: #FFFFFF;
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
   box-shadow: 0 0 0 3px rgba(255, 82, 0, 0.15);
 }
 
@@ -353,16 +354,16 @@ body {
 }
 
 .nav-home-btn:hover {
-  border-color: var(--swiggy-orange);
-  color: var(--swiggy-orange);
-  background: var(--swiggy-salt);
+  border-color: var(--beggy-orange);
+  color: var(--beggy-orange);
+  background: var(--beggy-salt);
 }
 
 .cart-trigger-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   border: none;
   border-radius: var(--radius-full);
@@ -375,13 +376,13 @@ body {
 }
 
 .cart-trigger-btn:hover {
-  background: var(--swiggy-orange-hover);
+  background: var(--beggy-orange-hover);
   transform: translateY(-1px);
 }
 
 .cart-badge {
   background: #FFFFFF;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-size: 0.75rem;
   font-weight: 900;
   min-width: 20px;
@@ -430,7 +431,7 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-.beggy-one-badge, .swiggy-one-badge {
+.beggy-one-badge, .beggy-one-badge {
   background: linear-gradient(90deg, #F59E0B, #FF5200);
   color: #FFFFFF;
   font-weight: 900;
@@ -481,9 +482,9 @@ body {
 
 .cuisine-pill:hover,
 .cuisine-pill.active {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
   box-shadow: var(--shadow-orange);
 }
 
@@ -594,7 +595,7 @@ body {
 }
 
 .rest-rating-pill {
-  background: var(--swiggy-rating);
+  background: var(--beggy-rating);
   color: #FFFFFF;
   font-weight: 800;
   font-size: 0.72rem;
@@ -643,8 +644,8 @@ body {
 }
 
 .btn-back-link:hover {
-  border-color: var(--swiggy-orange);
-  color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
+  color: var(--beggy-orange);
 }
 
 .restaurant-hero-card {
@@ -699,8 +700,8 @@ body {
 }
 
 .offer-pill {
-  background: var(--swiggy-salt);
-  color: var(--swiggy-orange);
+  background: var(--beggy-salt);
+  color: var(--beggy-orange);
   font-size: 0.8rem;
   font-weight: 800;
   padding: 4px 12px;
@@ -719,7 +720,7 @@ body {
   display: block;
   font-size: 1.25rem;
   font-weight: 900;
-  color: var(--swiggy-rating);
+  color: var(--beggy-rating);
   margin-bottom: 2px;
 }
 
@@ -755,9 +756,9 @@ body {
 
 .diet-btn:hover,
 .diet-btn.active {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
 }
 
 .menu-items-count {
@@ -830,7 +831,7 @@ body {
 .veg-icon {
   width: 12px;
   height: 12px;
-  border: 2px solid var(--swiggy-veg);
+  border: 2px solid var(--beggy-veg);
   border-radius: 2px;
   display: flex;
   align-items: center;
@@ -841,14 +842,14 @@ body {
   content: '';
   width: 6px;
   height: 6px;
-  background-color: var(--swiggy-veg);
+  background-color: var(--beggy-veg);
   border-radius: 50%;
 }
 
 .nonveg-icon {
   width: 12px;
   height: 12px;
-  border: 2px solid var(--swiggy-nonveg);
+  border: 2px solid var(--beggy-nonveg);
   border-radius: 2px;
   display: flex;
   align-items: center;
@@ -859,7 +860,7 @@ body {
   content: '';
   width: 6px;
   height: 6px;
-  background-color: var(--swiggy-nonveg);
+  background-color: var(--beggy-nonveg);
   border-radius: 50%;
 }
 
@@ -886,8 +887,8 @@ body {
 
 .add-btn {
   background: #FFFFFF;
-  color: var(--swiggy-orange);
-  border: 2px solid var(--swiggy-orange);
+  color: var(--beggy-orange);
+  border: 2px solid var(--beggy-orange);
   font-size: 0.9rem;
   font-weight: 900;
   letter-spacing: 0.03em;
@@ -903,16 +904,16 @@ body {
 }
 
 .add-btn:hover {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   box-shadow: 0 6px 16px rgba(255, 82, 0, 0.35);
   transform: translateY(-2px);
 }
 
 /* Legacy alias — keep working if old class used anywhere */
-.swiggy-add-btn-wrap { position: absolute; top: 202px; right: 14px; z-index: 20; }
-.swiggy-add-btn { background: #FFFFFF; color: var(--swiggy-orange); border: 2px solid var(--swiggy-orange); font-size: 0.9rem; font-weight: 900; padding: 8px 24px; border-radius: var(--radius-sm); cursor: pointer; box-shadow: 0 4px 12px rgba(255,82,0,0.25); transition: var(--transition); display: flex; align-items: center; white-space: nowrap; }
-.swiggy-add-btn:hover { background: var(--swiggy-orange); color: #FFFFFF; transform: translateY(-2px); }
+.beggy-add-btn-wrap { position: absolute; top: 202px; right: 14px; z-index: 20; }
+.beggy-add-btn { background: #FFFFFF; color: var(--beggy-orange); border: 2px solid var(--beggy-orange); font-size: 0.9rem; font-weight: 900; padding: 8px 24px; border-radius: var(--radius-sm); cursor: pointer; box-shadow: 0 4px 12px rgba(255,82,0,0.25); transition: var(--transition); display: flex; align-items: center; white-space: nowrap; }
+.beggy-add-btn:hover { background: var(--beggy-orange); color: #FFFFFF; transform: translateY(-2px); }
 
 .dish-card-body {
   padding: 28px 16px 16px; /* extra top padding: button hangs 18px below image */
@@ -965,7 +966,7 @@ body {
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   border-radius: var(--radius-full);
   padding: 12px 28px;
@@ -1040,7 +1041,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   font-weight: 900;
   font-size: 0.9rem;
@@ -1123,8 +1124,8 @@ body {
 }
 
 .payment-option.selected {
-  border-color: var(--swiggy-orange);
-  background: var(--swiggy-salt);
+  border-color: var(--beggy-orange);
+  background: var(--beggy-salt);
 }
 
 .pay-logo-badge {
@@ -1169,14 +1170,14 @@ body {
 }
 
 .payment-option.selected .radio-indicator {
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
 }
 
 .payment-option.selected .radio-indicator::after {
   content: '';
   width: 10px;
   height: 10px;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -1224,7 +1225,7 @@ body {
 
 .checkout-coupon-box {
   background: #ECFDF5;
-  border: 1px dashed var(--swiggy-veg);
+  border: 1px dashed var(--beggy-veg);
   padding: 10px 14px;
   border-radius: var(--radius-sm);
   margin-bottom: 16px;
@@ -1261,7 +1262,7 @@ body {
 }
 
 .free-badge {
-  color: var(--swiggy-veg);
+  color: var(--beggy-veg);
   font-weight: 800;
 }
 
@@ -1276,12 +1277,12 @@ body {
 .total-row strong {
   font-family: var(--font-display);
   font-size: 1.4rem;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 .btn-pay-and-place-order {
   width: 100%;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   border: none;
   border-radius: var(--radius-md);
@@ -1296,7 +1297,7 @@ body {
 }
 
 .btn-pay-and-place-order:hover {
-  background: var(--swiggy-orange-hover);
+  background: var(--beggy-orange-hover);
   transform: translateY(-2px);
 }
 
@@ -1384,8 +1385,8 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--swiggy-orange);
-  box-shadow: 0 0 12px var(--swiggy-orange);
+  background: var(--beggy-orange);
+  box-shadow: 0 0 12px var(--beggy-orange);
   animation: livePulse 1.5s infinite;
 }
 
@@ -1415,8 +1416,8 @@ body {
 }
 
 .eta-pill {
-  background: var(--swiggy-salt);
-  color: var(--swiggy-orange);
+  background: var(--beggy-salt);
+  color: var(--beggy-orange);
   font-weight: 900;
   font-size: 0.95rem;
   padding: 4px 14px;
@@ -1467,20 +1468,20 @@ body {
 }
 
 .step-node.completed .node-circle {
-  background: var(--swiggy-veg);
-  border-color: var(--swiggy-veg);
+  background: var(--beggy-veg);
+  border-color: var(--beggy-veg);
   color: #FFFFFF;
 }
 
 .step-node.active .node-circle {
-  background: var(--swiggy-orange);
-  border-color: var(--swiggy-orange);
+  background: var(--beggy-orange);
+  border-color: var(--beggy-orange);
   color: #FFFFFF;
   box-shadow: 0 0 12px rgba(255, 82, 0, 0.4);
 }
 
 .step-node.active span {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-weight: 900;
 }
 
@@ -1493,7 +1494,7 @@ body {
 }
 
 .step-line.completed {
-  background: var(--swiggy-veg);
+  background: var(--beggy-veg);
 }
 
 /* Map Wrapper */
@@ -1548,9 +1549,9 @@ body {
 }
 
 .simulate-arrival-btn:hover {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
 }
 
 .real-leaflet-map {
@@ -1580,7 +1581,7 @@ body {
 /* ── THE TWIST: DOPAMINE REVEAL & REAL SAVE SECTION ──────────────────────── */
 .dopamine-reveal-card {
   background: #FFFFFF;
-  border: 2px solid var(--swiggy-orange);
+  border: 2px solid var(--beggy-orange);
   border-radius: var(--radius-xl);
   padding: 36px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -1607,7 +1608,7 @@ body {
   font-size: 0.8rem;
   font-weight: 900;
   letter-spacing: 0.08em;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   margin-bottom: 4px;
 }
 
@@ -1627,7 +1628,7 @@ body {
 }
 
 .dopamine-savings-highlight {
-  background: var(--swiggy-salt);
+  background: var(--beggy-salt);
   border: 1px solid rgba(255, 82, 0, 0.25);
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -1638,7 +1639,7 @@ body {
 .dsh-tag {
   font-size: 0.74rem;
   font-weight: 900;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   display: block;
 }
 
@@ -1798,8 +1799,8 @@ body {
 }
 
 .cr-badge {
-  background: var(--swiggy-salt);
-  color: var(--swiggy-orange);
+  background: var(--beggy-salt);
+  color: var(--beggy-orange);
   font-size: 0.74rem;
   font-weight: 900;
   padding: 3px 10px;
@@ -1922,9 +1923,9 @@ body {
 }
 
 .btn-order-again:hover {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
 }
 
 /* ── CART DRAWER ─────────────────────────────────────────────────────────── */
@@ -2040,7 +2041,7 @@ body {
 
 .cart-item-info span {
   font-size: 0.78rem;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-weight: 800;
 }
 
@@ -2053,7 +2054,7 @@ body {
 .qty-btn {
   background: #FFFFFF;
   border: 1px solid #D4D5D9;
-  color: var(--swiggy-veg);
+  color: var(--beggy-veg);
   width: 26px;
   height: 26px;
   border-radius: var(--radius-sm);
@@ -2074,9 +2075,9 @@ body {
   gap: 10px;
 }
 
-.beggy-coupon-box, .swiggy-coupon-box {
+.beggy-coupon-box, .beggy-coupon-box {
   background: #ECFDF5;
-  border: 1px dashed var(--swiggy-veg);
+  border: 1px dashed var(--beggy-veg);
   padding: 10px 12px;
   border-radius: var(--radius-sm);
 }
@@ -2111,14 +2112,14 @@ body {
 }
 
 .highlight-total strong {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-family: var(--font-display);
   font-size: 1.35rem;
 }
 
-.checkout-beggy-btn, .checkout-swiggy-btn {
+.checkout-beggy-btn, .checkout-beggy-btn {
   width: 100%;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   border: none;
   border-radius: var(--radius-md);
@@ -2133,12 +2134,12 @@ body {
   box-shadow: var(--shadow-orange);
 }
 
-.checkout-beggy-btn:hover, .checkout-swiggy-btn:hover:not(:disabled) {
-  background: var(--swiggy-orange-hover);
+.checkout-beggy-btn:hover, .checkout-beggy-btn:hover:not(:disabled) {
+  background: var(--beggy-orange-hover);
   transform: translateY(-2px);
 }
 
-.checkout-beggy-btn:disabled, .checkout-swiggy-btn:disabled {
+.checkout-beggy-btn:disabled, .checkout-beggy-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(1);
@@ -2178,7 +2179,7 @@ body {
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 .footer-brand p {
@@ -2385,7 +2386,7 @@ body {
 
 .mode-tab-btn.active {
   background: #FFFFFF;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -2422,7 +2423,7 @@ body {
 .qcp-tag {
   font-size: 0.75rem;
   font-weight: 800;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   letter-spacing: 0.08em;
   margin-bottom: 6px;
 }
@@ -2476,14 +2477,14 @@ body {
 .craving-chip:hover {
   background: #FFF7ED;
   border-color: #FDBA74;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   transform: translateY(-2px);
 }
 
 .craving-chip.selected {
   background: #FFEDD5;
-  border-color: var(--swiggy-orange);
-  color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
+  color: var(--beggy-orange);
   font-weight: 800;
 }
 
@@ -2534,13 +2535,13 @@ body {
 }
 
 .qcp-input-group input:focus {
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
   box-shadow: 0 0 0 3px rgba(255, 82, 0, 0.15);
 }
 
 .btn-simulate-craving {
   width: 100%;
-  background: linear-gradient(135deg, var(--swiggy-orange), #EA580C);
+  background: linear-gradient(135deg, var(--beggy-orange), #EA580C);
   color: #FFFFFF;
   border: none;
   border-radius: var(--radius-md);
@@ -4441,191 +4442,308 @@ img, svg, canvas {
 }
 
 /* ====================================================================
-   CRAVING DISTRACTION ARCADE & NO-INSTALL WEB GAMES (POKI)
+   VIRAL REVEAL & SOCIAL CHALLENGE SYSTEM (P0 VIRALITY)
    ==================================================================== */
-.tracking-game-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  background: linear-gradient(135deg, rgba(28, 32, 43, 0.95), rgba(19, 22, 31, 0.95));
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  margin-top: 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(139, 92, 246, 0.15);
-}
-
-.tgb-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.tgb-icon {
-  font-size: 1.5rem;
-  animation: bounceSlow 2s infinite ease-in-out;
-}
-
-.tgb-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.tgb-text strong {
-  font-size: 0.9rem;
+.dopamine-sub-hero {
+  font-size: 1.1rem;
   font-weight: 800;
+  color: #FBBF24;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.reveal-dish-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  padding: 8px 18px;
+  margin: 14px auto 0;
+  max-width: 440px;
+  font-size: 0.92rem;
   color: #FFFFFF;
 }
 
-.tgb-text span {
-  font-size: 0.74rem;
-  color: #9CA3AF;
-  font-weight: 500;
-}
-
-.tgb-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
-  color: #FFFFFF;
-  text-decoration: none;
-  font-size: 0.82rem;
+.reveal-dish-row .rdr-dish {
   font-weight: 800;
-  padding: 8px 16px;
-  border-radius: 10px;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
 }
 
-.tgb-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+.reveal-dish-row .rdr-spent strong {
+  color: #34D399;
 }
 
-/* ── Craving Arcade Card on Dopamine Reveal Page ── */
-.craving-arcade-box {
-  background: linear-gradient(180deg, #1C202B 0%, #13161F 100%);
-  border: 1.5px solid rgba(139, 92, 246, 0.35);
+/* ── WhatsApp Story Share Button ── */
+.btn-sc-whatsapp {
+  background: #25D366 !important;
+  color: #FFFFFF !important;
+  border-color: #25D366 !important;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+}
+
+.btn-sc-whatsapp:hover {
+  background: #1EBE5D !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+/* ── Social Challenge a Friend Card ── */
+.challenge-friend-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+  border: 1.5px solid rgba(255, 87, 34, 0.4);
   border-radius: var(--radius-xl);
   padding: 24px 20px;
-  margin: 24px 0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(139, 92, 246, 0.12);
+  margin: 22px 0;
   text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(255, 87, 34, 0.15);
 }
 
-.cab-header {
-  margin-bottom: 18px;
-}
-
-.cab-badge {
+.cfc-badge {
   display: inline-block;
-  background: rgba(139, 92, 246, 0.15);
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  color: #A78BFA;
+  background: rgba(255, 87, 34, 0.15);
+  border: 1px solid rgba(255, 87, 34, 0.35);
+  color: #FF7043;
   font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   padding: 4px 12px;
   border-radius: var(--radius-full);
   margin-bottom: 8px;
   text-transform: uppercase;
 }
 
-.cab-title {
+.cfc-title {
   font-size: 1.35rem;
   font-weight: 900;
   color: #FFFFFF;
   margin: 0 0 6px;
 }
 
-.cab-sub {
-  font-size: 0.85rem;
-  color: #9CA3AF;
+.cfc-sub {
+  font-size: 0.86rem;
+  color: #94A3B8;
   line-height: 1.45;
-  max-width: 580px;
-  margin: 0 auto;
+  max-width: 480px;
+  margin: 0 auto 16px;
 }
 
-.cab-grid {
+.cfc-action-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin: 16px 0;
+  max-width: 440px;
+  margin: 0 auto;
 }
 
-.cab-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-lg);
-  padding: 14px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  text-align: left;
-}
-
-.cab-card:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.4);
-  transform: translateY(-2px);
-}
-
-.cab-icon {
-  font-size: 1.8rem;
-  flex-shrink: 0;
-}
-
-.cab-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-}
-
-.cab-info strong {
-  font-size: 0.92rem;
-  color: #FFFFFF;
-  font-weight: 800;
-}
-
-.cab-info span {
-  font-size: 0.72rem;
-  color: #9CA3AF;
-}
-
-.cab-arrow {
-  color: #A78BFA;
-  font-weight: 800;
-  font-size: 0.85rem;
-  flex-shrink: 0;
-}
-
-.cab-main-btn {
+.btn-cfc-whatsapp {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  gap: 8px;
+  background: #25D366;
   color: #FFFFFF;
-  text-decoration: none;
-  font-size: 0.95rem;
+  border: none;
+  font-size: 0.92rem;
   font-weight: 800;
-  padding: 13px 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
   transition: all 0.2s ease;
 }
 
-.cab-main-btn:hover {
+.btn-cfc-whatsapp:hover {
+  background: #1EBE5D;
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.55);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.btn-cfc-copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cfc-copy:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Collapsed Founder Support in Passbook (Single Placement) ── */
+.pb-support-details {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  margin: 16px 0;
+  transition: all 0.25s ease;
+}
+
+.pb-support-details[open] {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 87, 34, 0.3);
+}
+
+.pb-support-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 700;
+  color: #E2E8F0;
+  font-size: 0.92rem;
+  user-select: none;
+}
+
+.pb-support-summary::-webkit-details-marker {
+  display: none;
+}
+
+.pb-support-summary .pss-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.pb-support-body {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pss-desc {
+  font-size: 0.82rem;
+  color: #94A3B8;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.pb-tip-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pb-tip-pill {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pb-tip-pill.active {
+  background: #FF5722;
+  border-color: #FF5722;
+  color: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(255, 87, 34, 0.4);
+}
+
+.pb-custom-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pb-custom-input-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: #FFFFFF;
+}
+
+.pb-custom-input-box span {
+  color: #94A3B8;
+  font-weight: 800;
+  margin-right: 6px;
+}
+
+.pb-custom-input-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.92rem;
+  width: 100%;
+}
+
+.pb-custom-apply-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #FFFFFF;
+  font-weight: 800;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.pb-tip-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FF5722 0%, #EA580C 100%);
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 0.94rem;
+  font-weight: 800;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(255, 87, 34, 0.4);
+  transition: all 0.2s ease;
+}
+
+.pb-tip-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.55);
+}
+
+.pb-direct-settle {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ── Open Source GitHub Link in Trust Banner ── */
+.tsb-github-link {
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.tsb-github-link:hover {
+  color: #FF5722;
+  text-decoration: underline;
 }
 
 /* ====================================================================
@@ -4735,15 +4853,196 @@ img, svg, canvas {
   }
   .tgb-left {
     flex-direction: column;
-    text-align: center;
+  color: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(255, 87, 34, 0.4);
+}
+
+.pb-custom-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pb-custom-input-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: #FFFFFF;
+}
+
+.pb-custom-input-box span {
+  color: #94A3B8;
+  font-weight: 800;
+  margin-right: 6px;
+}
+
+.pb-custom-input-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.92rem;
+  width: 100%;
+}
+
+.pb-custom-apply-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #FFFFFF;
+  font-weight: 800;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.pb-tip-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FF5722 0%, #EA580C 100%);
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 0.94rem;
+  font-weight: 800;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(255, 87, 34, 0.4);
+  transition: all 0.2s ease;
+}
+
+.pb-tip-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.55);
+}
+
+.pb-direct-settle {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ── Open Source GitHub Link in Trust Banner ── */
+.tsb-github-link {
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.tsb-github-link:hover {
+  color: #FF5722;
+  text-decoration: underline;
+}
+
+/* ====================================================================
+   FLYING STREAK FIRE ANIMATION (CENTER-TO-HEADER IMPACT)
+   ==================================================================== */
+.flying-streak-flame {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 1000000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 0 35px rgba(255, 82, 0, 0.85));
+}
+
+.fsf-aura {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255, 82, 0, 0.45) 0%, rgba(245, 158, 11, 0.2) 50%, transparent 75%);
+  border-radius: 50%;
+  animation: flameAuraPulse 0.8s ease-in-out infinite alternate;
+}
+
+.fsf-emoji {
+  font-size: 5rem;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  animation: flameWiggle 0.6s ease-in-out infinite alternate;
+}
+
+.fsf-badge {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #FF5200 0%, #EA580C 100%);
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 20px rgba(255, 82, 0, 0.6);
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  text-transform: uppercase;
+}
+
+.fsf-sub {
+  font-size: 0.82rem;
+  color: #FEF08A;
+  font-weight: 800;
+  margin-top: 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes flameAuraPulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes flameWiggle {
+  0% { transform: scale(1) rotate(-4deg); }
+  100% { transform: scale(1.1) rotate(4deg); }
+}
+
+/* Header Streak Pill Impact Animation */
+.streak-pill.streak-pill-ignite {
+  animation: streakIgnitePulse 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes streakIgnitePulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 82, 0, 0);
   }
-  .tgb-btn {
-    width: 100%;
-    justify-content: center;
+  30% {
+    transform: scale(1.45);
+    background: linear-gradient(135deg, #FF5200, #F59E0B);
+    box-shadow: 0 0 30px #FF5200, 0 0 15px #F59E0B;
+    color: #FFFFFF;
   }
-  .cab-grid {
-    grid-template-columns: 1fr;
+  60% {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 82, 0, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 82, 0, 0.3);
   }
 }
 
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
 
+@media (max-width: 600px) {
+  .cfc-action-row {
+    grid-template-columns: 1fr;
+  }
+}

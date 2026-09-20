@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Beggy — Crave It. Simulate It. Save the Bill.</title>
   <meta name="description" content="Feel the full dopamine rush of ordering takeout in Bengaluru for ₹0, track the rider live, and turn the bill into real personal savings.">
-  <meta name="theme-color" content="#FF5200">
+  <meta name="theme-color" content="#FF5722">
   <link rel="icon" type="image/png" href="logo.png">
 
   <link rel="canonical" href="https://beggy.vercel.app/">
@@ -15,22 +15,25 @@
   <meta property="og:url" content="https://beggy.vercel.app/">
   <meta property="og:title" content="Beggy — Crave It. Simulate It. Save the Bill.">
   <meta property="og:description" content="Feel the full ordering thrill for ₹0, watch the rider move, and turn the food bill into real personal savings. The 45-second craving killer.">
-  <meta property="og:image" content="https://beggy.vercel.app/logo.png">
+  <meta property="og:image" content="https://beggy.vercel.app/og-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Beggy — Crave It. Simulate It. Save the Bill.">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://beggy.vercel.app/">
   <meta name="twitter:title" content="Beggy — Order Nothing. Save Everything.">
   <meta name="twitter:description" content="Turn midnight impulse food cravings into a visible savings score. 100% simulated, 100% money saved.">
-  <meta name="twitter:image" content="https://beggy.vercel.app/logo.png">
+  <meta name="twitter:image" content="https://beggy.vercel.app/og-1200x630.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
-  <meta name="keywords" content="Beggy, anti-spending app, food delivery simulator, Bengaluru food delivery savings, Swiggy craving killer, Zomato impulse craving, save money takeout, dopamine food simulator, Bangalore biryani savings">
+  <meta name="keywords" content="Beggy, anti-spending app, food delivery simulator, Bengaluru food delivery savings, no-spend challenge, craving killer, save money takeout, dopamine food simulator, Bangalore biryani savings">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="robots" content="index, follow">
-  <meta name="copyright" content="Beggy Inc.">
+  <meta name="copyright" content="Beggy">
 
   <!-- Schema.org Rich Snippet Structured Data for Google / Bing Search -->
   <script type="application/ld+json">
@@ -59,15 +62,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css">
 </head>
-<body oncontextmenu="return false;">
+<body>
   <!-- Dopamine Reveal Confetti Canvas -->
   <canvas id="confetti-canvas"></canvas>
-
-  <!-- Beggy Anti-Theft / Security Shield Toast Notification -->
-  <div class="security-shield-toast" id="security-shield-toast" aria-live="assertive">
-    <span class="sst-icon">🔒</span>
-    <span class="sst-msg">Protected by Beggy Shield — Content copying &amp; inspection are restricted.</span>
-  </div>
 
   <!-- Simulated Vault SMS / Push Notification Toast -->
   <div class="bank-sms-toast" id="bank-sms-toast" aria-live="polite">
@@ -221,8 +218,8 @@
         <!-- Top Offer Strip -->
         <div class="offer-banner-strip">
           <div class="strip-left">
-            <span class="beggy-one-badge swiggy-one-badge">⚡ Beggy ONE</span>
-            <span>Free Delivery on all orders above ₹149 in Bengaluru</span>
+            <span class="beggy-one-badge">⚡ Beggy ONE</span>
+            <span>Free Delivery on all orders above ₹149 in Bengaluru • <em style="font-style: normal; opacity: 0.85;">Demo • no real payments</em></span>
           </div>
           <div class="strip-right">
             <span>Use Coupon: <strong>BEGGY100</strong> for 100% OFF your order</span>
@@ -444,25 +441,11 @@
               </div>
             </div>
 
-            <!-- 🧪 SIMULATION BANNER — visible before user presses pay (P0 trust fix) -->
-            <div class="checkout-sim-banner">
-              <span class="sim-banner-icon">🧪</span>
-              <div class="sim-banner-text">
-                <strong>SIMULATION ONLY</strong>
-                <span>No real payment will be charged. This is Beggy's anti-spending experience — we never ask for your card, UPI PIN, or bank details.</span>
-              </div>
-            </div>
-
             <!-- Primary Place Order Button -->
             <button class="btn-pay-and-place-order" id="btn-pay-and-place-order">
               <span class="pay-btn-main">Pay ₹0.00 &amp; Place Order 🚀</span>
-              <span class="pay-btn-sub">Simulated 20-min express delivery in Bengaluru</span>
+              <span class="pay-btn-sub">20-min express delivery in Bengaluru</span>
             </button>
-
-            <!-- Post-button trust tagline -->
-            <p class="checkout-trust-tagline">
-              🔒 No real order &nbsp;•&nbsp; No real payment &nbsp;•&nbsp; No real delivery
-            </p>
           </div>
         </div>
       </div>
@@ -546,33 +529,28 @@
           <span>🛵 <strong>Live Scooter:</strong> Navigating CMH Road</span>
         </div>
 
-        <!-- Craving Distraction: Instant No-Install Games while Rider Travels -->
-        <div class="tracking-game-bar" id="tracking-game-bar">
-          <div class="tgb-left">
-            <span class="tgb-icon">🎮</span>
-            <div class="tgb-text">
-              <strong>Kill 5 Mins • Defeat the Craving!</strong>
-              <span>Play free instant games while waiting — No download or install</span>
-            </div>
-          </div>
-          <a href="https://poki.com" target="_blank" rel="noopener noreferrer" class="tgb-btn">
-            Play on Poki ➔
-          </a>
-        </div>
       </div>
 
       <!-- ================================================================
-           THE TWIST: DOPAMINE HIT DONE & REAL SAVE HERO SECTION
+           THE TWIST: VIRAL REVEAL & SAVINGS HERO SECTION (P0 VIRALITY)
            ================================================================ -->
       <div class="dopamine-reveal-card" id="dopamine-reveal-card" style="display: none;">
+        <!-- 1. FIRST: BIG SAVINGS REVEAL HERO -->
         <div class="dopamine-header">
           <div class="dopamine-icon">🎉</div>
           <div class="dopamine-eyebrow">CRAVE IT. SIMULATE IT. SAVE THE BILL.</div>
-          <h2 class="dopamine-title">DOPAMINE HIT DONE!</h2>
-          <p class="dopamine-joke" id="dopamine-joke">Your biryani is still in the restaurant's imagination.</p>
+          <h2 class="dopamine-title">YOUR FOOD WAS NEVER ORDERED.</h2>
+          <div class="dopamine-sub-hero">BUT YOU JUST SAVED</div>
+          <div class="dsh-amount" id="reveal-saved-amount">₹340.00</div>
+          <div class="reveal-dish-row" id="reveal-dish-row">
+            <span class="rdr-dish" id="reveal-dish-name">🍗 Chicken Dum Biryani</span>
+            <span class="rdr-arrow">•</span>
+            <span class="rdr-spent" id="reveal-dish-spent">₹340 → <strong>₹0 spent</strong></span>
+          </div>
+          <p class="dopamine-joke" id="dopamine-joke">Your food is still in the restaurant's imagination. Your money is 100% safe in your bank account!</p>
         </div>
 
-        <!-- Head-to-Head Friend Challenge Result Banner -->
+        <!-- Head-to-Head Friend Challenge Result Banner (Shown when arriving from challenge link) -->
         <div class="challenge-result-card" id="challenge-result-card" style="display: none;">
           <div class="crc-icon">⚔️</div>
           <div class="crc-body">
@@ -581,105 +559,61 @@
           </div>
         </div>
 
-        <div class="dopamine-savings-highlight">
-          <span class="dsh-tag">YOUR FOOD WAS NEVER ORDERED... BUT YOU JUST SAVED:</span>
-          <div class="dsh-amount" id="reveal-saved-amount">₹340.00</div>
-          <p class="dsh-note">
-            You experienced 100% of the craving excitement, menu browsing thrill, and delivery dopamine rush — <strong>without burning a single rupee from your bank!</strong>
-          </p>
+        <!-- 2. SECOND: VIRAL SHARING ENGINE (DYNAMIC STORY CANVAS CARD) -->
+        <div class="share-card-section" id="share-card-section">
+          <div class="sc-header">
+            <span class="sc-badge">🔥 VIRAL SAVINGS CARD</span>
+            <h3 class="sc-title">Flex Your Willpower</h3>
+            <p class="sc-sub">Share your craving victory directly to WhatsApp, Instagram Stories, or X with one tap.</p>
+          </div>
+
+          <!-- Live Canvas Container -->
+          <div class="sc-canvas-box">
+            <canvas id="share-card-canvas" width="1080" height="1920" class="share-card-canvas"></canvas>
+          </div>
+
+          <!-- Share Actions Grid -->
+          <div class="sc-actions-grid">
+            <button class="btn-sc-action btn-sc-whatsapp" id="btn-sc-whatsapp" type="button">
+              <span class="btn-sc-icon">💬</span>
+              <span>Share on WhatsApp</span>
+            </button>
+            <button class="btn-sc-action btn-sc-primary" id="btn-sc-share" type="button">
+              <span class="btn-sc-icon">📲</span>
+              <span>Share Story Card</span>
+            </button>
+            <button class="btn-sc-action btn-sc-secondary" id="btn-sc-download" type="button">
+              <span class="btn-sc-icon">💾</span>
+              <span>Download PNG</span>
+            </button>
+            <button class="btn-sc-action btn-sc-secondary" id="btn-sc-copy" type="button">
+              <span class="btn-sc-icon">📋</span>
+              <span>Copy Caption &amp; Link</span>
+            </button>
+          </div>
+          <p class="sc-toast-msg" id="sc-toast-msg"></p>
         </div>
 
-        <!-- THE REQUESTED "REAL SAVE" BUTTON -->
-        <div class="real-save-action-box">
-          <button class="btn-real-save" id="btn-real-save">
-            <div class="rs-icon-wrap">🏦</div>
-            <div class="rs-text-wrap">
-              <strong>Dopamine Hit Done — Let's Do Real Save</strong>
-              <span id="rs-subtext">Transfer <span id="rs-amount-val">₹340.00</span> to Your Savings Ledger</span>
-            </div>
-          </button>
-        </div>
-
-        <!-- ==============================================================
-             INSTANT UPI TIP MODULE ("CHAI FOR BEGGY" — DIRECT TO BANK)
-             ============================================================== -->
-        <div class="beggy-tip-card" id="beggy-tip-card">
-          <div class="btc-header">
-            <div class="btc-badge">🚀 DIRECT FOUNDER SUPPORT</div>
-            <h3 class="btc-title">Saved <span id="btc-saved-val">₹340</span>? Fund the Young Founder</h3>
-            <p class="btc-sub">Swiggy charges high platform fees on every delivery. Since Beggy saved your bill today, support the young solo student founder building Beggy with <strong>instant 1-tap UPI</strong> (0% platform cut)!</p>
+        <!-- 3. THIRD: CHALLENGE A FRIEND URL ENGINE -->
+        <div class="challenge-friend-card" id="challenge-friend-card">
+          <div class="cfc-header">
+            <span class="cfc-badge">⚔️ SOCIAL CHALLENGE</span>
+            <h3 class="cfc-title">Can your friends beat <span id="cfc-saved-val">₹340</span>?</h3>
+            <p class="cfc-sub">Send a challenge link to friends. See who has the strongest willpower against late-night takeout cravings.</p>
           </div>
-
-          <!-- Quick Tip Amount Selector: 10, 100, 1000, 2000, Any -->
-          <div class="btc-pills-row" id="btc-pills-row">
-            <button class="btc-pill active" data-amount="10" type="button">
-              <span class="btc-pill-price">₹10</span>
-              <span class="btc-pill-name">Chai ☕</span>
+          <div class="cfc-action-row">
+            <button class="btn-cfc-whatsapp" id="btn-cfc-whatsapp" type="button">
+              <span class="cfc-btn-icon">📲</span>
+              <span>Challenge on WhatsApp</span>
             </button>
-            <button class="btc-pill" data-amount="100" type="button">
-              <span class="btc-pill-price">₹100</span>
-              <span class="btc-pill-name">Supporter 🚀</span>
+            <button class="btn-cfc-copy" id="btn-cfc-copy" type="button">
+              <span class="cfc-btn-icon">📋</span>
+              <span id="btn-cfc-copy-text">Copy Challenge Link</span>
             </button>
-            <button class="btc-pill" data-amount="1000" type="button">
-              <span class="btc-pill-price">₹1,000</span>
-              <span class="btc-pill-name">Patron ⭐</span>
-            </button>
-            <button class="btc-pill" data-amount="2000" type="button">
-              <span class="btc-pill-price">₹2,000</span>
-              <span class="btc-pill-name">Angel 👑</span>
-            </button>
-            <button class="btc-pill btc-pill-custom-toggle" id="btc-custom-toggle" type="button">
-              <span class="btc-pill-price">✏️</span>
-              <span class="btc-pill-name">Any</span>
-            </button>
-          </div>
-
-          <!-- Custom Amount Input Field (hidden by default) -->
-          <div class="btc-custom-wrap" id="btc-custom-wrap" style="display: none;">
-            <div class="btc-custom-input-box">
-              <span class="btc-custom-currency">₹</span>
-              <input type="number" id="btc-custom-input" min="1" max="10000" step="1" placeholder="Enter tip amount" value="10">
-            </div>
-            <button class="btc-custom-apply-btn" id="btc-custom-apply-btn" type="button">Apply</button>
-          </div>
-
-          <!-- Primary Mobile 1-Tap UPI Button -->
-          <div class="btc-action-wrap">
-            <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Chai%20for%20Beggy" class="btc-pay-btn" id="btc-pay-btn">
-              <div class="btc-pay-glow"></div>
-              <span class="btc-pay-icon">⚡</span>
-              <div class="btc-pay-labels">
-                <span class="btc-pay-main" id="btc-pay-main-text">Pay ₹10 via UPI</span>
-                <span class="btc-pay-apps">GPay • PhonePe • Paytm • CRED • BHIM</span>
-              </div>
-            </a>
-          </div>
-
-          <!-- Desktop QR Code & Copy UPI Section -->
-          <div class="btc-desktop-section" id="btc-desktop-section">
-            <div class="btc-divider">
-              <span>OR SCAN WITH PHONE CAMERA / UPI APP</span>
-            </div>
-            <div class="btc-desktop-content">
-              <div class="btc-qr-frame">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi%3A%2F%2Fpay%3Fpa%3Darunking156-2%40oksbi%26pn%3DArunachalam%2520Venkatachalapathy%26am%3D10%26cu%3DINR%26tn%3DChai%2520for%2520Beggy" alt="Scan UPI QR Code to Tip" id="btc-qr-img" class="btc-qr-img" />
-              </div>
-              <div class="btc-desktop-info">
-                <div class="btc-scan-tip">📱 Open Google Pay, PhonePe, Paytm or Camera &amp; point here</div>
-                <div class="btc-copy-box">
-                  <span class="btc-upi-label">UPI ID:</span>
-                  <code class="btc-upi-id" id="btc-upi-id-val">arunking156-2@oksbi</code>
-                  <button class="btc-copy-btn" id="btc-copy-btn" type="button" title="Copy UPI ID">
-                    <span id="btc-copy-btn-text">📋 Copy</span>
-                  </button>
-                </div>
-                <div class="btc-settlement-note">✓ 100% direct bank settlement • 0-second transfer • Zero platform commission</div>
-              </div>
-            </div>
           </div>
         </div>
 
-        <!-- Beggy Savings Account Passbook Card -->
+        <!-- 4. FOURTH: SAVINGS PASSBOOK & STREAKS SUMMARY -->
         <div class="savings-account-card" id="savings-account-card">
           <div class="sa-top">
             <div class="sa-bank-label">
@@ -688,7 +622,7 @@
             </div>
             <div class="sa-chip">💳</div>
           </div>
-          <div class="sa-account-num">A/C **4921 • UPI / Beggy Anti-Spend</div>
+          <div class="sa-account-num">A/C **4921 • Beggy Anti-Spend Ledger</div>
           <div class="sa-balance-wrap">
             <span class="sa-bal-label">TOTAL ANTI-SPENDING VAULT BALANCE</span>
             <div class="sa-bal-val" id="sa-balance-val">₹0.00</div>
@@ -699,79 +633,18 @@
           </div>
         </div>
 
-        <!-- ==============================================================
-             VIRAL SHARING ENGINE: DYNAMIC CANVAS SHARE CARD GENERATOR (F2)
-             ============================================================== -->
-        <div class="share-card-section" id="share-card-section">
-          <div class="sc-header">
-            <span class="sc-badge">🔥 VIRAL SAVINGS CARD</span>
-            <h3 class="sc-title">Flex Your Willpower</h3>
-            <p class="sc-sub">Share your craving victory directly to Instagram Stories, WhatsApp, or X with one tap.</p>
-          </div>
-
-          <!-- Live Canvas Container -->
-          <div class="sc-canvas-box">
-            <canvas id="share-card-canvas" width="1080" height="1920" class="share-card-canvas"></canvas>
-          </div>
-
-          <!-- Share Actions Grid -->
-          <div class="sc-actions-grid">
-            <button class="btn-sc-action btn-sc-primary" id="btn-sc-share">
-              <span class="btn-sc-icon">📲</span>
-              <span>Share Story Card</span>
-            </button>
-            <button class="btn-sc-action btn-sc-secondary" id="btn-sc-download">
-              <span class="btn-sc-icon">💾</span>
-              <span>Download PNG</span>
-            </button>
-            <button class="btn-sc-action btn-sc-secondary" id="btn-sc-copy">
-              <span class="btn-sc-icon">📋</span>
-              <span>Copy Caption & Link</span>
-            </button>
-            <button class="btn-sc-action btn-sc-challenge" id="btn-sc-challenge">
-              <span class="btn-sc-icon">⚔️</span>
-              <span>Challenge a Friend</span>
-            </button>
-          </div>
-          <p class="sc-toast-msg" id="sc-toast-msg"></p>
+        <!-- Action to open full Passbook -->
+        <div class="real-save-action-box">
+          <button class="btn-real-save" id="btn-real-save" type="button">
+            <div class="rs-icon-wrap">🏦</div>
+            <div class="rs-text-wrap">
+              <strong>Open Savings Passbook &amp; Streaks</strong>
+              <span id="rs-subtext">View lifetime savings ledger, streaks &amp; milestone badges ➔</span>
+            </div>
+          </button>
         </div>
 
-        <!-- ==============================================================
-             CRAVING DISTRACTION ARCADE: INSTANT NO-INSTALL GAMES (POKI)
-             ============================================================== -->
-        <div class="craving-arcade-box" id="craving-arcade-box">
-          <div class="cab-header">
-            <span class="cab-badge">🎮 INSTANT CRAVING DISTRACTION</span>
-            <h3 class="cab-title">Still Craving? Play a 5-Min Game!</h3>
-            <p class="cab-sub">Visual distraction completely dissolves food cravings within 5 minutes. 100% free, zero installation, no login required.</p>
-          </div>
-
-          <div class="cab-grid">
-            <a href="https://poki.com" target="_blank" rel="noopener noreferrer" class="cab-card">
-              <span class="cab-icon">🏃</span>
-              <div class="cab-info">
-                <strong>Action Runners</strong>
-                <span>Subway Surfers, Temple Run &amp; more</span>
-              </div>
-              <span class="cab-arrow">Play ➔</span>
-            </a>
-            <a href="https://poki.com" target="_blank" rel="noopener noreferrer" class="cab-card">
-              <span class="cab-icon">🧩</span>
-              <div class="cab-info">
-                <strong>Brain Teasers &amp; Puzzles</strong>
-                <span>Instant dopamine reset • 0MB</span>
-              </div>
-              <span class="cab-arrow">Play ➔</span>
-            </a>
-          </div>
-
-          <a href="https://poki.com" target="_blank" rel="noopener noreferrer" class="cab-main-btn">
-            <span class="cab-btn-icon">🕹️</span>
-            <span>Explore 1,000+ Instant No-Install Games on Poki →</span>
-          </a>
-        </div>
-
-        <!-- Secret Chef Recipe Card with Natural Amazon Helper Button -->
+        <!-- 5. FIFTH: 15-MINUTE RESTAURANT RECIPE KIT (AMAZON FRESH) -->
         <div class="chef-recipe-box" id="chef-recipe-box">
           <div class="cr-header">
             <div>
@@ -812,12 +685,14 @@
         <!-- Trust and Simulation Disclaimer -->
         <div class="trust-safety-banner">
           <div>🛡️ <strong>100% Simulation</strong> • No real money charged • No real food dispatched • We never ask for bank, card, or UPI details.</div>
-          <div class="tsb-security-tag">🔒 Beggy Secure Core • 256-Bit Cryptographic Integrity • Anti-Tamper &amp; Anti-Clone Protected</div>
+          <div class="tsb-security-tag">
+            <a href="https://github.com/arunachalamvenkatachalapathy-dev/beggy" target="_blank" rel="noopener noreferrer" class="tsb-github-link">Open source (MIT) · View on GitHub</a>
+          </div>
         </div>
 
         <!-- Back to Home / Order Again Button -->
         <div class="order-again-wrapper">
-          <button class="btn-order-again" id="btn-order-again">
+          <button class="btn-order-again" id="btn-order-again" type="button">
             <span>Explore Other Restaurants in Bengaluru ➔</span>
           </button>
         </div>
@@ -858,7 +733,7 @@
     </div>
 
     <div class="cart-footer" id="cart-footer">
-      <div class="beggy-coupon-box swiggy-coupon-box">
+      <div class="beggy-coupon-box">
         <div class="coupon-title">
           <span>🎉 CODE 'BEGGY100' READY</span>
           <strong class="coupon-discount">-100% OFF</strong>
@@ -875,7 +750,7 @@
         <strong id="drawer-total">₹0.00</strong>
       </div>
 
-      <button class="checkout-beggy-btn checkout-swiggy-btn" id="drawer-checkout-btn" disabled>
+      <button class="checkout-beggy-btn" id="drawer-checkout-btn" disabled>
         <span class="btn-text">Proceed to Checkout ➔</span>
         <span class="btn-subtext">Select payment method & view GPS radar</span>
       </button>
@@ -932,19 +807,34 @@
         </div>
       </div>
 
-      <!-- Support Beggy Creator Passbook Tip Banner -->
-      <div class="pb-tip-banner" id="pb-tip-banner">
-        <div class="pb-tip-left">
-          <span class="pb-tip-icon">🚀</span>
-          <div class="pb-tip-text">
-            <strong>Fund the Young Founder</strong>
-            <p>Support the solo student creator with 1-tap UPI to keep Beggy 100% ad-free &amp; free forever!</p>
+      <!-- Single Founder Support Placement: Collapsed Details inside Passbook -->
+      <details class="pb-support-details" id="pb-support-details">
+        <summary class="pb-support-summary">
+          <span class="pss-icon">💖</span>
+          <span class="pss-text">Fund the Young Founder</span>
+          <span class="pss-badge">Optional</span>
+        </summary>
+        <div class="pb-support-body">
+          <p class="pss-desc">Support the solo student creator with direct 1-tap UPI to keep Beggy 100% ad-free &amp; free forever.</p>
+          <div class="pb-tip-pills" id="pb-tip-pills">
+            <button class="pb-tip-pill active" data-amount="10" type="button">₹10</button>
+            <button class="pb-tip-pill" data-amount="50" type="button">₹50</button>
+            <button class="pb-tip-pill" data-amount="100" type="button">₹100</button>
+            <button class="pb-tip-pill pb-pill-any" id="pb-any-toggle" type="button">Any</button>
           </div>
+          <div class="pb-custom-wrap" id="pb-custom-wrap" style="display: none;">
+            <div class="pb-custom-input-box">
+              <span>₹</span>
+              <input type="number" id="pb-custom-input" min="1" max="500" step="1" placeholder="Max 500" value="50">
+            </div>
+            <button class="pb-custom-apply-btn" id="pb-custom-apply-btn" type="button">Set</button>
+          </div>
+          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20founder" class="pb-tip-cta-btn" id="pb-tip-cta-btn">
+            <span>⚡ Fund ₹10 via UPI</span>
+          </a>
+          <div class="pb-direct-settle">✓ Direct bank settlement via UPI • 0% platform fee</div>
         </div>
-        <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20founder" class="pb-tip-btn" id="pb-tip-btn">
-          <span>Fund ₹10 ⚡</span>
-        </a>
-      </div>
+      </details>
 
       <!-- Milestone Badges Grid -->
       <div class="pb-badges-section">
@@ -989,68 +879,11 @@
       <div class="pdm-header">
         <div class="pdm-badge">🎉 CRAVING DEFEATED • 100% SAVED!</div>
         <h3 class="pdm-title" id="pdm-title">Dopamine Hit Done!</h3>
-        <p class="pdm-sub">You just saved <strong id="pdm-saved-val">₹340.00</strong> from Swiggy delivery!</p>
+        <p class="pdm-sub">You just saved <strong id="pdm-saved-val">₹340.00</strong> on takeout delivery!</p>
       </div>
 
       <div class="pdm-body">
-        <!-- TIER 1: FUND THE YOUNG FOUNDER (1-TAP UPI + AMOUNTS: 10, 100, 1000, 2000, ANY) -->
-        <div class="pdm-section pdm-tip-section">
-          <div class="pdm-sec-header">
-            <span class="pdm-sec-tag pdm-tip-tag">💖 SUPPORT INDIE INNOVATION</span>
-            <h4 class="pdm-sec-title">Fund the Young Founder</h4>
-            <p class="pdm-sec-desc">Saved your bill? Support the student creator building Beggy with direct 1-tap UPI.</p>
-          </div>
-
-          <!-- Amount Selection Pills: 10, 100, 1000, 2000, Any -->
-          <div class="pdm-pills-row" id="pdm-pills-row">
-            <button class="pdm-pill active" data-amount="10" type="button">₹10</button>
-            <button class="pdm-pill" data-amount="100" type="button">₹100</button>
-            <button class="pdm-pill" data-amount="1000" type="button">₹1,000</button>
-            <button class="pdm-pill" data-amount="2000" type="button">₹2,000</button>
-            <button class="pdm-pill pdm-pill-any" id="pdm-any-toggle" type="button">Any</button>
-          </div>
-
-          <!-- Custom Amount Input (Hidden until 'Any' is clicked) -->
-          <div class="pdm-custom-wrap" id="pdm-custom-wrap" style="display: none;">
-            <div class="pdm-custom-input-box">
-              <span class="pdm-custom-currency">₹</span>
-              <input type="number" id="pdm-custom-input" min="1" max="50000" step="1" placeholder="Enter amount" value="500">
-            </div>
-            <button class="pdm-custom-apply-btn" id="pdm-custom-apply-btn" type="button">Set</button>
-          </div>
-
-          <!-- 1-Tap UPI CTA Button (Raw ID is never shown in UI text) -->
-          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20founder" class="pdm-upi-btn" id="pdm-upi-btn">
-            <span class="pdm-btn-icon">⚡</span>
-            <div class="pdm-btn-text">
-              <strong id="pdm-upi-btn-main">Fund the Young Founder • ₹10</strong>
-              <span id="pdm-upi-btn-sub">1-Tap • GPay, PhonePe, Paytm, CRED &amp; BHIM</span>
-            </div>
-          </a>
-
-          <!-- Desktop QR & Copy Quick Reveal -->
-          <div class="pdm-desktop-pay" id="pdm-desktop-pay">
-            <button class="pdm-qr-toggle-btn" id="pdm-qr-toggle-btn" type="button">
-              <span>📱 On Laptop? Click to Scan QR with Phone</span>
-            </button>
-            <div class="pdm-qr-box" id="pdm-qr-box" style="display: none;">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3Darunking156-2%40oksbi%26pn%3DArunachalam%2520Venkatachalapathy%26am%3D10%26cu%3DINR%26tn%3DFund%2520the%2520young%2520founder" alt="Scan UPI QR Code" id="pdm-qr-img" class="pdm-qr-img" />
-              <div class="pdm-qr-info">
-                <span>Point your phone camera, GPay or PhonePe at this QR code</span>
-                <button class="pdm-copy-upi-btn" id="pdm-copy-upi-btn" type="button">
-                  📋 Copy UPI ID
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sleek Visual Divider -->
-        <div class="pdm-divider">
-          <span>OR COOK FRESH AT HOME</span>
-        </div>
-
-        <!-- TIER 2: AMAZON GOURMET FOOD DEAL -->
+        <!-- AMAZON GOURMET FOOD RECIPE KIT DEAL -->
         <div class="pdm-section pdm-amazon-section">
           <div class="pdm-sec-header">
             <span class="pdm-sec-tag">👨‍🍳 15-Minute Recipe Kit</span>
