@@ -3821,6 +3821,19 @@ body {
   transform: translateY(-1px);
 }
 
+/* Frictionless Draft Prompt Pill */
+.wsm-frictionless-pill {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #10B981;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
 /* Social Media Channels Grid in Segment 2 */
 .wsm-social-grid {
   display: grid;

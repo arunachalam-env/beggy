@@ -2110,11 +2110,76 @@ function getAppBaseUrl() {
 
 function getChallengeLinkData() {
   const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Takeout Craving";
-  const amount = state.lastOrderSaved || 340;
+  const amount = Math.round(state.lastOrderSaved || 340);
+  const streak = userState.streak || 1;
   const baseUrl = getAppBaseUrl();
-  const challengeUrl = `${baseUrl}?c=${Math.round(amount)}&dish=${encodeURIComponent(dish)}`;
-  const text = `⚔️ I resisted ordering ₹${Math.round(amount)} ${dish} and kept 100% of the money on Beggy! Can you beat my save? Try it: ${challengeUrl}`;
-  return { challengeUrl, text, amount, dish };
+  const challengeUrl = `${baseUrl}?c=${amount}&dish=${encodeURIComponent(dish)}`;
+
+  // 𝕏 (Twitter) Punchy Draft: Ultra-crisp hook, punchline, CTA & link
+  const twitterDraft = `🍗❌ I was about to order ${dish} on an impulsive craving.
+
+My food was NEVER ordered.
+Instead, I kept ₹${amount} in my bank account with @BeggyApp! 🚀
+
+Can you defeat your cravings and beat my savings streak?
+Take the challenge 👇
+${challengeUrl}
+
+#Beggy #DopamineSaving #AntiSpending #SaveMoney`;
+
+  // LinkedIn Punchy Draft: Habit psychology, behavioral economics, zero-spending punchline
+  const linkedinDraft = `I just simulated ordering ${dish} (₹${amount}) on Beggy — and my food was NEVER ordered.
+
+Instead of losing ₹${amount} to impulsive takeout delivery fees, I kept 100% of my money in my savings account.
+
+Beggy turns impulsive spending cravings into a gamified anti-spending dopamine loop.
+
+Can you beat my streak? Test your craving resistance here:
+👉 ${challengeUrl}
+
+#PersonalFinance #BehavioralEconomics #Savings #Beggy #Fintech`;
+
+  // WhatsApp Punchy Draft: 1-Tap status & friends hook
+  const whatsappDraft = `🍗❌ I almost spent ₹${amount} ordering ${dish}!
+
+My food was NEVER ordered, but I just kept ₹${amount} in my bank account with Beggy! 🔥
+
+Can you defeat your impulsive craving and beat my streak?
+Try it here:
+👉 ${challengeUrl}`;
+
+  // Telegram Punchy Draft
+  const telegramDraft = `🍗❌ Craved ${dish}?
+My food was NEVER ordered, but I just kept ₹${amount} in my bank account with Beggy! 🔥
+
+Can you defeat your impulsive cravings and beat my streak?
+Try it here:
+👉 ${challengeUrl}`;
+
+  // Instagram Story / Reel Caption Draft
+  const instagramDraft = `🍗❌ I almost ordered ${dish}, but my food was NEVER ordered.
+Instead, ₹${amount} stayed in my bank account! 💰🔥
+
+Can you beat my savings streak?
+Try the challenge at the link:
+👉 ${challengeUrl}
+
+#Beggy #CraveItSimulateItSaveIt #AntiSpending #MoneySaved #SavingsChallenge`;
+
+  const text = whatsappDraft;
+
+  return {
+    challengeUrl,
+    text,
+    twitterDraft,
+    linkedinDraft,
+    whatsappDraft,
+    telegramDraft,
+    instagramDraft,
+    amount,
+    dish,
+    streak
+  };
 }
 
 function shareStoryCard() {
@@ -2898,55 +2963,70 @@ function setupWhatsAppShareModal() {
     }
   });
 
-  // 1-Tap WhatsApp Share
+  // 1-Tap WhatsApp Share: Pre-filled punchy draft
   if (waBtn) {
     waBtn.addEventListener("click", () => {
-      const { text } = getChallengeLinkData();
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      const { whatsappDraft } = getChallengeLinkData();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(whatsappDraft).catch(() => {});
+      }
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappDraft)}`, "_blank", "noopener,noreferrer");
+      showShareToast("💬 Punchy draft loaded! Pick friend or status & tap Send!");
       Analytics.track("whatsapp_share_modal_shared");
     });
   }
 
-  // 𝕏 (Twitter) Share
+  // 𝕏 (Twitter) Share: Pre-filled punchy draft, only press Post!
   if (twitterBtn) {
     twitterBtn.addEventListener("click", () => {
-      const { challengeUrl, dish, amount } = getChallengeLinkData();
-      const tweetText = `🍗❌ Craved ${dish}? It was never ordered, but I just kept ₹${Math.round(amount)} in my bank with @BeggyApp! Can you beat my savings streak?\n\nTry it:`;
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(challengeUrl)}`, "_blank", "noopener,noreferrer");
+      const { twitterDraft } = getChallengeLinkData();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(twitterDraft).catch(() => {});
+      }
+      window.open(`https://x.com/intent/post?text=${encodeURIComponent(twitterDraft)}`, "_blank", "noopener,noreferrer");
+      showShareToast("𝕏 Punchy draft loaded! Just press Post!");
       Analytics.track("share_modal_twitter");
     });
   }
 
-  // Instagram Story Share
+  // Instagram Story Share: Download story image & copy punchy caption
   if (instagramBtn) {
     instagramBtn.addEventListener("click", () => {
-      const { text } = getChallengeLinkData();
+      const { instagramDraft } = getChallengeLinkData();
       downloadShareCard();
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => {});
+        navigator.clipboard.writeText(instagramDraft).catch(() => {});
       }
-      showShareToast("📥 Story card downloaded & challenge text copied! Opening Instagram...");
+      showShareToast("📸 Story card saved & punchy draft copied! Just paste & post on Instagram!");
       setTimeout(() => {
         window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
-      }, 1200);
+      }, 700);
       Analytics.track("share_modal_instagram");
     });
   }
 
-  // Telegram Share
+  // Telegram Share: Pre-filled punchy draft
   if (telegramBtn) {
     telegramBtn.addEventListener("click", () => {
-      const { challengeUrl, text } = getChallengeLinkData();
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(challengeUrl)}&text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      const { telegramDraft, challengeUrl } = getChallengeLinkData();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(telegramDraft).catch(() => {});
+      }
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(challengeUrl)}&text=${encodeURIComponent(telegramDraft)}`, "_blank", "noopener,noreferrer");
+      showShareToast("✈️ Punchy draft loaded! Pick chat & tap Send!");
       Analytics.track("share_modal_telegram");
     });
   }
 
-  // LinkedIn Share
+  // LinkedIn Share: Open post modal with pre-filled punchy draft & auto-copied to clipboard
   if (linkedinBtn) {
     linkedinBtn.addEventListener("click", () => {
-      const { challengeUrl } = getChallengeLinkData();
-      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(challengeUrl)}`, "_blank", "noopener,noreferrer");
+      const { linkedinDraft } = getChallengeLinkData();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(linkedinDraft).catch(() => {});
+      }
+      window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(linkedinDraft)}`, "_blank", "noopener,noreferrer");
+      showShareToast("💼 Punchy draft loaded & copied! Just press Post on LinkedIn.");
       Analytics.track("share_modal_linkedin");
     });
   }
@@ -2954,7 +3034,7 @@ function setupWhatsAppShareModal() {
   // Native Share Sheet (Snapchat, SMS, Reddit, etc.)
   if (nativeShareBtn) {
     nativeShareBtn.addEventListener("click", async () => {
-      const { challengeUrl, text } = getChallengeLinkData();
+      const { twitterDraft, challengeUrl } = getChallengeLinkData();
       if (navigator.share) {
         try {
           if (shareCardCanvas && navigator.canShare) {
@@ -2964,13 +3044,13 @@ function setupWhatsAppShareModal() {
                   const file = new File([blob], "beggy-savings.png", { type: "image/png" });
                   await navigator.share({
                     title: "Beggy Savings Challenge",
-                    text: text,
+                    text: twitterDraft,
                     files: [file]
                   });
                 } else {
                   await navigator.share({
                     title: "Beggy Savings Challenge",
-                    text: text,
+                    text: twitterDraft,
                     url: challengeUrl
                   });
                 }
@@ -2983,7 +3063,7 @@ function setupWhatsAppShareModal() {
           } else {
             await navigator.share({
               title: "Beggy Savings Challenge",
-              text: text,
+              text: twitterDraft,
               url: challengeUrl
             });
           }
@@ -2995,8 +3075,8 @@ function setupWhatsAppShareModal() {
         }
       } else {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(() => {
-            showShareToast("✓ Challenge text & link copied!");
+          navigator.clipboard.writeText(twitterDraft).then(() => {
+            showShareToast("✓ Punchy draft & link copied!");
           });
         }
       }
