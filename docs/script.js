@@ -938,6 +938,80 @@ function updateUserStateUI() {
   }
 }
 
+// ── FLYING STREAK FIRE ANIMATION (CENTER-TO-HEADER IMPACT) ────────────────────
+function triggerFlyingStreakAnimation(streakCount) {
+  const count = streakCount || (userState && userState.streak) || 1;
+  const targetPill = document.getElementById("header-streak-pill");
+
+  // Prevent multiple overlapping flying flames
+  const existing = document.querySelector(".flying-streak-flame");
+  if (existing) existing.remove();
+
+  // Create flying flame element
+  const flame = document.createElement("div");
+  flame.className = "flying-streak-flame";
+  flame.innerHTML = `
+    <div class="fsf-aura"></div>
+    <div class="fsf-emoji">🔥</div>
+    <div class="fsf-badge">🔥 STREAK EXTENDED!</div>
+    <div class="fsf-sub">${count}-Day Willpower Streak</div>
+  `;
+  document.body.appendChild(flame);
+
+  // Play bank chime for auditory dopamine
+  try { playBankChime(); } catch (e) {}
+
+  // Initial center entrance pop
+  flame.style.transform = "translate(-50%, -50%) scale(0.2)";
+  flame.style.opacity = "0";
+  flame.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease";
+
+  // Force reflow
+  flame.offsetHeight;
+  flame.style.transform = "translate(-50%, -50%) scale(1)";
+  flame.style.opacity = "1";
+
+  // After 900ms celebration at center, fly to header streak pill
+  setTimeout(() => {
+    if (!targetPill) {
+      flame.remove();
+      return;
+    }
+
+    const flameRect = flame.getBoundingClientRect();
+    const targetRect = targetPill.getBoundingClientRect();
+
+    // Distance calculation from flame center to target pill center
+    const flameCenterX = flameRect.left + flameRect.width / 2;
+    const flameCenterY = flameRect.top + flameRect.height / 2;
+    const targetCenterX = targetRect.left + targetRect.width / 2;
+    const targetCenterY = targetRect.top + targetRect.height / 2;
+
+    const dx = targetCenterX - flameCenterX;
+    const dy = targetCenterY - flameCenterY;
+
+    // Smooth bezier curve flight directly to the streak spot
+    flame.style.transition = "transform 0.75s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.75s ease-in";
+    flame.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.25)`;
+    flame.style.opacity = "0.2";
+
+    // On impact at header streak pill
+    setTimeout(() => {
+      flame.remove();
+      targetPill.classList.remove("streak-pill-ignite");
+      // Force reflow for re-triggering animation
+      targetPill.offsetHeight;
+      targetPill.classList.add("streak-pill-ignite");
+      targetPill.textContent = `🔥 ${count}d`;
+
+      // Remove class after animation finishes
+      setTimeout(() => {
+        targetPill.classList.remove("streak-pill-ignite");
+      }, 1000);
+    }, 750);
+  }, 950);
+}
+
 // ── Application State ────────────────────────────────────────────────────────
 const state = {
   currentView: "restaurants",
@@ -1797,10 +1871,15 @@ function triggerOrderArrival() {
   dopamineRevealCard.style.display = "block";
   dopamineRevealCard.scrollIntoView({ behavior: "smooth" });
 
-  // Show clean post-delivery Amazon popup after brief celebration (no UPI begging)
+  // ── TRIGGER FLYING STREAK FIRE ANIMATION (CENTER-TO-HEADER) ───────────────
+  setTimeout(() => {
+    triggerFlyingStreakAnimation(userState.streak);
+  }, 400);
+
+  // Show clean post-delivery dual value popup (after flame lands at header)
   setTimeout(() => {
     showPostDeliveryModal(dish, savedAmount);
-  }, 1500);
+  }, 2300);
 }
 
 // ── "Dopamine Hit Done — View Savings Passbook" Handler ───────────────────────
@@ -2429,6 +2508,15 @@ function setupEventListeners() {
 
   // Passbook modal triggers (F3)
   if (passbookTriggerBtn) passbookTriggerBtn.addEventListener("click", openPassbookModal);
+  if (headerStreakPill) {
+    headerStreakPill.style.cursor = "pointer";
+    headerStreakPill.title = "View Streak & Passbook";
+    headerStreakPill.addEventListener("click", (e) => {
+      e.stopPropagation();
+      triggerFlyingStreakAnimation(userState.streak);
+      setTimeout(openPassbookModal, 1800);
+    });
+  }
   if (pbCloseBtn) pbCloseBtn.addEventListener("click", closePassbookModal);
   if (passbookBackdrop) passbookBackdrop.addEventListener("click", closePassbookModal);
   if (pbBtnDone) pbBtnDone.addEventListener("click", closePassbookModal);
