@@ -726,7 +726,8 @@ function loadInitialUserState() {
     bestStreak: 0,
     lastSaveDate: null,
     history: [],
-    badges: []
+    badges: [],
+    lastCraving: null // Caches user's previous craving to reuse on next visit
   };
 
   try {
@@ -750,6 +751,15 @@ function recordCravingVictory(dishTitle, restaurantName, amount) {
 
   userState.totalSaved += amount;
   userState.cravingsDefeated += 1;
+
+  // Cache last craving details to reuse on next visit
+  userState.lastCraving = {
+    dish: dishTitle,
+    restaurant: restaurantName,
+    amount: amount,
+    date: todayStr,
+    timestamp: Date.now()
+  };
 
   // Streak logic
   if (!userState.lastSaveDate) {
@@ -1620,11 +1630,26 @@ function triggerOrderArrival() {
     challengeResultCard.style.display = "none";
   }
 
-  // Reset "Real Save" button appearance
+  // ── AUTOMATIC SAVINGS RECORDING (Requested by user) ───────────────────────
+  recordCravingVictory(dish.title, state.activeRestaurant.name, savedAmount);
+  playBankChime();
+
+  // Mark "Real Save" button as already recorded
   btnRealSave.disabled = false;
-  btnRealSave.querySelector("strong").textContent = "Dopamine Hit Done — Let's Do Real Save";
-  btnRealSave.querySelector("#rs-subtext").innerHTML = `Transfer <span id="rs-amount-val">₹${savedAmount.toFixed(2)}</span> to Your Savings Ledger`;
-  btnRealSave.style.background = "linear-gradient(135deg, #10B981, #059669)";
+  btnRealSave.querySelector("strong").textContent = `✓ Recorded ₹${savedAmount.toFixed(2)} in Your Savings Vault!`;
+  btnRealSave.querySelector("#rs-subtext").textContent = "100% of your money remains safely in your bank account!";
+  btnRealSave.style.background = "linear-gradient(135deg, #059669, #047857)";
+
+  // Trigger Slide-Down Bank SMS Notification Toast
+  const availBalStr = userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  smsAmount.textContent = `₹${savedAmount.toFixed(2)} Saved`;
+  smsMessage.textContent = `Beggy Vault: ₹${savedAmount.toFixed(2)} credited to your Anti-Spending Savings Ledger. Avail Bal: ₹${availBalStr}. Craving defeated!`;
+
+  bankSmsToast.classList.add("show");
+  if (window._smsTimeout) clearTimeout(window._smsTimeout);
+  window._smsTimeout = setTimeout(() => {
+    bankSmsToast.classList.remove("show");
+  }, 7000);
 
   // Update Savings Account Card Balance
   updateUserStateUI();
@@ -1654,36 +1679,9 @@ function triggerOrderArrival() {
   dopamineRevealCard.scrollIntoView({ behavior: "smooth" });
 }
 
-// ── "Dopamine Hit Done — Let's Do Real Save" Handler ─────────────────────────
+// ── "Dopamine Hit Done — View Savings Passbook" Handler ───────────────────────
 function handleRealSave() {
-  const savedAmount = state.lastOrderSaved || 340.00;
-  const dish = state.activeRecipeDish || DISHES_CATALOG[0];
-
-  // Record victory in reactive user state
-  recordCravingVictory(dish.title, state.activeRestaurant.name, savedAmount);
-
-  // Audio chime & Confetti
-  playBankChime();
-  triggerConfetti();
-
-  // Update Button visual state
-  btnRealSave.querySelector("strong").textContent = `✓ Recorded ₹${savedAmount.toFixed(2)} in Your Savings Vault!`;
-  btnRealSave.querySelector("#rs-subtext").textContent = "100% of your money remains safely in your bank account!";
-  btnRealSave.style.background = "linear-gradient(135deg, #059669, #047857)";
-
-  // Trigger Slide-Down Bank SMS Notification Toast
-  const availBalStr = userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  smsAmount.textContent = `₹${savedAmount.toFixed(2)} Saved`;
-  smsMessage.textContent = `Beggy Vault: ₹${savedAmount.toFixed(2)} credited to your Anti-Spending Savings Ledger. Avail Bal: ₹${availBalStr}. Craving defeated!`;
-
-  bankSmsToast.classList.add("show");
-  if (window._smsTimeout) clearTimeout(window._smsTimeout);
-  window._smsTimeout = setTimeout(() => {
-    bankSmsToast.classList.remove("show");
-  }, 7000);
-
-  // Re-render share card with updated streak & totals
-  renderShareCard(dish.title, savedAmount);
+  openPassbookModal();
 }
 
 // ── DYNAMIC CANVAS SHARE CARD GENERATOR (F2) ──────────────────────────────────
@@ -1910,22 +1908,31 @@ function downloadShareCard() {
   showShareToast("✓ Savings card PNG downloaded to your device!");
 }
 
+function getAppBaseUrl() {
+  if (window.location.hostname.includes("beggy.io")) {
+    return "https://www.beggy.io/";
+  }
+  return window.location.origin + window.location.pathname;
+}
+
 function copyShareCaption() {
   const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Food";
   const amount = state.lastOrderSaved || 340;
-  const caption = `I just defeated a ₹${amount.toFixed(0)} ${dish} craving 😤 ${userState.streak}-day streak with @Beggy. Try it: https://arunachalamvenkatachalapathy-dev.github.io/beggy/`;
+  const baseUrl = getAppBaseUrl();
+  const caption = `I just defeated a ₹${amount.toFixed(0)} ${dish} craving 😤 ${userState.streak}-day streak with @Beggy. Try it: ${baseUrl}`;
 
   navigator.clipboard.writeText(caption).then(() => {
     showShareToast("✓ Caption & link copied to clipboard!");
   }).catch(() => {
-    showShareToast("✓ Link: https://arunachalamvenkatachalapathy-dev.github.io/beggy/");
+    showShareToast(`✓ Link: ${baseUrl}`);
   });
 }
 
 function createFriendChallengeLink() {
   const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Biryani";
   const amount = state.lastOrderSaved || 340;
-  const challengeUrl = `https://arunachalamvenkatachalapathy-dev.github.io/beggy/?challenge=1&amount=${amount.toFixed(0)}&dish=${encodeURIComponent(dish)}&from=A%20Friend`;
+  const baseUrl = getAppBaseUrl();
+  const challengeUrl = `${baseUrl}?challenge=1&amount=${amount.toFixed(0)}&dish=${encodeURIComponent(dish)}&from=A%20Friend`;
   const text = `⚔️ I resisted ordering ₹${amount.toFixed(0)} ${dish} and kept the money! Can you beat my save? Try it: ${challengeUrl}`;
 
   navigator.clipboard.writeText(text).then(() => {
@@ -2312,6 +2319,43 @@ function setupEventListeners() {
   }
 }
 
+// ── 10-Second Chef's Recipe Hovering Modal ────────────────────────────────────
+let recipeTakeoverShown = false;
+function init10SecondRecipePopup() {
+  if (sessionStorage.getItem("beggy_recipe_popup_seen")) return;
+
+  setTimeout(() => {
+    if (recipeTakeoverShown) return;
+    if (state.currentView !== "restaurants" && state.currentView !== "menu") return;
+
+    const overlay = document.getElementById("recipe-takeover-overlay");
+    const backBtn = document.getElementById("recipe-takeover-back-btn");
+    const card = document.getElementById("recipe-takeover-card");
+
+    if (overlay && card) {
+      overlay.style.display = "flex";
+      recipeTakeoverShown = true;
+      sessionStorage.setItem("beggy_recipe_popup_seen", "1");
+
+      card.addEventListener("click", (e) => {
+        if (e.target.closest("#recipe-takeover-back-btn")) {
+          overlay.style.display = "none";
+          return;
+        }
+        window.open(AMAZON_GROCERY_URL, "_blank");
+        overlay.style.display = "none";
+      });
+
+      if (backBtn) {
+        backBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          overlay.style.display = "none";
+        });
+      }
+    }
+  }, 10000);
+}
+
 // ── App Initialization ───────────────────────────────────────────────────────
 function init() {
   updateUserStateUI();
@@ -2319,6 +2363,20 @@ function init() {
   updateCartUI();
   setupEventListeners();
   checkUrlChallenge();
+  init10SecondRecipePopup();
+
+  // Reuse cached last craving on next visit
+  if (userState.lastCraving && customDishName && customDishPrice) {
+    if (!customDishName.value || customDishName.value === "Chicken Dum Biryani") {
+      customDishName.value = userState.lastCraving.dish;
+    }
+    if (customDishPrice && userState.lastCraving.amount) {
+      customDishPrice.value = userState.lastCraving.amount;
+    }
+    if (btnCravingAmount && userState.lastCraving.amount) {
+      btnCravingAmount.textContent = userState.lastCraving.amount;
+    }
+  }
 
   // Pre-load default active restaurant dishes in background
   renderRestaurantDishes(RESTAURANTS_DATA[0].id);

@@ -2964,3 +2964,110 @@ body {
   background: #2563EB;
 }
 
+/* ── 10-Second Chef's Recipe Hovering Modal ── */
+.recipe-takeover-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 99990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.recipe-takeover-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  width: 100%;
+  padding: 32px 24px 24px;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--swiggy-orange);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.recipe-takeover-back-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-700);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+  transition: var(--transition);
+}
+
+.recipe-takeover-back-btn:hover {
+  background: #E5E7EB;
+  color: var(--text-900);
+}
+
+.recipe-takeover-badge {
+  display: inline-block;
+  background: #FFF0E6;
+  color: var(--swiggy-orange);
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 12px;
+}
+
+.recipe-takeover-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text-900);
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+
+.recipe-takeover-sub {
+  font-size: 0.88rem;
+  color: var(--text-500);
+  line-height: 1.45;
+  margin-bottom: 20px;
+}
+
+.recipe-takeover-cta-btn {
+  background: var(--swiggy-orange);
+  color: #FFFFFF;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: var(--shadow-orange);
+  transition: var(--transition);
+}
+
+.recipe-takeover-card:hover .recipe-takeover-cta-btn {
+  background: var(--swiggy-orange-hover);
+  transform: translateY(-2px);
+}
+
+.recipe-takeover-hint {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
