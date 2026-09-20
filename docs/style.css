@@ -2965,9 +2965,132 @@ body {
 }
 
 /* ====================================================================
-   MASTER MONETIZATION POPUP (CHAI TIP + AMAZON GOURMET INGREDIENTS)
+   AMAZON SLIDE BANNER (5-SECOND LANDING — SUBTLE, NON-INTRUSIVE)
    ==================================================================== */
-.mmm-overlay {
+.asb-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99990;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.asb-banner.show {
+  transform: translateY(0);
+}
+
+.asb-inner {
+  background: rgba(17, 24, 39, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 153, 0, 0.35);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  gap: 16px;
+}
+
+.asb-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.asb-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.asb-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.asb-text strong {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.3;
+}
+
+.asb-text span {
+  font-size: 0.74rem;
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+.asb-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.asb-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #FF9900 0%, #E68A00 100%);
+  color: #111827;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(255, 153, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.asb-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 153, 0, 0.45);
+}
+
+.asb-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #9CA3AF;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.asb-close:hover {
+  background: #EF4444;
+  border-color: #EF4444;
+  color: #FFFFFF;
+}
+
+.asb-disclosure {
+  font-size: 0.62rem;
+  color: #6B7280;
+  text-align: center;
+  padding: 0 20px 8px;
+  margin: 0;
+  background: rgba(17, 24, 39, 0.96);
+}
+
+/* ====================================================================
+   POST-DELIVERY MODAL (AMAZON ONLY — CLEAN, EARNED POPUP)
+   ==================================================================== */
+.pdm-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -2984,10 +3107,10 @@ body {
   animation: fadeIn 0.25s ease;
 }
 
-.mmm-card {
+.pdm-card {
   background: linear-gradient(180deg, #1C202B 0%, #13161F 100%);
   border-radius: var(--radius-xl);
-  max-width: 500px;
+  max-width: 460px;
   width: 100%;
   max-height: 92vh;
   overflow-y: auto;
@@ -2999,7 +3122,7 @@ body {
   scrollbar-width: thin;
 }
 
-.mmm-close-btn {
+.pdm-close-btn {
   position: absolute;
   top: 14px;
   right: 14px;
@@ -3020,18 +3143,18 @@ body {
   transition: all 0.2s ease;
 }
 
-.mmm-close-btn:hover {
+.pdm-close-btn:hover {
   background: #EF4444;
   border-color: #EF4444;
   color: #FFFFFF;
   transform: rotate(90deg) scale(1.08);
 }
 
-.mmm-header {
+.pdm-header {
   margin-bottom: 16px;
 }
 
-.mmm-badge {
+.pdm-badge {
   display: inline-block;
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.35);
@@ -3045,7 +3168,7 @@ body {
   text-transform: uppercase;
 }
 
-.mmm-title {
+.pdm-title {
   font-size: 1.45rem;
   font-weight: 900;
   color: #FFFFFF;
@@ -3053,180 +3176,63 @@ body {
   line-height: 1.2;
 }
 
-.mmm-sub {
+.pdm-sub {
   font-size: 0.88rem;
   color: #9CA3AF;
   margin: 0;
 }
 
-.mmm-sub strong {
+.pdm-sub strong {
   color: #10B981;
 }
 
-/* ── Tier Sections ── */
-.mmm-body {
+.pdm-body {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.mmm-section {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.pdm-section {
+  background: linear-gradient(180deg, rgba(255, 153, 0, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
+  border: 1px solid rgba(255, 153, 0, 0.3);
   border-radius: var(--radius-lg);
-  padding: 14px 14px;
+  padding: 14px;
   text-align: left;
 }
 
-.mmm-tip-section {
-  border-color: rgba(245, 158, 11, 0.3);
-  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 82, 0, 0.04) 100%);
-}
-
-.mmm-amazon-section {
-  border-color: rgba(255, 153, 0, 0.3);
-  background: linear-gradient(180deg, rgba(255, 153, 0, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
-}
-
-.mmm-sec-header {
+.pdm-sec-header {
   margin-bottom: 10px;
 }
 
-.mmm-sec-tag {
+.pdm-sec-tag {
   display: inline-block;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #F59E0B;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #FF9900;
+  background: rgba(255, 153, 0, 0.15);
+  border: 1px solid rgba(255, 153, 0, 0.35);
   border-radius: var(--radius-full);
   padding: 3px 8px;
   margin-bottom: 6px;
 }
 
-.mmm-sec-tag.amazon-tag {
-  color: #FF9900;
-  background: rgba(255, 153, 0, 0.15);
-  border-color: rgba(255, 153, 0, 0.35);
-}
-
-.mmm-sec-title {
+.pdm-sec-title {
   font-size: 1.02rem;
   font-weight: 800;
   color: #FFFFFF;
   margin: 0 0 4px;
 }
 
-.mmm-sec-desc {
+.pdm-sec-desc {
   font-size: 0.78rem;
   color: #9CA3AF;
   line-height: 1.4;
   margin: 0;
 }
 
-/* ── Tip Pills ── */
-.mmm-pills-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.mmm-pill {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  padding: 8px;
-  color: #FFFFFF;
-  font-size: 0.9rem;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: all 0.2s ease;
-}
-
-.mmm-pill span {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #9CA3AF;
-  margin-top: 2px;
-}
-
-.mmm-pill.active {
-  background: linear-gradient(135deg, rgba(255, 82, 0, 0.25), rgba(245, 158, 11, 0.3));
-  border-color: #FF5200;
-  box-shadow: 0 0 10px rgba(255, 82, 0, 0.35);
-}
-
-.mmm-pill.active span {
-  color: #FDBA74;
-}
-
-/* ── UPI Button ── */
-.mmm-upi-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, #FF5200 0%, #EA580C 100%);
-  color: #FFFFFF;
-  text-decoration: none;
-  border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 4px 16px rgba(255, 82, 0, 0.35);
-  transition: all 0.2s ease;
-}
-
-.mmm-upi-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 22px rgba(255, 82, 0, 0.5);
-}
-
-.mmm-btn-icon {
-  font-size: 1.4rem;
-  flex-shrink: 0;
-}
-
-.mmm-btn-text {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.mmm-btn-text strong {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #FFFFFF;
-}
-
-.mmm-btn-text span {
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 600;
-}
-
-/* ── Divider ── */
-.mmm-divider {
-  text-align: center;
-  position: relative;
-  margin: 2px 0;
-}
-
-.mmm-divider span {
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #6B7280;
-  text-transform: uppercase;
-  background: #171B24;
-  padding: 0 10px;
-}
-
-/* ── Amazon Button ── */
-.mmm-amazon-btn {
+.pdm-amazon-btn {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3239,36 +3245,46 @@ body {
   transition: all 0.2s ease;
 }
 
-.mmm-amazon-btn:hover {
+.pdm-amazon-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 22px rgba(255, 153, 0, 0.45);
 }
 
-.mmm-amazon-btn .mmm-btn-text strong {
+.pdm-btn-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.pdm-btn-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.pdm-btn-text strong {
   font-size: 0.95rem;
   font-weight: 800;
   color: #111827;
 }
 
-.mmm-amazon-btn .mmm-btn-text span {
+.pdm-btn-text span {
   font-size: 0.68rem;
   color: #374151;
   font-weight: 600;
 }
 
-.mmm-amazon-disclosure {
+.pdm-amazon-disclosure {
   font-size: 0.66rem;
   color: #9CA3AF;
   margin: 8px 0 0;
   line-height: 1.35;
 }
 
-/* ── Modal Footer ── */
-.mmm-footer {
+.pdm-footer {
   margin-top: 14px;
 }
 
-.mmm-dismiss-link {
+.pdm-dismiss-link {
   background: none;
   border: none;
   color: #9CA3AF;
@@ -3279,7 +3295,7 @@ body {
   transition: color 0.2s;
 }
 
-.mmm-dismiss-link:hover {
+.pdm-dismiss-link:hover {
   color: #FFFFFF;
 }
 
@@ -3479,21 +3495,42 @@ body {
     gap: 8px;
   }
 
-  /* ── Master Monetization Overlay on Mobile ── */
-  .mmm-card {
+  /* ── Amazon Slide Banner on Mobile ── */
+  .asb-inner {
+    flex-direction: column;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .asb-content {
+    width: 100%;
+  }
+
+  .asb-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .asb-cta {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* ── Post-Delivery Modal on Mobile ── */
+  .pdm-card {
     padding: 22px 14px 16px;
     max-width: 95vw;
   }
 
-  .mmm-title {
+  .pdm-title {
     font-size: 1.25rem;
   }
 
-  .mmm-sub {
+  .pdm-sub {
     font-size: 0.82rem;
   }
 
-  .mmm-section {
+  .pdm-section {
     padding: 12px 10px;
   }
 }
@@ -3987,7 +4024,7 @@ body {
    BEGGY SECURITY SHIELD: ANTI-COPY, ANTI-SCRAPE & TAMPER DETERRENT
    ==================================================================== */
 /* Block UI text selection across the site to prevent asset and copy theft */
-body, .app-view, .app-header, .cart-drawer, .passbook-modal, .mmm-card {
+body, .app-view, .app-header, .cart-drawer, .passbook-modal, .pdm-card {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -3995,8 +4032,8 @@ body, .app-view, .app-header, .cart-drawer, .passbook-modal, .mmm-card {
   -webkit-touch-callout: none;
 }
 
-/* Allow normal text selection ONLY inside input fields and textareas */
-input, textarea, [contenteditable="true"] {
+/* Allow normal text selection ONLY inside input fields, textareas, and UPI IDs */
+input, textarea, [contenteditable="true"], .btc-upi-id {
   -webkit-user-select: text !important;
   -moz-user-select: text !important;
   -ms-user-select: text !important;

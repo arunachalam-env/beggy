@@ -1797,10 +1797,10 @@ function triggerOrderArrival() {
   dopamineRevealCard.style.display = "block";
   dopamineRevealCard.scrollIntoView({ behavior: "smooth" });
 
-  // Trigger Master Monetization Modal (Chai Tip + Amazon Deal) after brief celebration
+  // Show clean post-delivery Amazon popup after brief celebration (no UPI begging)
   setTimeout(() => {
-    showMasterMonetizationModal(dish, savedAmount);
-  }, 1000);
+    showPostDeliveryModal(dish, savedAmount);
+  }, 1500);
 }
 
 // ── "Dopamine Hit Done — View Savings Passbook" Handler ───────────────────────
@@ -2496,13 +2496,21 @@ function setupEventListeners() {
   }
 
   if (btcUpiIdVal) {
-    btcUpiIdVal.title = "Click to set creator UPI ID";
+    btcUpiIdVal.title = "Click to copy UPI ID";
     btcUpiIdVal.style.cursor = "pointer";
     btcUpiIdVal.addEventListener("click", () => {
-      const custom = prompt("Enter your personal UPI ID for direct bank deposits (e.g. name@okhdfcbank, mobile@paytm):", BEGGY_UPI_CONFIG.pa);
-      if (custom && custom.trim()) {
-        window.setBeggyUpiId(custom);
-        alert(`UPI ID successfully set to: ${custom.trim()}! All tips will now route directly to your account.`);
+      const idToCopy = BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(idToCopy).then(() => {
+          if (btcCopyBtnText) btcCopyBtnText.textContent = "✓ Copied!";
+          setTimeout(() => {
+            if (btcCopyBtnText) btcCopyBtnText.textContent = "📋 Copy";
+          }, 2500);
+        }).catch(() => {
+          prompt("Copy this UPI ID:", idToCopy);
+        });
+      } else {
+        prompt("Copy this UPI ID:", idToCopy);
       }
     });
   }
@@ -2593,54 +2601,91 @@ function setupEventListeners() {
   }
 }
 
-// ── MASTER MONETIZATION POPUP (CHAI TIP + AMAZON DEAL) ────────────────────────
-let masterMonetizationShown = false;
+// ── AMAZON SLIDE BANNER (5-SEC LANDING — SUBTLE, VALUE-FIRST) ─────────────────
+function showAmazonSlideBanner() {
+  const banner = document.getElementById("amazon-slide-banner");
+  if (!banner) return;
+  banner.style.display = "block";
+  // Force reflow before adding animation class
+  banner.offsetHeight;
+  banner.classList.add("show");
+}
 
-function showMasterMonetizationModal(dish, savedAmount) {
-  const modal = document.getElementById("monetization-master-modal");
+function setupAmazonSlideBanner() {
+  const banner = document.getElementById("amazon-slide-banner");
+  const closeBtn = document.getElementById("asb-close-btn");
+  const ctaBtn = document.getElementById("asb-cta-btn");
+
+  if (!banner) return;
+
+  const dismissBanner = () => {
+    banner.classList.remove("show");
+    setTimeout(() => { banner.style.display = "none"; }, 400);
+    try { sessionStorage.setItem("beggy_asb_dismissed", "1"); } catch (e) {}
+  };
+
+  if (closeBtn) closeBtn.addEventListener("click", dismissBanner);
+  if (ctaBtn) ctaBtn.addEventListener("click", () => { dismissBanner(); });
+
+  // Only show if not already dismissed this session
+  try {
+    if (sessionStorage.getItem("beggy_asb_dismissed") === "1") return;
+  } catch (e) {}
+
+  // 5-second delay on landing — only when user hasn't started ordering
+  setTimeout(() => {
+    if (state.currentView === "tracking" || state.currentView === "reveal") return;
+    try {
+      if (sessionStorage.getItem("beggy_asb_dismissed") === "1") return;
+    } catch (e) {}
+    showAmazonSlideBanner();
+
+    // Auto-dismiss after 15 seconds if user doesn't interact
+    setTimeout(() => {
+      if (banner.classList.contains("show")) {
+        dismissBanner();
+      }
+    }, 15000);
+  }, 5000);
+}
+
+// ── POST-DELIVERY MODAL (AMAZON ONLY — EARNED, NOT BEGGING) ──────────────────
+function showPostDeliveryModal(dish, savedAmount) {
+  const modal = document.getElementById("post-delivery-modal");
   if (!modal) return;
 
   const currentDish = dish || state.activeRecipeDish || DISHES_CATALOG[0];
   const amount = savedAmount || state.lastOrderSaved || 340.00;
 
   // Populate dynamic copy
-  const savedValEl = document.getElementById("mmm-saved-val");
+  const savedValEl = document.getElementById("pdm-saved-val");
   if (savedValEl) savedValEl.textContent = `₹${amount.toFixed(2)}`;
 
-  const dealTitleEl = document.getElementById("mmm-dish-deal-title");
+  const dealTitleEl = document.getElementById("pdm-dish-title");
   if (dealTitleEl) dealTitleEl.textContent = `Cook ${currentDish.title} at Home for ₹${currentDish.cookPrice || 85}!`;
 
-  const dealDescEl = document.getElementById("mmm-dish-deal-desc");
+  const dealDescEl = document.getElementById("pdm-dish-desc");
   if (dealDescEl) dealDescEl.textContent = `Get fresh ingredients delivered via Amazon India Pantry. Total prep: ${currentDish.recipe?.prep || '15 mins'}.`;
 
-  const amazonBtn = document.getElementById("mmm-amazon-btn");
+  const amazonBtn = document.getElementById("pdm-amazon-btn");
   if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
 
-  // Update default UPI link to ₹10
-  updateMasterModalUpi(10);
+  // Dismiss the landing banner if still visible
+  const slideBanner = document.getElementById("amazon-slide-banner");
+  if (slideBanner) {
+    slideBanner.classList.remove("show");
+    setTimeout(() => { slideBanner.style.display = "none"; }, 400);
+  }
 
   modal.style.display = "flex";
-  masterMonetizationShown = true;
 }
 
-function updateMasterModalUpi(amt) {
-  const upiBtn = document.getElementById("mmm-upi-btn");
-  const upiText = document.getElementById("mmm-upi-btn-text");
-  if (upiBtn) {
-    upiBtn.href = generateUpiUri(amt);
-  }
-  if (upiText) {
-    upiText.textContent = `Pay ₹${amt} with any UPI App`;
-  }
-}
-
-function setupMasterMonetizationModal() {
-  const modal = document.getElementById("monetization-master-modal");
-  const card = document.getElementById("mmm-card");
-  const closeBtn = document.getElementById("mmm-close-btn");
-  const dismissBtn = document.getElementById("mmm-dismiss-btn");
-  const amazonBtn = document.getElementById("mmm-amazon-btn");
-  const pillsRow = document.getElementById("mmm-pills-row");
+function setupPostDeliveryModal() {
+  const modal = document.getElementById("post-delivery-modal");
+  const card = document.getElementById("pdm-card");
+  const closeBtn = document.getElementById("pdm-close-btn");
+  const dismissBtn = document.getElementById("pdm-dismiss-btn");
+  const amazonBtn = document.getElementById("pdm-amazon-btn");
 
   if (!modal) return;
 
@@ -2665,31 +2710,12 @@ function setupMasterMonetizationModal() {
     }
   });
 
-  // Tip Pills click
-  if (pillsRow) {
-    pillsRow.querySelectorAll(".mmm-pill").forEach(pill => {
-      pill.addEventListener("click", () => {
-        pillsRow.querySelectorAll(".mmm-pill").forEach(p => p.classList.remove("active"));
-        pill.classList.add("active");
-        const amt = Number(pill.dataset.amount) || 10;
-        updateMasterModalUpi(amt);
-      });
-    });
-  }
-
   // Amazon button closes modal upon click
   if (amazonBtn) {
     amazonBtn.addEventListener("click", () => {
       closeModal();
     });
   }
-
-  // Fallback 5-second timer on initial landing if user hasn't ordered yet
-  setTimeout(() => {
-    if (masterMonetizationShown) return;
-    if (state.currentView === "tracking" || state.currentView === "reveal") return;
-    showMasterMonetizationModal();
-  }, 5000);
 }
 
 // ── App Initialization ───────────────────────────────────────────────────────
@@ -2699,7 +2725,8 @@ function init() {
   updateCartUI();
   setupEventListeners();
   checkUrlChallenge();
-  setupMasterMonetizationModal();
+  setupAmazonSlideBanner();
+  setupPostDeliveryModal();
 
   // Reuse cached last craving on next visit
   if (userState.lastCraving && customDishName && customDishPrice) {
