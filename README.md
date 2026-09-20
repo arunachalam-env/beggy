@@ -1,103 +1,75 @@
-# Beggy — Smart Food Delivery & Anti-Spending Dopamine Platform
+# Beggy — Crave It. Simulate It. Save the Bill.
 
-> **"Craving takeout in Bengaluru? Experience the complete excitement of ordering from top local kitchens, track your delivery live on the map, and unlock real financial savings."**
+[![Live Demo](https://img.shields.io/badge/Try%20it%20Live-beggy.app-FF5200?style=for-the-badge&logo=github)](https://arunachalamvenkatachalapathy-dev.github.io/beggy/)
 
-🌐 **Live Demo (GitHub Pages)**: [https://arunachalamvenkatachalapathy-dev.github.io/beggy/](https://arunachalamvenkatachalapathy-dev.github.io/beggy/)
+> **The only food delivery app that actually delivers savings.** 
 
----
+Beggy is a parody food-delivery web app that gives you the full dopamine thrill of ordering takeout at 11 PM—scrolling menus, adding to your cart, and watching the rider approach on a live GPS map. But just as the food "arrives", the app reveals the twist: **the food was never ordered, and the exact bill amount is redirected into your personal savings.**
 
-## 🌟 Highlights & Features
-
-1. **Authentic 4-Stage Food Delivery Experience**
-   - **Stage 1: Restaurant Discovery**: Explore 8 iconic Bengaluru kitchens across Indiranagar, Koramangala, and HSR Layout (Megha's Dum Darbar, Snuffles Burgers, Bengaluru Tiffin Room, Milano Woodfire Crusts, etc.).
-   - **Stage 2: Rich Menu & Customization**: 28+ mouthwatering dishes across Biryani, Burgers, South Indian Tiffins, Pizza, Asian Bowls, and Desserts with dietary badges (Veg, Non-Veg, Must Try).
-   - **Stage 3: Indian Payment Simulation**: Authentic UPI (Google Pay, PhonePe, Paytm), Net Banking (HDFC, SBI, ICICI, Axis), and COD with instant processing.
-   - **Stage 4: Real-Time GPS Rider Tracking**: Dynamic Leaflet route map tracking rider "Manjunath K." navigating Koramangala / Indiranagar streets with animated scooter markers, live speed, distance, and 4-step milestones.
-
-2. **The "Dopamine Hit Done — Real Save" Twist**
-   - Upon rider arrival, the app celebrates with sound and confetti, revealing that your craving has been defeated!
-   - **"Dopamine Hit Done — Let's Do Real Save"**: Automatically redirects the exact food bill directly into your simulated personal bank savings vault.
-   - **Simulated Indian Bank SMS Toast**: Realistic SMS push notification (`🏦 BHARAT-BANK: A/C **4921 credited...`) with authentic bank chime sound synthesized via Web Audio API.
-   - **Cook It at Home Link**: Direct link to Amazon Pantry / Fresh (`https://link.amazon/B05RiQ3Jy`) with curated ingredients and chef recipe instructions to cook the dish at home for a fraction of the cost.
-
-3. **Passbook & Savings Ledger**
-   - Interactive savings passbook tracking total lifetime savings, total orders resisted, and complete transaction history stored securely in `localStorage`.
-
-4. **Cryptographic Blockchain Evidence Log (Backend)**
-   - Tamper-evident ledger with **secp256k1** signature validation and **SHA-256** canonical JSON hashing.
-   - Cross-runtime SQLite support (compatible with Bun and Node.js 22+).
-   - Verify entire chain integrity from genesis via `/api/chain/verify`.
+![Beggy Hero GIF](https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80) 
+*(Note: Imagine a hero GIF of the UI and twist here!)*
 
 ---
 
-## 🚀 Quick Start
+### 💡 Why does this exist?
+People don't share tools; they share moments. Late-night cravings often lead to impulsive, expensive food delivery orders. Beggy uses **dopamine substitution**: you get the mechanical satisfaction and anticipation of ordering, but the climax is a proud realization that you conquered your craving and kept your money. 
 
-### Run Frontend Locally
-Simply open `public/index.html` or `docs/index.html` directly in any modern web browser.
+## 🚀 How it Works (The 45-Second Craving Killer)
+1. **Browse or Quick Crave**: Explore 8 iconic Bengaluru kitchens or tap a "Quick Craving" chip (e.g., *₹340 Biryani*).
+2. **Checkout (₹0)**: Apply the `BEGGY100` coupon. Your total becomes ₹0.
+3. **Live GPS Tracking**: Watch "Manjunath K." navigate Koramangala / Indiranagar streets with an animated scooter marker.
+4. **The Reveal**: Just as the rider arrives, confetti explodes! You get a simulated bank SMS confirming the exact amount was "saved", updating your digital passbook and streak counter.
 
-### Run with Backend Server (Node.js or Bun)
-```bash
-# Using Bun
-bun install
-bun run dev
-
-# Or using Node.js (v22+)
-npm install
-npm start
-```
-The server will start at `http://localhost:3000`.
-
-### Run Automated Tests
-```bash
-# Using Bun
-bun test
-
-# Or using Node.js
-npm test
-```
+## ✨ Features
+- **Authentic Indian Payment Simulation**: Supports UPI (GPay, PhonePe, Paytm), Net Banking, and COD.
+- **Dynamic 2D Share Cards**: Generates high-res 1080×1920 Instagram Story / WhatsApp cards of your "saved" amount with a single tap.
+- **Friend Challenges**: Send a prank URL to a friend challenging them to resist a craving.
+- **Passbook & Streaks**: LocalStorage-powered streak tracker with badges (*First Defeat*, *Midnight Warrior*, *₹5,000 Club*).
+- **Cook-at-Home Engine**: Offers a quick recipe to cook your craving at home for a fraction of the cost, complete with Amazon Fresh ingredient links.
 
 ---
 
-## 🛠️ Backend API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/health` | Service health, block count, uptime, and environment |
-| `POST` | `/api/readings` | Submit signed savings receipt / block to ledger |
-| `GET` | `/api/chain` | Retrieve all verified blocks in chronological order |
-| `GET` | `/api/chain/latest?n=10` | Retrieve the latest N blocks (default 10) |
-| `GET` | `/api/chain/verify` | Recompute hashes & signatures from genesis |
-| `POST` | `/api/keys/register` | Dev-only: Generate new secp256k1 keypair |
+## 🛡️ Trust & Privacy Notice
+**Beggy is a simulation.** 
+- No real orders are placed. 
+- No real payments are processed. We never ask for your card details or UPI PIN. 
+- All data (streaks, passbook) stays entirely local on your device (`localStorage`).
+- *As an Amazon Associate I earn from qualifying purchases.*
 
 ---
 
-## 📁 Repository Structure
+## 💻 Tech Stack & Architecture
 
-```
-beggy/
-├── .github/workflows/pages.yml # GitHub Actions auto-deployment to GitHub Pages
-├── docs/                      # GitHub Pages static distribution
-│   ├── index.html             # Multi-stage food delivery SPA
-│   ├── style.css              # Swiggy design system styling & animations
-│   ├── script.js              # State machine, GPS map, audio synth, and catalog
-│   └── logo.jpg               # Official Beggy brand logo
-├── public/                    # Express static directory (mirrored to docs/)
-├── src/                       # TypeScript backend sources
-│   ├── chain.ts               # Ledger validation, block appending & verify
-│   ├── crypto.ts              # Deterministic JSON, SHA-256, secp256k1
-│   ├── db.ts                  # Cross-runtime SQLite abstraction
-│   ├── index.ts               # Express HTTP server & static fallback
-│   └── keystore.ts            # Secp256k1 key generation helper
-├── test/
-│   ├── api.test.js            # Express endpoint integration tests
-│   └── chain.test.js          # Cryptographic & SQLite unit tests
-├── index.html                 # GitHub Pages root redirect fallback
-├── package.json               # Dependencies & scripts
-├── tsconfig.json              # TypeScript configuration
-└── README.md                  # Project documentation
-```
+- **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+). Zero build-step for the UI.
+- **Mapping**: Leaflet.js with OpenStreetMap tiles.
+- **Backend (Optional / API)**: TypeScript, Express, SQLite (`better-sqlite3`).
+- **Cryptography**: `secp256k1` signatures and SHA-256 for a tamper-evident savings ledger.
 
----
+### Local Setup & Tests
+
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/arunachalamvenkatachalapathy-dev/beggy.git
+   cd beggy
+   ```
+2. **Run Frontend**:
+   Simply open `docs/index.html` in your browser.
+3. **Run Backend (Node or Bun)**:
+   ```bash
+   bun install
+   bun run dev
+   ```
+4. **Run Tests**:
+   ```bash
+   bun test
+   ```
+
+## 🗺️ Roadmap
+- [x] Phase 0: Trust & Polish (Fix design, generic bank SMS, link previews)
+- [x] Phase 1: Personalization & Shareable Cards
+- [x] Phase 2: Reactivate Passbook & Streaks
+- [ ] Phase 3: Leaderboards & "Beggy Wrapped"
+- [ ] Phase 4: Localization (Hindi, Tamil, Kannada)
 
 ## 📄 License
 MIT © 2026 arunachalamvenkatachalapathy-dev

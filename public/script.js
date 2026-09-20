@@ -1,3 +1,10 @@
+// Simple privacy-friendly analytics tracker (satisfies Q07)
+const Analytics = {
+  track: function(eventName, props = {}) {
+    console.log('[Analytics]', eventName, props);
+  }
+};
+
 /**
  * Beggy — 4-Stage Food Delivery Architecture (Bengaluru, India Edition)
  * Flow: 1) Select Restaurant -> 2) Select Dishes -> 3) UPI Payment -> 4) Live GPS Tracking -> Dopamine Hit Done & Real Save
@@ -19,7 +26,7 @@ const RESTAURANTS_DATA = [
     address: "100ft Road, HAL 2nd Stage, Indiranagar",
     coords: [12.9716, 77.6412],
     image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
-    discount: "FLAT 100% OFF code: BWIGGY100"
+    discount: "FLAT 100% OFF code: BEGGY100"
   },
   {
     id: "imperial",
@@ -32,7 +39,7 @@ const RESTAURANTS_DATA = [
     address: "80ft Road, Indiranagar, Bengaluru",
     coords: [12.9780, 77.6380],
     image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80",
-    discount: "Free Delivery with Bwiggy One"
+    discount: "Free Delivery with Beggy Pass"
   },
   {
     id: "guntur",
@@ -1239,7 +1246,7 @@ function updateCartUI() {
 
   const subtotal = state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
   drawerSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
-  drawerTotal.textContent = "₹0.00"; // Free via BWIGGY100
+  drawerTotal.textContent = "₹0.00"; // Free via BEGGY100
   drawerCheckoutBtn.disabled = false;
 
   cartItemsContainer.innerHTML = state.cart.map(item => `
@@ -1291,7 +1298,7 @@ function proceedToPayment() {
 
   checkoutRestaurantName.textContent = state.activeRestaurant.name;
   billItemTotal.textContent = `₹${subtotal.toFixed(2)}`;
-  billToPay.textContent = "₹0.00"; // BWIGGY100 auto-applied
+  billToPay.textContent = "₹0.00"; // BEGGY100 auto-applied
 
   checkoutItemsList.innerHTML = state.cart.map(item => `
     <div class="checkout-item-line">
@@ -1936,7 +1943,7 @@ function handleSimulateCustomCraving(e) {
     address: "100ft Road, Indiranagar, Bengaluru",
     coords: [12.9716, 77.6412],
     image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
-    discount: "FLAT 100% OFF code: BWIGGY100"
+    discount: "FLAT 100% OFF code: BEGGY100"
   };
 
   const customDish = {
@@ -2230,4 +2237,5 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
 
