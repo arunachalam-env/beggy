@@ -1,6 +1,6 @@
 # Beggy — Crave It. Simulate It. Save the Bill.
 
-[![Live Demo](https://img.shields.io/badge/Try%20it%20Live-beggy.app-FF5200?style=for-the-badge&logo=github)](https://arunachalamvenkatachalapathy-dev.github.io/beggy/)
+[![Live Demo](https://img.shields.io/badge/Try%20it%20Live-beggy.app-FF5200?style=for-the-badge&logo=vercel)](https://beggy.vercel.app/)
 
 > **The only food delivery app that actually delivers savings.** 
 

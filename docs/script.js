@@ -2079,10 +2079,7 @@ function showShareToast(msg) {
 }
 
 function getAppBaseUrl() {
-  if (window.location.hostname.includes("vercel.app")) {
-    return "https://beggy.vercel.app/";
-  }
-  return window.location.origin + window.location.pathname;
+  return "https://beggy.vercel.app/";
 }
 
 function getChallengeLinkData() {
@@ -2675,7 +2672,7 @@ function setupEventListeners() {
 function showAmazonSlideBanner() {}
 function setupAmazonSlideBanner() {}
 
-// ── POST-DELIVERY MODAL (AMAZON ONLY — EARNED, NOT BEGGING) ──────────────────
+// ── POST-DELIVERY MODAL — SEGMENT 1: CRAVING DEFEATED & RECIPE KIT ──────────
 function showPostDeliveryModal(dish, savedAmount) {
   const modal = document.getElementById("post-delivery-modal");
   if (!modal) return;
@@ -2697,38 +2694,149 @@ function showPostDeliveryModal(dish, savedAmount) {
   if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
 
   modal.style.display = "flex";
+  Analytics.track("post_delivery_segment1_opened", { dish: currentDish.title, amount });
 }
 
 function setupPostDeliveryModal() {
   const modal = document.getElementById("post-delivery-modal");
   const card = document.getElementById("pdm-card");
   const closeBtn = document.getElementById("pdm-close-btn");
+  const nextBtn = document.getElementById("pdm-next-btn");
   const dismissBtn = document.getElementById("pdm-dismiss-btn");
   const amazonBtn = document.getElementById("pdm-amazon-btn");
 
   if (!modal) return;
 
-  const closeModal = () => {
+  const closeFirstModalAndOpenWhatsApp = () => {
+    modal.style.display = "none";
+    // As instructed: when the user closes the 1st popup post delivery, the WhatsApp share popup should come!
+    setTimeout(() => {
+      showWhatsAppShareModal();
+    }, 150);
+  };
+
+  if (closeBtn) closeBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
+  if (nextBtn) nextBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
+  if (dismissBtn) dismissBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
+  if (amazonBtn) {
+    amazonBtn.addEventListener("click", () => {
+      setTimeout(closeFirstModalAndOpenWhatsApp, 500);
+    });
+  }
+
+  // Click outside card on backdrop closes modal 1 and opens modal 2
+  modal.addEventListener("click", (e) => {
+    if (card && !card.contains(e.target)) {
+      closeFirstModalAndOpenWhatsApp();
+    }
+  });
+
+  // Escape key closes modal 1 and opens modal 2
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "flex") {
+      closeFirstModalAndOpenWhatsApp();
+    }
+  });
+}
+
+// ── POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP VIRAL SHARE ───────────────────
+function showWhatsAppShareModal() {
+  const modal = document.getElementById("whatsapp-share-modal");
+  if (!modal) return;
+
+  const dish = state.activeRecipeDish || DISHES_CATALOG[0];
+  const amount = state.lastOrderSaved || 340.00;
+
+  // Update saved amount headline
+  const savedAmountEl = document.getElementById("wsm-saved-amount");
+  if (savedAmountEl) savedAmountEl.textContent = Math.round(amount);
+
+  // Ensure canvas has rendered with current dish & amount
+  renderShareCard(dish.title, amount);
+
+  // Update preview image from canvas data URL
+  const previewImg = document.getElementById("wsm-preview-img");
+  if (previewImg && shareCardCanvas) {
+    try {
+      previewImg.src = shareCardCanvas.toDataURL("image/png");
+    } catch (e) {
+      console.warn("Could not export canvas to preview img:", e);
+    }
+  }
+
+  modal.style.display = "flex";
+  Analytics.track("whatsapp_share_modal_opened", { dish: dish.title, amount });
+}
+
+function setupWhatsAppShareModal() {
+  const modal = document.getElementById("whatsapp-share-modal");
+  const card = document.getElementById("wsm-card");
+  const closeBtn = document.getElementById("wsm-close-btn");
+  const dismissBtn = document.getElementById("wsm-dismiss-btn");
+  const waBtn = document.getElementById("wsm-btn-whatsapp");
+  const copyBtn = document.getElementById("wsm-btn-copy");
+  const downloadBtn = document.getElementById("wsm-btn-download");
+
+  if (!modal) return;
+
+  const closeSecondModal = () => {
     modal.style.display = "none";
   };
 
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  if (dismissBtn) dismissBtn.addEventListener("click", closeModal);
-  if (amazonBtn) amazonBtn.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeSecondModal);
+  if (dismissBtn) dismissBtn.addEventListener("click", closeSecondModal);
 
-  // Click outside card on backdrop closes modal
+  // Click outside card on backdrop closes modal 2
   modal.addEventListener("click", (e) => {
     if (card && !card.contains(e.target)) {
-      closeModal();
+      closeSecondModal();
     }
   });
 
-  // Escape key closes modal
+  // Escape key closes modal 2
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal.style.display === "flex") {
-      closeModal();
+      closeSecondModal();
     }
   });
+
+  // 1-Tap WhatsApp Share
+  if (waBtn) {
+    waBtn.addEventListener("click", () => {
+      const { text } = getChallengeLinkData();
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+      Analytics.track("whatsapp_share_modal_shared");
+    });
+  }
+
+  // Copy Challenge Link & Text
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      const { challengeUrl, text } = getChallengeLinkData();
+      const textEl = document.getElementById("wsm-btn-copy-text");
+      const iconEl = document.getElementById("wsm-btn-copy-icon");
+
+      navigator.clipboard.writeText(text).then(() => {
+        if (textEl) textEl.textContent = "✓ Copied Link!";
+        if (iconEl) iconEl.textContent = "✅";
+        setTimeout(() => {
+          if (textEl) textEl.textContent = "Copy Challenge Link";
+          if (iconEl) iconEl.textContent = "📋";
+        }, 3000);
+      }).catch(() => {
+        if (textEl) textEl.textContent = "✓ Link Copied";
+      });
+      Analytics.track("whatsapp_share_modal_copied");
+    });
+  }
+
+  // Download Story Image
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", () => {
+      downloadShareCard();
+      Analytics.track("whatsapp_share_modal_downloaded");
+    });
+  }
 }
 
 // ── App Initialization ───────────────────────────────────────────────────────
@@ -2740,6 +2848,7 @@ function init() {
   checkUrlChallenge();
   setupAmazonSlideBanner();
   setupPostDeliveryModal();
+  setupWhatsAppShareModal();
   setupLiveVisitorsCounter();
 
   // Trigger Flying Streak Fire on initial landing right from the beginning

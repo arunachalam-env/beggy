@@ -870,14 +870,18 @@
   <div class="passbook-backdrop" id="passbook-backdrop"></div>
 
   <!-- ====================================================================
-       POST-DELIVERY MODAL (AMAZON ONLY — EARNED, NOT BEGGING)
+       POST-DELIVERY MODAL — SEGMENT 1: CRAVING DEFEATED & RECIPE KIT
        ==================================================================== -->
   <div class="pdm-overlay" id="post-delivery-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pdm-title">
     <div class="pdm-card" id="pdm-card">
       <button class="pdm-close-btn" id="pdm-close-btn" aria-label="Close popup">&times;</button>
 
       <div class="pdm-header">
-        <div class="pdm-badge">🎉 CRAVING DEFEATED • 100% SAVED!</div>
+        <div class="pdm-step-badge">
+          <span class="pdm-step-num">STEP 1 OF 2</span>
+          <span class="pdm-step-sep">•</span>
+          <span>CRAVING DEFEATED 🎉</span>
+        </div>
         <h3 class="pdm-title" id="pdm-title">Dopamine Hit Done!</h3>
         <p class="pdm-sub">You just saved <strong id="pdm-saved-val">₹340.00</strong> on takeout delivery!</p>
       </div>
@@ -900,10 +904,65 @@
           </a>
           <p class="pdm-amazon-disclosure">*As an Amazon Associate, Beggy earns from qualifying purchases.</p>
         </div>
+
+        <!-- Next to WhatsApp Share button -->
+        <button class="pdm-next-btn" id="pdm-next-btn" type="button">
+          <span>Continue to WhatsApp Share (Step 2/2) ➔</span>
+        </button>
       </div>
 
       <div class="pdm-footer">
-        <button class="pdm-dismiss-link" id="pdm-dismiss-btn" type="button">No thanks, return to my savings vault ➔</button>
+        <button class="pdm-dismiss-link" id="pdm-dismiss-btn" type="button">Skip to WhatsApp Share ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP VIRAL SHARE
+       ==================================================================== -->
+  <div class="pdm-overlay" id="whatsapp-share-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wsm-title">
+    <div class="pdm-card wsm-card" id="wsm-card">
+      <button class="pdm-close-btn" id="wsm-close-btn" aria-label="Close popup">&times;</button>
+
+      <div class="pdm-header">
+        <div class="pdm-step-badge wsm-step-badge">
+          <span class="pdm-step-num">STEP 2 OF 2</span>
+          <span class="pdm-step-sep">•</span>
+          <span>WHATSAPP VIRAL SHARE 🔥</span>
+        </div>
+        <h3 class="pdm-title" id="wsm-title">Flex Your ₹<span id="wsm-saved-amount">340</span> Save!</h3>
+        <p class="pdm-sub">Share your craving victory directly to WhatsApp status or challenge your friends.</p>
+      </div>
+
+      <div class="wsm-body">
+        <!-- Canvas Story Card Image Preview -->
+        <div class="wsm-preview-container">
+          <img id="wsm-preview-img" class="wsm-preview-img" src="" alt="Beggy Savings Story Card Preview" />
+        </div>
+
+        <!-- WhatsApp Primary CTA -->
+        <button class="wsm-btn-whatsapp" id="wsm-btn-whatsapp" type="button">
+          <span class="wsm-wa-icon">💬</span>
+          <div class="wsm-wa-text">
+            <strong>Share on WhatsApp Status &amp; Friends</strong>
+            <span>Send story card &amp; challenge link with 1 tap</span>
+          </div>
+        </button>
+
+        <!-- Secondary Action Buttons -->
+        <div class="wsm-secondary-actions">
+          <button class="wsm-btn-action" id="wsm-btn-copy" type="button">
+            <span id="wsm-btn-copy-icon">📋</span>
+            <span id="wsm-btn-copy-text">Copy Challenge Link</span>
+          </button>
+          <button class="wsm-btn-action" id="wsm-btn-download" type="button">
+            <span>💾 Download Story Image</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pdm-footer">
+        <button class="pdm-dismiss-link" id="wsm-dismiss-btn" type="button">Done, return to my savings vault ➔</button>
       </div>
     </div>
   </div>
