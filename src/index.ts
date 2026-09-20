@@ -43,6 +43,10 @@ app.use(
         connectSrc: [
           "'self'",
           'https://esm.sh',
+          'https://router.project-osrm.org',
+          'https://vitals.vercel-insights.com',
+          'https://server.arcgisonline.com',
+          'https://api.qrserver.com',
           'https://*.unsplash.com',
           'https://*.tile.openstreetmap.org',
           'https://*.basemaps.cartocdn.com',
@@ -53,6 +57,7 @@ app.use(
           'data:',
           'https:',
           'blob:',
+          'https://server.arcgisonline.com',
           'https://*.tile.openstreetmap.org',
           'https://*.basemaps.cartocdn.com',
         ],

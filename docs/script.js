@@ -36,6 +36,19 @@ window.getBeggyAnalytics = function() {
 };
 
 /**
+ * Robust HTML entity escaping to prevent DOM and Stored XSS.
+ */
+function escapeHtml(str) {
+  if (typeof str !== "string") return String(str ?? "");
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
  * Beggy — 4-Stage Food Delivery Architecture (Bengaluru, India Edition)
  * Flow: 1) Select Restaurant -> 2) Select Dishes -> 3) UPI Payment -> 4) Live GPS Tracking -> Dopamine Hit Done & Real Save
  * Fictionalized Brand Names • Natural Grocery Helper
@@ -781,8 +794,18 @@ function loadInitialUserState() {
     const raw = localStorage.getItem("beggy_user_state_v2");
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (!parsed.streak || parsed.streak < 1) parsed.streak = 1;
-      return { ...defaultState, ...parsed };
+      if (parsed && typeof parsed === "object") {
+        return {
+          totalSaved: typeof parsed.totalSaved === "number" && !isNaN(parsed.totalSaved) && parsed.totalSaved >= 0 ? parsed.totalSaved : 0,
+          cravingsDefeated: typeof parsed.cravingsDefeated === "number" && !isNaN(parsed.cravingsDefeated) && parsed.cravingsDefeated >= 0 ? parsed.cravingsDefeated : 0,
+          streak: typeof parsed.streak === "number" && !isNaN(parsed.streak) && parsed.streak >= 1 ? Math.floor(parsed.streak) : 1,
+          bestStreak: typeof parsed.bestStreak === "number" && !isNaN(parsed.bestStreak) && parsed.bestStreak >= 1 ? Math.floor(parsed.bestStreak) : 1,
+          lastSaveDate: typeof parsed.lastSaveDate === "string" ? parsed.lastSaveDate.slice(0, 50) : null,
+          history: Array.isArray(parsed.history) ? parsed.history.filter(h => h && typeof h === "object").slice(0, 50) : [],
+          badges: Array.isArray(parsed.badges) ? parsed.badges.filter(b => typeof b === "string").slice(0, 20) : [],
+          lastCraving: parsed.lastCraving && typeof parsed.lastCraving === "object" ? parsed.lastCraving : null
+        };
+      }
     }
   } catch (e) {
     console.warn("Could not parse user state:", e);
@@ -1431,13 +1454,13 @@ function updateCartUI() {
   cartItemsContainer.innerHTML = state.cart.map(item => `
     <div class="cart-item-row">
       <div class="cart-item-info">
-        <strong>${item.title}</strong>
+        <strong>${escapeHtml(item.title)}</strong>
         <span>₹${item.price} each</span>
       </div>
       <div class="cart-qty-ctrl">
-        <button class="qty-btn" onclick="updateCartQty(${item.id}, -1)">−</button>
+        <button class="qty-btn" onclick="updateCartQty(${parseInt(item.id, 10)}, -1)">−</button>
         <span style="font-size:0.88rem; font-weight:700;">${item.qty}</span>
-        <button class="qty-btn" onclick="updateCartQty(${item.id}, 1)">+</button>
+        <button class="qty-btn" onclick="updateCartQty(${parseInt(item.id, 10)}, 1)">+</button>
       </div>
     </div>
   `).join('');
@@ -1485,7 +1508,7 @@ function proceedToPayment() {
 
   checkoutItemsList.innerHTML = state.cart.map(item => `
     <div class="checkout-item-line">
-      <span>${item.qty} × ${item.title}</span>
+      <span>${item.qty} × ${escapeHtml(item.title)}</span>
       <strong>₹${(item.price * item.qty).toFixed(2)}</strong>
     </div>
   `).join('');
@@ -1606,7 +1629,10 @@ function initLeafletMap() {
   map = L.map('real-leaflet-map', {
     center: HOME_COORDS,
     zoom: 14,
-    zoomControl: true
+    zoomControl: true,
+    scrollWheelZoom: false,
+    dragging: !L.Browser.mobile,
+    tap: true
   });
 
   // Clean, High-Contrast Bengaluru Street Navigation Tiles (Esri World Street Map: 100% Free, No Watermarks)
@@ -2166,10 +2192,10 @@ function openPassbookModal() {
       pbHistoryList.innerHTML = userState.history.map(h => `
         <div class="pb-history-item">
           <div class="pb-hi-left">
-            <strong>${h.dish}</strong>
-            <span>${h.date} • ${h.restaurant}</span>
+            <strong>${escapeHtml(h.dish)}</strong>
+            <span>${escapeHtml(h.date)} • ${escapeHtml(h.restaurant)}</span>
           </div>
-          <div class="pb-hi-right">+₹${h.amount.toFixed(2)}</div>
+          <div class="pb-hi-right">+₹${Number(h.amount || 0).toFixed(2)}</div>
         </div>
       `).join('');
     }
@@ -2301,9 +2327,12 @@ function switchDiscoveryMode(mode) {
 
 function handleSimulateCustomCraving(e) {
   if (e) e.preventDefault();
-  const dishTitle = (customDishName && customDishName.value.trim()) || "Chicken Dum Biryani";
-  const rawPrice = (customDishPrice && parseFloat(customDishPrice.value)) || 340;
-  const price = Math.max(10, Math.min(rawPrice, 5000));
+  const rawTitle = customDishName ? customDishName.value.trim() : "";
+  const dishTitle = (rawTitle ? rawTitle.slice(0, 60) : "") || "Chicken Dum Biryani";
+  const rawPrice = customDishPrice ? parseFloat(customDishPrice.value) : 340;
+  const price = (!isNaN(rawPrice) && isFinite(rawPrice) && rawPrice > 0)
+    ? Math.max(10, Math.min(Math.round(rawPrice), 10000))
+    : 340;
 
   const customRest = {
     id: "custom_kitchen",
@@ -2365,23 +2394,28 @@ function checkUrlChallenge() {
     const params = new URLSearchParams(window.location.search);
     const cParam = params.get("c") || (params.get("challenge") === "1" ? params.get("amount") : null);
     if (cParam) {
-      const from = params.get("from") || "A friend";
-      const amount = parseFloat(cParam) || 340;
-      const dish = params.get("dish") || "Takeout Craving";
+      const rawNum = parseFloat(cParam);
+      const amount = (!isNaN(rawNum) && isFinite(rawNum) && rawNum > 0)
+        ? Math.max(10, Math.min(Math.round(rawNum), 50000))
+        : 340;
+      const rawFrom = params.get("from") || "A friend";
+      const from = rawFrom.trim().slice(0, 30);
+      const rawDish = params.get("dish") || "Takeout Craving";
+      const dish = rawDish.trim().slice(0, 50);
 
       state.activeChallenge = { from, amount, dish };
 
       if (friendChallengeBanner) {
         friendChallengeBanner.style.display = "flex";
-        if (fcbTitle) fcbTitle.textContent = `⚔️ Friend Challenge: Can you save ₹${amount.toFixed(0)}?`;
-        if (fcbDesc) fcbDesc.textContent = `${from} challenged you to resist ordering ${dish} and save ₹${amount.toFixed(0)}. Can you resist your craving?`;
+        if (fcbTitle) fcbTitle.textContent = `⚔️ Friend Challenge: Can you save ₹${amount}?`;
+        if (fcbDesc) fcbDesc.textContent = `${from} challenged you to resist ordering ${dish} and save ₹${amount}. Can you resist your craving?`;
       }
 
       switchDiscoveryMode("quick");
       if (customDishName) customDishName.value = dish;
       if (customDishPrice) {
         customDishPrice.value = amount;
-        if (btnCravingAmount) btnCravingAmount.textContent = amount.toFixed(0);
+        if (btnCravingAmount) btnCravingAmount.textContent = String(amount);
       }
     } else {
       if (friendChallengeBanner) {
@@ -2548,7 +2582,7 @@ function setupEventListeners() {
   if (btnScWhatsapp) {
     btnScWhatsapp.addEventListener("click", () => {
       const { text } = getChallengeLinkData();
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
       Analytics.track("share_card_whatsapp");
     });
   }
@@ -2558,7 +2592,7 @@ function setupEventListeners() {
   if (btnCfcWhatsapp) {
     btnCfcWhatsapp.addEventListener("click", () => {
       const { text } = getChallengeLinkData();
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
       Analytics.track("challenge_whatsapp");
     });
   }
@@ -2804,7 +2838,7 @@ function setupWhatsAppShareModal() {
   if (waBtn) {
     waBtn.addEventListener("click", () => {
       const { text } = getChallengeLinkData();
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
       Analytics.track("whatsapp_share_modal_shared");
     });
   }
