@@ -739,11 +739,11 @@
                 <!-- Injected via script.js -->
               </ul>
               <!-- Natural Grocery Helper Button -->
-              <a href="https://link.amazon/B05RiQ3Jy" target="_blank" rel="noopener noreferrer" class="amazon-recipe-btn" id="amazon-recipe-btn">
+              <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" target="_blank" rel="noopener noreferrer" class="amazon-recipe-btn" id="amazon-recipe-btn">
                 <span class="amz-icon">🛒</span>
                 <span>Get Fresh Ingredients to Cook This on Amazon</span>
               </a>
-              <p class="amazon-disclosure">Cook fresh at home for a fraction of takeout cost.</p>
+              <p class="amazon-disclosure">*As an Amazon Associate, Beggy earns from qualifying purchases. Cook fresh at home for a fraction of takeout cost.</p>
             </div>
 
             <div class="cr-steps">
@@ -913,23 +913,74 @@
   <div class="passbook-backdrop" id="passbook-backdrop"></div>
 
   <!-- ====================================================================
-       5-SECOND CHEF'S RECIPE POPUP WITH CROSS MARK CLOSE
+       MASTER MONETIZATION POPUP (CHAI TIP + AMAZON GOURMET INGREDIENTS)
        ==================================================================== -->
-  <div class="recipe-takeover-overlay" id="recipe-takeover-overlay" style="display: none;">
-    <div class="recipe-takeover-card" id="recipe-takeover-card">
-      <!-- Prominent Cross Mark (X) to Close if not needed -->
-      <button class="recipe-takeover-close-btn" id="recipe-takeover-close-btn" aria-label="Close recipe popup">&times;</button>
+  <div class="mmm-overlay" id="monetization-master-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="mmm-title">
+    <div class="mmm-card" id="mmm-card">
+      <!-- Prominent Cross Mark (X) to Close -->
+      <button class="mmm-close-btn" id="mmm-close-btn" aria-label="Close popup">&times;</button>
 
-      <div class="recipe-takeover-content">
-        <span class="recipe-takeover-badge">🍳 Secret Chef Recipe &amp; Grocery Kit</span>
-        <h3 class="recipe-takeover-title">Get Recipe to Cook Fresh at Home!</h3>
-        <p class="recipe-takeover-sub">Why spend ₹340 on restaurant delivery? Cook authentic Bengaluru biryani in 15 minutes for just ₹85.</p>
-        <button class="recipe-takeover-cta-btn" id="recipe-takeover-cta-btn" type="button">
-          <span>Get Recipe &amp; Fresh Ingredients on Amazon 🛒</span>
-        </button>
-        <div class="recipe-takeover-footer">
-          <button class="recipe-takeover-dismiss-link" id="recipe-takeover-back-btn" type="button">No thanks, return to Beggy</button>
+      <!-- Celebratory Header -->
+      <div class="mmm-header">
+        <div class="mmm-badge">🎉 CRAVING DEFEATED • 100% SAVED!</div>
+        <h3 class="mmm-title" id="mmm-title">Dopamine Hit Done!</h3>
+        <p class="mmm-sub" id="mmm-sub">You just saved <strong id="mmm-saved-val">₹340.00</strong> from Swiggy delivery!</p>
+      </div>
+
+      <div class="mmm-body">
+        <!-- TIER 1: INSTANT UPI TIP (DIRECT TO BANK) -->
+        <div class="mmm-section mmm-tip-section">
+          <div class="mmm-sec-header">
+            <span class="mmm-sec-tag">☕ KEEP BEGGY 100% FREE</span>
+            <h4 class="mmm-sec-title">Tip ₹10 Chai (Swiggy Platform Fee)</h4>
+            <p class="mmm-sec-desc">Swiggy charges a ₹10 platform fee on every order anyway. Buy the solo developer a cutting chai with 1-tap UPI!</p>
+          </div>
+
+          <!-- Quick Tip Amount Pills -->
+          <div class="mmm-pills-row" id="mmm-pills-row">
+            <button class="mmm-pill active" data-amount="10" type="button">₹10 <span>Chai ☕</span></button>
+            <button class="mmm-pill" data-amount="20" type="button">₹20 <span>Coffee ☕</span></button>
+            <button class="mmm-pill" data-amount="50" type="button">₹50 <span>Dosa 🥞</span></button>
+          </div>
+
+          <!-- 1-Tap UPI CTA Button -->
+          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Chai%20for%20Beggy" class="mmm-upi-btn" id="mmm-upi-btn">
+            <span class="mmm-btn-icon">⚡</span>
+            <div class="mmm-btn-text">
+              <strong id="mmm-upi-btn-text">Pay ₹10 with any UPI App</strong>
+              <span>GPay • PhonePe • Paytm • CRED • BHIM</span>
+            </div>
+          </a>
         </div>
+
+        <!-- Sleek Visual Divider -->
+        <div class="mmm-divider">
+          <span>OR COOK FRESH AT HOME</span>
+        </div>
+
+        <!-- TIER 2: AMAZON GOURMET FOOD DEAL (QUALIFYING 180-DAY SALES) -->
+        <div class="mmm-section mmm-amazon-section">
+          <div class="mmm-sec-header">
+            <span class="mmm-sec-tag amazon-tag">👨‍🍳 15-Minute Recipe Kit</span>
+            <h4 class="mmm-sec-title" id="mmm-dish-deal-title">Cook Biryani at Home for ₹85!</h4>
+            <p class="mmm-sec-desc" id="mmm-dish-deal-desc">Get fresh gourmet ingredients delivered to your door via Amazon India Pantry.</p>
+          </div>
+
+          <!-- Amazon CTA Button -->
+          <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" target="_blank" rel="noopener noreferrer" class="mmm-amazon-btn" id="mmm-amazon-btn">
+            <span class="mmm-btn-icon">🛒</span>
+            <div class="mmm-btn-text">
+              <strong>Shop Fresh Ingredients on Amazon India</strong>
+              <span>Cook fresh gourmet meals for 1/4th takeout price</span>
+            </div>
+          </a>
+          <p class="mmm-amazon-disclosure">*As an Amazon Associate, Beggy earns from qualifying purchases.</p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="mmm-footer">
+        <button class="mmm-dismiss-link" id="mmm-dismiss-btn" type="button">No thanks, return to my savings vault ➔</button>
       </div>
     </div>
   </div>

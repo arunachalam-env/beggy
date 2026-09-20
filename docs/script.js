@@ -91,7 +91,7 @@ const Analytics = {
  * Fictionalized Brand Names • Natural Grocery Helper
  */
 
-const AMAZON_GROCERY_URL = "https://link.amazon/B05RiQ3Jy";
+const AMAZON_GROCERY_URL = "https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl";
 
 /**
  * Beggy Creator UPI Tip Configuration (0-Second Direct Bank Settlement)
@@ -1796,6 +1796,11 @@ function triggerOrderArrival() {
   // Show the Dopamine Reveal Card and scroll to it smoothly
   dopamineRevealCard.style.display = "block";
   dopamineRevealCard.scrollIntoView({ behavior: "smooth" });
+
+  // Trigger Master Monetization Modal (Chai Tip + Amazon Deal) after brief celebration
+  setTimeout(() => {
+    showMasterMonetizationModal(dish, savedAmount);
+  }, 1000);
 }
 
 // ── "Dopamine Hit Done — View Savings Passbook" Handler ───────────────────────
@@ -2588,55 +2593,102 @@ function setupEventListeners() {
   }
 }
 
-// ── 5-Second Chef's Recipe Modal with Cross Mark Close ────────────────────────
-let recipeTakeoverShown = false;
-function init5SecondRecipePopup() {
-  setTimeout(() => {
-    if (recipeTakeoverShown) return;
-    if (state.currentView === "tracking" || state.currentView === "reveal") return;
+// ── MASTER MONETIZATION POPUP (CHAI TIP + AMAZON DEAL) ────────────────────────
+let masterMonetizationShown = false;
 
-    const overlay = document.getElementById("recipe-takeover-overlay");
-    const card = document.getElementById("recipe-takeover-card");
-    const closeCrossBtn = document.getElementById("recipe-takeover-close-btn");
-    const backBtn = document.getElementById("recipe-takeover-back-btn");
-    const ctaBtn = document.getElementById("recipe-takeover-cta-btn");
+function showMasterMonetizationModal(dish, savedAmount) {
+  const modal = document.getElementById("monetization-master-modal");
+  if (!modal) return;
 
-    if (overlay) {
-      overlay.style.display = "flex";
-      recipeTakeoverShown = true;
+  const currentDish = dish || state.activeRecipeDish || DISHES_CATALOG[0];
+  const amount = savedAmount || state.lastOrderSaved || 340.00;
 
-      // Clicking cross mark (X) closes if user doesn't need it
-      if (closeCrossBtn) {
-        closeCrossBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          overlay.style.display = "none";
-        });
-      }
+  // Populate dynamic copy
+  const savedValEl = document.getElementById("mmm-saved-val");
+  if (savedValEl) savedValEl.textContent = `₹${amount.toFixed(2)}`;
 
-      // Clicking 'No thanks' button closes modal
-      if (backBtn) {
-        backBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          overlay.style.display = "none";
-        });
-      }
+  const dealTitleEl = document.getElementById("mmm-dish-deal-title");
+  if (dealTitleEl) dealTitleEl.textContent = `Cook ${currentDish.title} at Home for ₹${currentDish.cookPrice || 85}!`;
 
-      // Clicking outside the card on the backdrop closes modal
-      overlay.addEventListener("click", (e) => {
-        if (card && !card.contains(e.target)) {
-          overlay.style.display = "none";
-        }
-      });
+  const dealDescEl = document.getElementById("mmm-dish-deal-desc");
+  if (dealDescEl) dealDescEl.textContent = `Get fresh ingredients delivered via Amazon India Pantry. Total prep: ${currentDish.recipe?.prep || '15 mins'}.`;
 
-      // Clicking the CTA button opens Amazon in a new tab
-      if (ctaBtn) {
-        ctaBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          window.open(AMAZON_GROCERY_URL, "_blank");
-          overlay.style.display = "none";
-        });
-      }
+  const amazonBtn = document.getElementById("mmm-amazon-btn");
+  if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
+
+  // Update default UPI link to ₹10
+  updateMasterModalUpi(10);
+
+  modal.style.display = "flex";
+  masterMonetizationShown = true;
+}
+
+function updateMasterModalUpi(amt) {
+  const upiBtn = document.getElementById("mmm-upi-btn");
+  const upiText = document.getElementById("mmm-upi-btn-text");
+  if (upiBtn) {
+    upiBtn.href = generateUpiUri(amt);
+  }
+  if (upiText) {
+    upiText.textContent = `Pay ₹${amt} with any UPI App`;
+  }
+}
+
+function setupMasterMonetizationModal() {
+  const modal = document.getElementById("monetization-master-modal");
+  const card = document.getElementById("mmm-card");
+  const closeBtn = document.getElementById("mmm-close-btn");
+  const dismissBtn = document.getElementById("mmm-dismiss-btn");
+  const amazonBtn = document.getElementById("mmm-amazon-btn");
+  const pillsRow = document.getElementById("mmm-pills-row");
+
+  if (!modal) return;
+
+  const closeModal = () => {
+    modal.style.display = "none";
+  };
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (dismissBtn) dismissBtn.addEventListener("click", closeModal);
+
+  // Click outside card on backdrop closes modal
+  modal.addEventListener("click", (e) => {
+    if (card && !card.contains(e.target)) {
+      closeModal();
     }
+  });
+
+  // Escape key closes modal
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "flex") {
+      closeModal();
+    }
+  });
+
+  // Tip Pills click
+  if (pillsRow) {
+    pillsRow.querySelectorAll(".mmm-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        pillsRow.querySelectorAll(".mmm-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        const amt = Number(pill.dataset.amount) || 10;
+        updateMasterModalUpi(amt);
+      });
+    });
+  }
+
+  // Amazon button closes modal upon click
+  if (amazonBtn) {
+    amazonBtn.addEventListener("click", () => {
+      closeModal();
+    });
+  }
+
+  // Fallback 5-second timer on initial landing if user hasn't ordered yet
+  setTimeout(() => {
+    if (masterMonetizationShown) return;
+    if (state.currentView === "tracking" || state.currentView === "reveal") return;
+    showMasterMonetizationModal();
   }, 5000);
 }
 
@@ -2647,7 +2699,7 @@ function init() {
   updateCartUI();
   setupEventListeners();
   checkUrlChallenge();
-  init5SecondRecipePopup();
+  setupMasterMonetizationModal();
 
   // Reuse cached last craving on next visit
   if (userState.lastCraving && customDishName && customDishPrice) {
