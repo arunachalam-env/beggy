@@ -1156,16 +1156,16 @@
 
     let whatsappText = '';
     if (activeDuel && activeDuel.from) {
-      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI just beat ${activeDuel.from}'s savings streak!\nTracked a simulated Swiggy rider for ₹${amt} ${dish}.\nRider arrived. Food was fake. ₹${amt} stayed in my bank account! 💸\n\n0 calories. 100% money kept.\nThink you have better willpower? Beat me here 👇\n${challengeUrl}`;
+      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI just beat ${activeDuel.from}'s savings streak!\nTracked a simulated beggy rider for ₹${amt} ${dish}.\nRider arrived. Food was fake. ₹${amt} stayed in my bank account! 💸\n\n0 calories. 100% money kept.\nThink you have better willpower? Beat me here 👇\n${challengeUrl}`;
     } else {
-      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI was literally about to blow ₹${amt} on Swiggy.\nTracked the rider across the city for 11 mins straight.\nPlot twist: THE FOOD WAS FAKE. The rider doesn't exist.\n₹${amt} is STILL sitting in my bank account! 💸\n\nCalories: 0. Bank balance: intact.\nDare you to resist your next 2 AM takeout craving. Duel me 👇\n${challengeUrl}`;
+      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI was literally about to blow ₹${amt} on food delivery.\nTracked the beggy rider across the city for 11 mins straight.\nPlot twist: THE FOOD WAS FAKE. The rider doesn't exist.\n₹${amt} is STILL sitting in my bank account! 💸\n\nCalories: 0. Bank balance: intact.\nDare you to resist your next 2 AM takeout craving. Duel me 👇\n${challengeUrl}`;
     }
 
-    const twitterText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\n\nTracked a Swiggy rider for 11 mins straight.\nRider arrived at my gate. Food never existed.\nTotal paid: ₹0.00.\nTotal saved with @BeggyApp: ₹${amt}!\n\nWho has the discipline to beat this? Take the challenge 👇\n${challengeUrl}\n\n#Beggy #Swiggy #SaveMoney #100PercentOff #Discipline`;
+    const twitterText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\nTracked a beggy rider for 11 mins straight.\nTotal paid: ₹0.00.\nTotal saved with @BeggyApp: ₹${amt}!\n\n${challengeUrl}\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
 
-    const instagramText = `100% DISCOUNT ON ${dish.toUpperCase()} 🛵💨\nSwiggy bill: ₹0. Bank balance: +₹${amt}. Willpower: 100/100.\nFood was fake, savings are REAL.\nDuel me before your next 2 AM order 👇\n${challengeUrl}`;
+    const instagramText = `100% DISCOUNT ON ${dish.toUpperCase()} 🛵💨\nDelivery bill: ₹0. Bank balance: +₹${amt}. Willpower: 100/100.\nFood was fake, savings are REAL.\nDuel me before your next 2 AM order 👇\n${challengeUrl}\n\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
 
-    const linkedinText = `Unlocked a 100% discount on dinner tonight using an unconventional financial experiment: ordered ${dish}, tracked the delivery partner across the city, and realized the food was a simulation.\n\nTotal spent: ₹0.\nCash saved: ₹${amt}.\nDiscipline score: 10/10.\nCalories: 0.\n\nDare you to resist your next late-night impulse: ${challengeUrl}`;
+    const linkedinText = `How I unlocked a 100% DISCOUNT on ${dish} tonight 💡\n\nTracked a beggy rider for 11 mins straight.\nTotal paid: ₹0.00.\nTotal saved: ₹${amt}.00.\nDiscipline: 100%.\n\nTake the willpower challenge: ${challengeUrl}\n\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
 
     return {
       name: cleanName,
@@ -1325,9 +1325,9 @@
     ctx.fillStyle = '#94A3B8';
     ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
     ctx.letterSpacing = '4px';
-    ctx.fillText('SWIGGY SIMULATION • ZERO REAL FOOD', 540, 180);
+    ctx.fillText('BEGGY PROTOCOL • ZERO REAL FOOD', 540, 180);
 
-    // 5. Simulated Swiggy Order Cancellation Notice Pill
+    // 5. Simulated Order Cancellation Notice Pill
     ctx.fillStyle = '#161F30';
     ctx.beginPath();
     ctx.roundRect(120, 220, 840, 90, 45);
@@ -1338,21 +1338,27 @@
 
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '800 27px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('🛵 Swiggy Order Cancelled • 100% Refunded to Reality', 540, 275);
+    ctx.fillText('🛵 Delivery Order Ghosted • 100% Retained in Bank', 540, 275);
 
-    // 6. Massive Shock Punchline
+    // 6. Massive Shock Punchline: ORDER FOOD FOR FREE.
+    ctx.fillStyle = '#38BDF8';
+    ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+    ctx.letterSpacing = '2px';
+    ctx.fillText(`USER: ${cleanName.toUpperCase()} // STATEMENT OF NON-PURCHASE`, 540, 370);
+
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '900 64px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('100% DISCOUNT UNLOCKED!', 540, 420);
+    ctx.font = '900 68px "Plus Jakarta Sans", sans-serif';
+    ctx.letterSpacing = '-1px';
+    ctx.fillText('ORDER FOOD FOR FREE.', 540, 440);
 
     // 7. Giant Glowing Emerald Rupees
-    ctx.fillStyle = '#10B981';
+    ctx.fillStyle = '#00F59B';
     ctx.font = '900 170px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(`+₹${amt}`, 540, 590);
+    ctx.fillText(`+₹${amt}`, 540, 595);
 
-    ctx.fillStyle = '#CBD5E1';
-    ctx.font = '800 36px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('IS STILL IN YOUR BANK ACCOUNT', 540, 660);
+    ctx.fillStyle = '#F8FAFC';
+    ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('...FOR THE FOOD THAT NEVER COMES.', 540, 665);
 
     // 8. Simulated Food Delivery Bill Receipt Box
     ctx.fillStyle = '#111726';
@@ -1460,11 +1466,14 @@
     ctx.font = '600 22px "Plus Jakarta Sans", sans-serif';
     ctx.fillText('Beat my discipline streak!', 440, 1655);
 
-    // 11. Student Founder Footer
+    // 11. Student Founder Footer & Viral Hashtags
     ctx.textAlign = 'center';
     ctx.fillStyle = '#64748B';
     ctx.font = '700 24px "Plus Jakarta Sans", sans-serif';
     ctx.fillText('🎓 Built by Young Student Founder • 100% Free & Zero Ads', 540, 1780);
+    ctx.fillStyle = '#00F59B';
+    ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline', 540, 1820);
   }
 
   // ── 1-Tap Download Image Helper ─────────────────────────────────────────────

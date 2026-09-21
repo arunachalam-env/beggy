@@ -29,9 +29,8 @@ export default async function middleware(request) {
 
   const amount = clampInt(c, 10, 50000);
   const name = sanitize(from, 24) || 'Someone';
-  const food = dishPhrase(dish);
-  const title = `${name} just didn't order ${food} — ₹${amount} kept`;
-  const desc = `Rider came. Food didn't. Swiggy, but the food is fake. Beat ${name}.`;
+  const title = `🚨 ${name} unlocked 100% DISCOUNT on ${food} — ₹${amount} kept!`;
+  const desc = `Tracked a beggy rider for 11 mins. Total paid: ₹0.00. Order food for free... for the food that never comes. Beat ${name}.`;
   const canonical = `https://beggy.vercel.app/?c=${amount}&dish=${encodeURIComponent(food)}&from=${encodeURIComponent(name)}`;
 
   // Fetch clean static index.html without searchParams so subrequest does not re-trigger middleware logic
