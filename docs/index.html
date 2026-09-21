@@ -28,6 +28,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <!-- Theme Pre-init (Light theme is default) -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('beggyTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
   <meta name="keywords" content="Beggy, Swiggy fake order, fake food delivery, late night craving killer, Bangalore food savings, anti-spending food app, food delivery simulator India">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -150,6 +159,11 @@
           <span class="bill-icon">🧾</span>
           <span class="bill-label">The bill you kept</span>
           <span class="bill-badge" id="header-saved-val">₹0</span>
+        </button>
+
+        <!-- Theme Toggle (Light / Dark) -->
+        <button class="header-theme-btn" id="header-theme-btn" type="button" aria-label="Toggle Dark / Light Theme" title="Toggle theme">
+          <span class="theme-icon" id="theme-icon">🌙</span>
         </button>
 
         <!-- Cart Button -->
@@ -424,10 +438,11 @@
         </div>
       </div>
 
-      <!-- Simulation Speed Controls (1x only by default; 5x dev-only) -->
+      <!-- Simulation Speed Controls -->
       <div class="tracking-speed-controls" id="tracking-speed-controls" title="Simulation Speed">
         <button class="speed-btn active" data-speed="1" id="speed-1x">1x (11m)</button>
-        <button class="speed-btn dev-speed-btn" data-speed="5" id="speed-5x" style="display: none;">5x (2m)</button>
+        <button class="speed-btn" data-speed="6" id="speed-5x">Fast (2m)</button>
+        <button class="speed-btn" data-speed="skip" id="speed-skip">Skip ⚡</button>
       </div>
     </div>
 
@@ -492,12 +507,26 @@
 
     </div>
 
-    <!-- Panic Modal: "Sit With It" -->
+    <!-- Panic Modal: "Sit With It" + Amazon Affiliate Link -->
     <div class="panic-modal" id="panic-modal" style="display: none;">
       <div class="panic-card">
-        <h3>Sit with it.</h3>
-        <p>Drink a glass of cold water. Wait 5 minutes. The midnight craving is lying to you.</p>
-        <p class="panic-roast">Food apps want your ₹450. You want to wake up with zero regret.</p>
+        <h3>Actually hungry?</h3>
+        <p>Instead of blowing ₹450 on late-night delivery fees, stock your kitchen with real gourmet snacks &amp; meals at 1/3rd the cost.</p>
+        
+        <!-- Amazon Affiliate Link Box -->
+        <div class="panic-affiliate-box">
+          <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             class="btn-amazon-affiliate" 
+             id="btn-amazon-affiliate">
+            <span class="amz-icon">📦</span>
+            <span class="amz-text">Get Real Groceries on Amazon ➔</span>
+          </a>
+          <span class="amz-disclaimer">*Official Amazon Gourmet partner link (tag: beggy-21). Real food that actually arrives.</span>
+        </div>
+
+        <p class="panic-roast">Or just drink a cold glass of water and wait 5 mins.</p>
         <button class="panic-resume-btn" id="panic-resume-btn" type="button">I'll hold out ➔</button>
       </div>
     </div>

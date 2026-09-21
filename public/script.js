@@ -834,9 +834,28 @@
   let trackingMap = null;
   let riderMarker = null;
   let trackingTimer = null;
-  let simSpeedMultiplier = 1; // 1 = 11 mins, 5 = ~2 mins, 30 = quick demo
+  let simSpeedMultiplier = 1; // 1 = 11 mins, 6 = ~2 mins, skip = instant
   let totalSimSeconds = 660; // 11 minutes
   let elapsedSimSeconds = 0;
+  let currentTileLayer = null;
+
+  function getMapTileUrl() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return isDark
+      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+  }
+
+  function updateMapTiles() {
+    if (!trackingMap) return;
+    if (currentTileLayer) {
+      trackingMap.removeLayer(currentTileLayer);
+    }
+    currentTileLayer = L.tileLayer(getMapTileUrl(), {
+      maxZoom: 19,
+      attribution: '&copy; Esri'
+    }).addTo(trackingMap);
+  }
 
   function startTrackingMovie(order) {
     const trackingScreen = document.getElementById('tracking-screen');
@@ -875,8 +894,8 @@
 
   function updateSpeedControlsUI() {
     document.querySelectorAll('.speed-btn').forEach(btn => {
-      const sp = Number(btn.getAttribute('data-speed'));
-      if (sp === simSpeedMultiplier) {
+      const sp = btn.getAttribute('data-speed');
+      if (sp === String(simSpeedMultiplier)) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -898,9 +917,7 @@
         attributionControl: false
       }).setView(start, 14);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19
-      }).addTo(trackingMap);
+      updateMapTiles();
 
       // Destination Pin
       const destIcon = L.divIcon({
@@ -920,6 +937,7 @@
       });
       riderMarker = L.marker(start, { icon: riderIcon }).addTo(trackingMap);
     } else {
+      updateMapTiles();
       trackingMap.invalidateSize();
       riderMarker.setLatLng(start);
       trackingMap.setView(start, 14);
@@ -935,15 +953,20 @@
     const etaEl = document.getElementById('eta-countdown');
     if (etaEl) etaEl.textContent = timeStr;
 
-    // Move Rider along straight interpolation or road
+    // Move Rider: scooter stays stationary at kitchen until order picked up (progress >= 0.45)
     const cityData = CITIES[currentCityKey] || CITIES.bengaluru;
     const start = cityData.kitchens[0].coords;
     const end = cityData.dest;
     const progress = Math.min(1, elapsedSimSeconds / totalSimSeconds);
 
-    const curLat = start[0] + (end[0] - start[0]) * progress;
-    const curLng = start[1] + (end[1] - start[1]) * progress;
-    if (riderMarker) riderMarker.setLatLng([curLat, curLng]);
+    if (progress < 0.45) {
+      if (riderMarker) riderMarker.setLatLng(start);
+    } else {
+      const travelProgress = (progress - 0.45) / 0.55;
+      const curLat = start[0] + (end[0] - start[0]) * travelProgress;
+      const curLng = start[1] + (end[1] - start[1]) * travelProgress;
+      if (riderMarker) riderMarker.setLatLng([curLat, curLng]);
+    }
 
     // Update Staged Timeline Dots & Status
     const headingEl = document.getElementById('track-status-heading');
@@ -1342,18 +1365,17 @@
     if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
     if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
 
-    // Tracking Speed Controls (1x only by default; 5x dev-only)
-    const dev = new URLSearchParams(window.location.search).has('dev');
+    // Tracking Speed Controls
     document.querySelectorAll('.speed-btn').forEach(btn => {
-      const sp = Number(btn.getAttribute('data-speed'));
-      if (sp !== 1 && !dev) {
-        btn.remove();
-      } else if (sp !== 1 && dev) {
-        btn.style.display = 'inline-block';
-      }
       btn.addEventListener('click', () => {
-        simSpeedMultiplier = sp || 1;
-        updateSpeedControlsUI();
+        const sp = btn.getAttribute('data-speed');
+        if (sp === 'skip') {
+          if (trackingTimer) clearInterval(trackingTimer);
+          finishTrackingMovie();
+        } else {
+          simSpeedMultiplier = Number(sp) || 1;
+          updateSpeedControlsUI();
+        }
       });
     });
 
@@ -1398,8 +1420,48 @@
     }
   }
 
+  // ── Theme Manager (Light theme is default) ───────────────────────────────────
+  function getPreferredTheme() {
+    const saved = localStorage.getItem('beggyTheme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return 'light'; // Light theme default
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('beggyTheme', theme);
+
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+      themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+
+    const themeBtn = document.getElementById('header-theme-btn');
+    if (themeBtn) {
+      themeBtn.setAttribute('title', theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode');
+      themeBtn.setAttribute('aria-label', theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode');
+    }
+
+    updateMapTiles();
+  }
+
+  function initTheme() {
+    const current = getPreferredTheme();
+    applyTheme(current);
+
+    const themeBtn = document.getElementById('header-theme-btn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const active = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = active === 'light' ? 'dark' : 'light';
+        applyTheme(next);
+      });
+    }
+  }
+
   // ── Initialization Entry Point ──────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     loadUserKeptState();
     initLiveTicker();
     initCitySwitcher();

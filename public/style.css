@@ -1,9 +1,42 @@
 /* ============================================================================
    BEGGY — ORDER IT. TRACK IT. IT NEVER COMES.
-   Phone-first, dark Swiggy-like design with brutalist punchlines.
+   Phone-first, Swiggy-like design with brutalist punchlines.
    ============================================================================ */
 
-:root {
+:root, [data-theme="light"] {
+  /* Light Theme (Default) */
+  --bg-dark: #F6F8FA;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F5F9;
+  --bg-elevated: #FFFFFF;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-bright: rgba(0, 0, 0, 0.16);
+
+  --swiggy-orange: #FC8019;
+  --swiggy-orange-glow: rgba(252, 128, 25, 0.25);
+  --swiggy-green: #059669;
+  --swiggy-green-glow: rgba(5, 150, 105, 0.2);
+  --swiggy-red: #EF4444;
+
+  --text-main: #0F172A;
+  --text-sub: #475569;
+  --text-muted: #64748B;
+
+  --header-bg: rgba(255, 255, 255, 0.94);
+  --input-bg: #FFFFFF;
+  --chip-bg: #FFFFFF;
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --modal-backdrop: rgba(15, 23, 42, 0.6);
+
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
   --bg-dark: #07090E;
   --bg-card: #111520;
   --bg-card-hover: #181E2E;
@@ -21,11 +54,11 @@
   --text-sub: #94A3B8;
   --text-muted: #64748B;
 
-  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --header-bg: rgba(7, 9, 14, 0.88);
+  --input-bg: #111520;
+  --chip-bg: rgba(255, 255, 255, 0.04);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --modal-backdrop: rgba(0, 0, 0, 0.8);
 }
 
 * {
@@ -43,6 +76,7 @@ body.beggy-body {
   line-height: 1.5;
   overflow-x: hidden;
   padding-bottom: 70px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ====================================================================
@@ -54,10 +88,11 @@ body.beggy-body {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(7, 9, 14, 0.88);
+  background: var(--header-bg);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .header-container {
@@ -118,7 +153,7 @@ body.beggy-body {
 }
 
 .city-selector-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--chip-bg);
   border: 1px solid var(--border-color);
   color: var(--text-main);
   padding: 6px 12px;
@@ -134,7 +169,7 @@ body.beggy-body {
 }
 
 .city-selector-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
+  background: var(--bg-card-hover);
   border-color: var(--border-bright);
 }
 
@@ -150,9 +185,9 @@ body.beggy-body {
   left: 0;
   width: 240px;
   background: var(--bg-card);
-  border: 1px solid var(--border-bright);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--card-shadow);
   padding: 6px;
   z-index: 1010;
   animation: fadeIn 0.15s ease;
@@ -178,7 +213,7 @@ body.beggy-body {
 }
 
 .city-option:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-card-hover);
 }
 
 .city-option.active {
@@ -219,15 +254,36 @@ body.beggy-body {
 
 .bill-badge {
   background: var(--swiggy-green);
-  color: #064E3B;
+  color: #FFFFFF;
   padding: 1px 6px;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 900;
 }
 
+.header-theme-btn {
+  background: var(--chip-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-theme-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-bright);
+  transform: scale(1.05);
+}
+
 .header-cart-btn {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--chip-bg);
   border: 1px solid var(--border-color);
   color: var(--text-main);
   width: 40px;
@@ -243,7 +299,8 @@ body.beggy-body {
 }
 
 .header-cart-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card-hover);
+  border-color: var(--border-bright);
 }
 
 .cart-count-badge {
@@ -319,7 +376,7 @@ body.beggy-body {
 .ticker-number {
   font-size: clamp(2.8rem, 9vw, 4.4rem);
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
   letter-spacing: -0.04em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -388,13 +445,18 @@ body.beggy-body {
 .duel-card {
   max-width: 480px;
   width: 100%;
-  background: linear-gradient(180deg, #161B29 0%, #0D111A 100%);
+  background: var(--bg-card);
   border: 1.5px solid rgba(252, 128, 25, 0.4);
   border-radius: var(--radius-xl);
   padding: 36px 24px 30px;
   text-align: center;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(252, 128, 25, 0.15);
+  box-shadow: var(--card-shadow);
   animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .duel-card {
+  background: linear-gradient(180deg, #161B29 0%, #0D111A 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(252, 128, 25, 0.15);
 }
 
 @keyframes popIn {
@@ -418,7 +480,7 @@ body.beggy-body {
 .duel-headline {
   font-size: clamp(1.7rem, 5vw, 2.3rem);
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
   line-height: 1.2;
   margin-bottom: 8px;
 }
@@ -435,7 +497,7 @@ body.beggy-body {
 }
 
 .duel-rupee-box {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--bg-card-hover);
   border: 1px dashed rgba(16, 185, 129, 0.4);
   border-radius: var(--radius-lg);
   padding: 20px 16px;
@@ -454,7 +516,7 @@ body.beggy-body {
 .duel-rupee-amt {
   font-size: 3rem;
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--swiggy-green);
   line-height: 1;
   letter-spacing: -0.03em;
   text-shadow: 0 4px 16px var(--swiggy-green-glow);
@@ -470,7 +532,7 @@ body.beggy-body {
 .duel-taunt {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #CBD5E1;
+  color: var(--text-sub);
   margin-bottom: 14px;
 }
 
@@ -506,19 +568,34 @@ body.beggy-body {
   position: sticky;
   top: 65px;
   z-index: 990;
-  background: #1E1B4B;
-  border-bottom: 1px solid #4338CA;
+  background: rgba(99, 102, 241, 0.12);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.3);
   padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   font-size: 0.84rem;
+  color: #4338CA;
+}
+
+[data-theme="dark"] .active-duel-strip {
+  background: #1E1B4B;
+  border-bottom: 1px solid #4338CA;
   color: #C7D2FE;
 }
 
 .active-duel-strip strong {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .active-duel-strip strong {
   color: #FFFFFF;
+}
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.84rem;
+  color: #C7D2FE;
 }
 
 .ads-dismiss {
@@ -558,7 +635,7 @@ body.beggy-body {
 
 .spb-text {
   font-size: 0.82rem;
-  color: #CBD5E1;
+  color: var(--text-sub);
   line-height: 1.4;
 }
 
@@ -635,7 +712,7 @@ body.beggy-body {
 }
 
 .c-chip {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--chip-bg);
   border: 1px solid var(--border-color);
   color: var(--text-sub);
   padding: 8px 16px;
@@ -649,7 +726,7 @@ body.beggy-body {
 }
 
 .c-chip:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card-hover);
   color: var(--text-main);
 }
 
@@ -673,7 +750,7 @@ body.beggy-body {
 .kitchens-title {
   font-size: 1.35rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -683,7 +760,7 @@ body.beggy-body {
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-card-hover);
   padding: 2px 8px;
   border-radius: 12px;
 }
@@ -706,7 +783,8 @@ body.beggy-body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .kitchen-card:hover {
@@ -773,7 +851,7 @@ body.beggy-body {
 .kc-name {
   font-size: 1.05rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-main);
   line-height: 1.2;
 }
 
@@ -821,14 +899,14 @@ body.beggy-body {
 .dish-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #E2E8F0;
+  color: var(--text-main);
   line-height: 1.3;
 }
 
 .dish-price {
   font-size: 0.85rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-main);
   margin-top: 2px;
 }
 
@@ -901,9 +979,9 @@ body.beggy-body {
   right: 16px;
   max-width: 500px;
   margin: 0 auto;
-  background: #161B29;
+  background: var(--bg-card);
   border: 1px solid var(--swiggy-orange);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px var(--swiggy-orange-glow);
+  box-shadow: var(--card-shadow);
   border-radius: var(--radius-xl);
   padding: 12px 18px;
   display: flex;
@@ -911,6 +989,11 @@ body.beggy-body {
   justify-content: space-between;
   z-index: 999;
   animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .floating-cart-bar {
+  background: #161B29;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px var(--swiggy-orange-glow);
 }
 
 @keyframes slideUp {
@@ -937,7 +1020,7 @@ body.beggy-body {
 .fc-total {
   font-size: 1.1rem;
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .floating-cart-btn {
@@ -963,12 +1046,17 @@ body.beggy-body {
   width: 100%;
   max-width: 440px;
   height: 100vh;
-  background: var(--bg-dark);
+  background: var(--bg-card);
   z-index: 1050;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .cart-drawer {
+  background: var(--bg-dark);
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
 }
 
@@ -979,7 +1067,7 @@ body.beggy-body {
 .cart-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--modal-backdrop);
   backdrop-filter: blur(6px);
   z-index: 1040;
   opacity: 0;
@@ -1007,7 +1095,7 @@ body.beggy-body {
 .cart-title-row h3 {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .close-cart-btn {
@@ -1049,7 +1137,7 @@ body.beggy-body {
 .ci-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #E2E8F0;
+  color: var(--text-main);
 }
 
 .ci-price {
@@ -1086,7 +1174,7 @@ body.beggy-body {
   padding-top: 8px;
   font-size: 1.1rem;
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .bill-grand-total strong {
@@ -1152,7 +1240,7 @@ body.beggy-body {
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--modal-backdrop);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
@@ -1163,11 +1251,16 @@ body.beggy-body {
 
 .checkout-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-bright);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   max-width: 440px;
   width: 100%;
   padding: 24px 20px;
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .checkout-card {
+  border-color: var(--border-bright);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
 }
 
@@ -1181,6 +1274,7 @@ body.beggy-body {
 .co-header h3 {
   font-size: 1.15rem;
   font-weight: 800;
+  color: var(--text-main);
 }
 
 .co-close-btn {
@@ -1192,7 +1286,7 @@ body.beggy-body {
 }
 
 .co-address-box {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 12px;
@@ -1209,7 +1303,7 @@ body.beggy-body {
 .co-addr-text strong {
   display: block;
   font-size: 0.85rem;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .co-addr-text span {
@@ -1234,7 +1328,7 @@ body.beggy-body {
 }
 
 .co-pay-row {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 10px 14px;
@@ -1255,7 +1349,7 @@ body.beggy-body {
 .pay-info strong {
   display: block;
   font-size: 0.84rem;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .pay-info span {
@@ -1270,7 +1364,7 @@ body.beggy-body {
 }
 
 .co-slam-box {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 12px 14px;
@@ -1355,7 +1449,9 @@ body.beggy-body {
 
 .tracking-top-bar {
   padding: 12px 16px;
-  background: rgba(7, 9, 14, 0.95);
+  background: var(--header-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -1378,7 +1474,7 @@ body.beggy-body {
   display: block;
   font-size: 0.92rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .tt-info span {
@@ -1392,7 +1488,7 @@ body.beggy-body {
 }
 
 .speed-btn {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-color);
   color: var(--text-sub);
   font-family: inherit;
@@ -1401,6 +1497,11 @@ body.beggy-body {
   padding: 4px 8px;
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.speed-btn:hover {
+  color: var(--text-main);
 }
 
 .speed-btn.active {
@@ -1426,11 +1527,11 @@ body.beggy-body {
   top: 14px;
   left: 14px;
   z-index: 800;
-  background: rgba(13, 17, 26, 0.92);
-  border: 1px solid var(--border-bright);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 8px 14px;
   border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--card-shadow);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1456,11 +1557,11 @@ body.beggy-body {
   right: 14px;
   max-width: 360px;
   z-index: 850;
-  background: #1E2538;
+  background: var(--bg-card);
   border: 1.5px solid #6366F1;
   border-radius: var(--radius-lg);
   padding: 12px 14px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+  box-shadow: var(--card-shadow);
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -1487,7 +1588,7 @@ body.beggy-body {
 .rc-text {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--text-main);
   line-height: 1.3;
 }
 
@@ -1530,7 +1631,7 @@ body.beggy-body {
 .tl-dot {
   width: 16px;
   height: 16px;
-  background: var(--bg-dark);
+  background: var(--bg-card-hover);
   border: 2px solid var(--border-bright);
   border-radius: 50%;
   transition: all 0.2s ease;
@@ -1565,7 +1666,7 @@ body.beggy-body {
 .track-dish-info strong {
   display: block;
   font-size: 0.95rem;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .track-dish-info span {
@@ -1606,7 +1707,7 @@ body.beggy-body {
   position: fixed;
   inset: 0;
   z-index: 1300;
-  background: rgba(0, 0, 0, 0.88);
+  background: var(--modal-backdrop);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -1615,27 +1716,72 @@ body.beggy-body {
 }
 
 .panic-card {
-  background: #181D29;
+  background: var(--bg-card);
   border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: var(--radius-xl);
   max-width: 400px;
   width: 100%;
   padding: 28px 22px;
   text-align: center;
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .panic-card {
+  background: #181D29;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
 }
 
 .panic-card h3 {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
   margin-bottom: 10px;
 }
 
 .panic-card p {
   font-size: 0.92rem;
-  color: #CBD5E1;
+  color: var(--text-sub);
   margin-bottom: 8px;
+}
+
+.panic-affiliate-box {
+  background: rgba(255, 153, 0, 0.08);
+  border: 1.5px solid rgba(255, 153, 0, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-amazon-affiliate {
+  background: linear-gradient(135deg, #FF9900 0%, #E68A00 100%);
+  color: #111;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(255, 153, 0, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-amazon-affiliate:hover {
+  background: #FFA724;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 153, 0, 0.5);
+}
+
+.amz-disclaimer {
+  font-size: 0.7rem;
+  color: #94A3B8;
+  line-height: 1.3;
 }
 
 .panic-roast {
@@ -1923,7 +2069,7 @@ body.beggy-body {
   position: fixed;
   inset: 0;
   z-index: 1500;
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--modal-backdrop);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -1933,13 +2079,19 @@ body.beggy-body {
 
 .passbook-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-bright);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   max-width: 460px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   padding: 24px;
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .passbook-card {
+  border-color: var(--border-bright);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
 }
 
 .pb-header {
@@ -1952,7 +2104,7 @@ body.beggy-body {
 .pb-header h2 {
   font-size: 1.3rem;
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
 }
 
 .pb-sub {
@@ -1988,7 +2140,7 @@ body.beggy-body {
 }
 
 .pb-stat {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 12px;
@@ -2085,7 +2237,7 @@ body.beggy-body {
 }
 
 .pb-item {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
@@ -2097,7 +2249,7 @@ body.beggy-body {
 .pb-item-dish {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #E2E8F0;
+  color: var(--text-main);
 }
 
 .pb-item-meta {
@@ -2132,9 +2284,9 @@ body.beggy-body {
 }
 
 .pb-done-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card-hover);
   border: 1px solid var(--border-bright);
-  color: #FFFFFF;
+  color: var(--text-main);
   font-family: inherit;
   font-size: 0.84rem;
   font-weight: 700;
@@ -2147,10 +2299,14 @@ body.beggy-body {
    SEO & FAQ SECTION
    ==================================================================== */
 .beggy-seo-guide {
-  background: #090C12;
+  background: var(--bg-card-hover);
   border-top: 1px solid var(--border-color);
   padding: 48px 16px 36px;
   margin-top: 40px;
+}
+
+[data-theme="dark"] .beggy-seo-guide {
+  background: #090C12;
 }
 
 .seo-guide-container {
@@ -2179,7 +2335,7 @@ body.beggy-body {
 .seo-guide-title {
   font-size: clamp(1.4rem, 4vw, 1.8rem);
   font-weight: 900;
-  color: #FFFFFF;
+  color: var(--text-main);
   margin-bottom: 8px;
 }
 
@@ -2196,16 +2352,17 @@ body.beggy-body {
 }
 
 .seo-faq-item {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 14px 18px;
+  box-shadow: var(--card-shadow);
 }
 
 .seo-faq-q {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--text-main);
   cursor: pointer;
   list-style: none;
 }
@@ -2221,11 +2378,16 @@ body.beggy-body {
 
 /* Footer */
 .app-footer {
+  background: var(--bg-card);
   border-top: 1px solid var(--border-color);
   padding: 24px 16px;
   text-align: center;
   color: var(--text-muted);
   font-size: 0.76rem;
+}
+
+[data-theme="dark"] .app-footer {
+  background: transparent;
 }
 
 .footer-brand {
