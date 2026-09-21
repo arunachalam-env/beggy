@@ -5,8 +5,14 @@ Allow: /
 # All web crawlers, AI agents, and LLM training bots are welcome.
 # Beggy is a free, open, publicly shareable anti-spending tool.
 
-# Standard Search Engines
+# Standard Search Engines & Social Crawlers
 User-agent: Googlebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
 Allow: /
 
 User-agent: Bingbot

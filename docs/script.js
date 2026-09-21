@@ -1054,7 +1054,30 @@
     showPostDeliveryModal();
   }
 
-  // ── Share Toast Notification ───────────────────────────────────────────────
+  // ── Share Toast Notification & Safe Synchronous Clipboard Copy ───────────
+  function copyTextWithFallback(text) {
+    let success = false;
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      ta.style.top = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      success = document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch (e) {
+      success = false;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+    return success;
+  }
+
   let shareToastTimer = null;
   function showShareToast(message) {
     const toast = document.getElementById('share-toast');
@@ -1065,7 +1088,7 @@
     if (shareToastTimer) clearTimeout(shareToastTimer);
     shareToastTimer = setTimeout(() => {
       toast.style.display = 'none';
-    }, 2800);
+    }, 4000);
   }
 
   // ── Post-Delivery Celebration Modal (Founder Support & Amazon Recipe Kit) ──
@@ -1164,7 +1187,7 @@
 
     const instagramText = `100% DISCOUNT ON ${dish.toUpperCase()} 🛵💨\nDelivery bill: ₹0. Bank balance: +₹${amt}. Willpower: 100/100.\nFood was fake, savings are REAL.\nDuel me before your next 2 AM order 👇\n${challengeUrl}\n\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
 
-    const linkedinText = `How I unlocked a 100% DISCOUNT on ${dish} tonight 💡\n\nTracked a beggy rider for 11 mins straight.\nTotal paid: ₹0.00.\nTotal saved: ₹${amt}.00.\nDiscipline: 100%.\n\nTake the willpower challenge: ${challengeUrl}\n\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
+    const linkedinText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\nTracked a beggy rider for 11 mins straight.\nTotal paid: ₹0.00.\nTotal saved with @BeggyApp: ₹${amt}!\n\n${challengeUrl}\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
 
     return {
       name: cleanName,
@@ -1902,12 +1925,21 @@
     if (liBtn) {
       liBtn.addEventListener('click', () => {
         const data = getChallengeData();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(data.linkedinText).catch(() => {});
+        copyTextWithFallback(data.linkedinText);
+
+        // Switch to LinkedIn template tab so user sees the copied text right away
+        const rtbTabs = document.querySelectorAll('.rtb-tab');
+        const liTab = document.querySelector('.rtb-tab[data-tab="linkedin"]');
+        if (liTab && rtbTabs.length) {
+          rtbTabs.forEach(t => t.classList.remove('active'));
+          liTab.classList.add('active');
+          activeTemplateTab = 'linkedin';
+          updateSharePreview();
         }
+
         const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data.challengeUrl)}`;
         window.open(url, '_blank', 'noopener,noreferrer');
-        showShareToast('💼 Post copied! Paste into LinkedIn share window.');
+        showShareToast('💼 LinkedIn post draft copied! Press Paste (Ctrl+V) in LinkedIn.');
       });
     }
 
@@ -1915,15 +1947,8 @@
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
         const data = getChallengeData();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(data.challengeUrl).then(() => {
-            showShareToast('📋 Challenge link copied to clipboard!');
-          }).catch(() => {
-            showShareToast(`Link: ${data.challengeUrl}`);
-          });
-        } else {
-          showShareToast(`Link: ${data.challengeUrl}`);
-        }
+        copyTextWithFallback(data.challengeUrl);
+        showShareToast('📋 Challenge link copied to clipboard!');
       });
     }
 
@@ -1940,15 +1965,13 @@
             });
           } catch (err) {
             if (err && err.name !== 'AbortError') {
+              copyTextWithFallback(data.challengeUrl);
               showShareToast('📋 Challenge link copied!');
             }
           }
         } else {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(data.challengeUrl).then(() => {
-              showShareToast('📋 Challenge link copied to clipboard!');
-            });
-          }
+          copyTextWithFallback(data.challengeUrl);
+          showShareToast('📋 Challenge link copied to clipboard!');
         }
       });
     }
@@ -1971,19 +1994,9 @@
         const previewEl = document.getElementById('rtb-preview-text');
         if (!previewEl) return;
         const textToCopy = previewEl.value;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(textToCopy).then(() => {
-            showShareToast('✓ Template copied! Ready to paste!');
-          }).catch(() => {
-            previewEl.select();
-            document.execCommand('copy');
-            showShareToast('✓ Template copied!');
-          });
-        } else {
-          previewEl.select();
-          document.execCommand('copy');
-          showShareToast('✓ Template copied!');
-        }
+        copyTextWithFallback(textToCopy);
+        const tabLabel = activeTemplateTab.charAt(0).toUpperCase() + activeTemplateTab.slice(1);
+        showShareToast(`✓ ${tabLabel} template copied! Ready to paste!`);
       });
     }
   }

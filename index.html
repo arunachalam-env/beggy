@@ -2,34 +2,952 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beggy — Crave It. Simulate It. Save the Bill.</title>
-  <meta name="description" content="Feel the full ordering thrill for ₹0, watch the rider move, and turn the food bill into real personal savings. The 45-second craving killer.">
-  <meta name="theme-color" content="#FF5722">
-  <link rel="icon" type="image/png" href="docs/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Beggy — Order it. Track it. It never comes.</title>
+  <meta name="description" content="Beggy is India's viral anti-spending food delivery simulator &amp; Zomato alternative. Order food for free... for the food that never comes. Satisfy your dopamine craving and keep 100% of your money.">
+  <link rel="icon" type="image/png" href="logo.png">
 
-  <!-- Open Graph / WhatsApp / Facebook Previews (Q06) -->
+  <link rel="canonical" href="https://beggy.vercel.app/">
+
+  <!-- Open Graph / WhatsApp / Facebook / LinkedIn Previews -->
+  <meta property="og:site_name" content="Beggy">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://beggy.vercel.app/">
-  <meta property="og:title" content="Beggy — Crave It. Simulate It. Save the Bill.">
-  <meta property="og:description" content="Feel the full ordering thrill for ₹0, watch the rider move, and turn the food bill into real personal savings. The 45-second craving killer.">
+  <meta property="og:title" content="Beggy — Order food for free... for the food that never comes.">
+  <meta property="og:description" content="India's viral anti-spending food delivery simulator &amp; Zomato alternative. Order food for free... for the food that never comes. Keep 100% of your money.">
   <meta property="og:image" content="https://beggy.vercel.app/og-1200x630.png">
+  <meta property="og:image:secure_url" content="https://beggy.vercel.app/og-1200x630.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="ORDER FOOD FOR FREE — for the food that never comes.">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@BeggyApp">
+  <meta name="twitter:creator" content="@BeggyApp">
   <meta name="twitter:url" content="https://beggy.vercel.app/">
-  <meta name="twitter:title" content="Beggy — Order Nothing. Save Everything.">
-  <meta name="twitter:description" content="Turn midnight impulse food cravings into a visible savings score. 100% simulated, 100% money saved.">
+  <meta name="twitter:title" content="Beggy — Order food for free... for the food that never comes.">
+  <meta name="twitter:description" content="India's viral anti-spending food delivery simulator &amp; Zomato alternative. Order food for free... for the food that never comes. Keep 100% of your money.">
   <meta name="twitter:image" content="https://beggy.vercel.app/og-1200x630.png">
+  <meta name="twitter:image:alt" content="ORDER FOOD FOR FREE — for the food that never comes.">
 
-  <meta http-equiv="refresh" content="0; url=docs/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <!-- Theme Pre-init (Light theme is default) -->
   <script>
-    window.location.replace("docs/");
+    (function() {
+      try {
+        var t = localStorage.getItem('beggyTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
   </script>
+  <meta name="keywords" content="Beggy, Zomato alternative, bwiggy, fake food delivery app, anti-spending food app, order food for free, food delivery simulator India, stop late night cravings, save money on takeout, Bangalore food delivery alternative, dopamine shopping food simulator">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="copyright" content="Beggy">
+  <meta name="author" content="Arunachalam Venkatachalapathy">
+
+  <!-- AI Agent & LLM Machine-Readable Documentation -->
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="Beggy LLM Context">
+  <link rel="alternate" type="text/plain" href="/llms-full.txt" title="Beggy Full AI Reference">
+
+  <!-- Schema.org: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Beggy",
+    "url": "https://beggy.vercel.app/",
+    "creator": {
+      "@type": "Person",
+      "name": "Arunachalam Venkatachalapathy",
+      "url": "https://beggy.vercel.app/"
+    },
+    "description": "Order food for free... for the food that never comes. You keep the money. Simulate ordering late-night food delivery in India and keep the entire bill in your account.",
+    "screenshot": "https://beggy.vercel.app/og-1200x630.png",
+    "featureList": [
+      "Simulated late-night restaurant food ordering",
+      "Interactive 11-minute delivery partner tracking on live map",
+      "Cryptographic proof-of-willpower local savings ledger",
+      "Zero money spent, zero calories consumed"
+    ]
+  }
+  </script>
+
+  <!-- Schema.org: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Beggy a Zomato alternative?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Beggy is India's leading anti-spending Zomato alternative. When you experience impulsive late-night cravings, Beggy gives you the full dopamine thrill of browsing restaurants, building a cart, and tracking a simulated GPS rider for 11 minutes—without charging you a single rupee. You keep 100% of your money in your bank."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I order food for free on Beggy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Beggy lets you order food for free... for the food that never comes. You select your favorite biryani, fries, or desserts, checkout with simulated payments for ₹0, and satisfy your craving itch while saving hundreds of rupees."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Beggy help me save money on late-night cravings?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Order food for free... for the food that never comes. You keep the money. Beggy lets you order food, track a rider on a live GPS map, and at the end reveals your food was never ordered and your money never left."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does real food arrive?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Nothing will arrive. That's the entire point. You get the emotional rush of ordering, but keep 100% of your rupees."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the challenge work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When you ghost a food craving on Beggy, you get a challenge link (e.g. Arun ghosted a biryani — ₹340 kept. Beat him). Send it to your WhatsApp group to see who can save more."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Leaflet CSS for real-world interactive map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <p>Redirecting to <a href="docs/">Beggy — Crave It. Simulate It. Save the Bill.</a>...</p>
+<body class="beggy-body">
+
+  <!-- ====================================================================
+       APP HEADER: Sleek delivery-style top bar with city picker & bill kept
+       ==================================================================== -->
+  <header class="app-header" id="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <a href="/" class="brand-logo" id="nav-brand-home" aria-label="Beggy Home">
+          <img src="logo.png" alt="Beggy Logo" class="brand-logo-img" />
+          <div class="logo-text">
+            <span class="logo-title">beggy</span>
+            <span class="logo-sub">fake food • real money</span>
+          </div>
+        </a>
+
+        <!-- 4 City Selector Dropdown -->
+        <div class="city-selector-wrap">
+          <button class="city-selector-btn" id="city-selector-btn" type="button" aria-haspopup="true" aria-expanded="false">
+            <span class="city-pin">📍</span>
+            <span class="city-name" id="current-city-label">Bengaluru</span>
+            <span class="city-chevron">▼</span>
+          </button>
+          <div class="city-dropdown" id="city-dropdown" style="display: none;">
+            <div class="city-option active" data-city="bengaluru">
+              <strong>Bengaluru</strong>
+              <span>Indiranagar, Koramangala, HSR</span>
+            </div>
+            <div class="city-option" data-city="mumbai">
+              <strong>Mumbai</strong>
+              <span>Bandra, Lower Parel, Andheri</span>
+            </div>
+            <div class="city-option" data-city="delhi">
+              <strong>Delhi NCR</strong>
+              <span>Connaught Place, Cyber Hub, Hauz Khas</span>
+            </div>
+            <div class="city-option" data-city="hyderabad">
+              <strong>Hyderabad</strong>
+              <span>Jubilee Hills, Madhapur, Gachibowli</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- The Bill You Kept (Passbook) button -->
+        <button class="header-bill-btn" id="header-bill-btn" type="button" title="The bill you kept">
+          <span class="bill-icon">🧾</span>
+          <span class="bill-label">The bill you kept</span>
+          <span class="bill-badge" id="header-saved-val">₹0</span>
+        </button>
+
+        <!-- Theme Toggle (Light / Dark) -->
+        <button class="header-theme-btn" id="header-theme-btn" type="button" aria-label="Toggle Dark / Light Theme" title="Toggle theme">
+          <span class="theme-icon" id="theme-icon">🌙</span>
+        </button>
+
+        <!-- Cart Button -->
+        <button class="header-cart-btn" id="header-cart-btn" type="button" aria-label="View Cart">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-count-badge" id="header-cart-count" style="display: none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       DUEL SCREEN (Shown when visiting via challenge link ?c=610&dish=Butter+Chicken&from=Priya)
+       ==================================================================== -->
+  <section class="duel-screen" id="duel-screen" style="display: none;">
+    <div class="duel-card">
+      <div class="duel-skull-badge">⚔️ BEGGY DUEL</div>
+      <h1 class="duel-headline">
+        <span class="duel-name" id="duel-sender-name">Arun</span> ghosted a <span class="duel-dish" id="duel-dish-name">biryani</span>.
+      </h1>
+      <p class="duel-substory">Rider came. Food didn't.</p>
+      
+      <div class="duel-rupee-box">
+        <span class="duel-rupee-label">STAYED IN THEIR ACCOUNT</span>
+        <strong class="duel-rupee-amt" id="duel-saved-amount">₹340</strong>
+        <span class="duel-rupee-foot">₹0 spent • 100% money preserved</span>
+      </div>
+
+      <div class="duel-action-box">
+        <p class="duel-taunt">Beat them. Order something bigger and keep the cash.</p>
+        <button class="duel-accept-btn" id="duel-accept-btn" type="button">
+          <span>I'll waste more than <span id="duel-btn-amt">₹340</span> ➔</span>
+        </button>
+      </div>
+
+      <p class="duel-tagline">Order food for free... for the food that never comes. You keep the money.</p>
+    </div>
+  </section>
+
+  <!-- Active Duel Sticky Indicator (when browsing inside a duel) -->
+  <div class="active-duel-strip" id="active-duel-strip" style="display: none;">
+    <span class="ads-icon">⚔️</span>
+    <span class="ads-text">Dueling <strong id="ads-name">Arun</strong> · Target to beat: <strong id="ads-target">₹340</strong></span>
+    <button class="ads-dismiss" id="ads-dismiss">&times;</button>
+  </div>
+
+  <!-- ====================================================================
+       MAIN CONTENT CONTAINER
+       ==================================================================== -->
+  <main class="app-main" id="app-main">
+
+    <!-- ==================================================================
+         HERO: Minimalist live meme ticker + One Button
+         ================================================================== -->
+    <section class="hero-ticker-section" id="hero-ticker-section">
+      <div class="ticker-badge">
+        <span class="ticker-dot"></span> LIVE TONIGHT
+      </div>
+
+      <div class="ticker-counter-row">
+        <span class="ticker-curr">₹</span>
+        <span class="ticker-number" id="live-hero-ticker">0</span>
+      </div>
+      <p class="ticker-subtitle" id="ticker-subtitle">kept so far — be the first tonight</p>
+
+      <div class="hero-cta-wrap">
+        <button class="hero-craving-btn" id="hero-craving-btn" type="button">
+          <span>I'm craving something.</span>
+          <span class="btn-chevron">➔</span>
+        </button>
+        <p class="hero-tiny-truth">Nothing will arrive. That's the point.</p>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         BROWSE SECTION: 30+ Kitchens across 4 Cities
+         ================================================================== -->
+    <section class="browse-section" id="browse-section">
+      
+      <!-- Satirical promo strip -->
+      <div class="satire-promo-banner">
+        <div class="spb-icon">⚡</div>
+        <div class="spb-text">
+          <strong>50% OFF up to ₹0</strong> • Code <code>NOTHANKS</code> auto-fails • Surge fee active just to test your willpower
+        </div>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div class="browse-controls">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="search-input" placeholder="Search biryani, burgers, pizza, rolls, momos..." aria-label="Search restaurants or food">
+          <button class="search-clear-btn" id="search-clear-btn" style="display: none;">&times;</button>
+        </div>
+
+        <div class="cuisine-chips-scroll" id="cuisine-chips">
+          <button class="c-chip active" data-filter="all">All Cravings</button>
+          <button class="c-chip" data-filter="biryani">Biryani &amp; Mandi</button>
+          <button class="c-chip" data-filter="burger">Midnight Burgers</button>
+          <button class="c-chip" data-filter="pizza">Cheesy Pizzas</button>
+          <button class="c-chip" data-filter="rolls">Kathi Rolls &amp; Shawarma</button>
+          <button class="c-chip" data-filter="south">Dosas &amp; Idli</button>
+          <button class="c-chip" data-filter="north">Butter Chicken &amp; Naan</button>
+          <button class="c-chip" data-filter="dessert">Ice Cream &amp; Desserts</button>
+        </div>
+      </div>
+
+      <!-- Section Title with Kitchen Count -->
+      <div class="kitchens-header">
+        <h2 class="kitchens-title">
+          <span id="kitchens-city-title">Bengaluru</span> Kitchens
+          <span class="kitchens-count-badge" id="kitchens-count-badge">8 kitchens</span>
+        </h2>
+        <span class="kitchens-sub">Tap any dish to load your cart with the real bill.</span>
+      </div>
+
+      <!-- Kitchens Grid -->
+      <div class="kitchens-grid" id="kitchens-grid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </section>
+
+    <!-- Global Floating Bottom Cart Strip -->
+    <div class="floating-cart-bar" id="floating-cart-bar" style="display: none;">
+      <div class="floating-cart-info">
+        <span class="fc-count" id="fc-count">1 Item</span>
+        <span class="fc-sep">•</span>
+        <span class="fc-total" id="fc-total">₹457.00</span>
+      </div>
+      <button class="floating-cart-btn" id="fc-proceed-btn" type="button">
+        <span>View Painful Bill ➔</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ====================================================================
+       CART DRAWER: Painful Delivery Math Breakdown
+       ==================================================================== -->
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+    <div class="cart-header">
+      <div class="cart-title-row">
+        <h3>Your Bill 🛒</h3>
+        <button class="close-cart-btn" id="close-cart-btn" aria-label="Close cart">&times;</button>
+      </div>
+      <p class="cart-location-info" id="cart-location-info">Delivering to: Indiranagar, 100ft Road • ~11 mins</p>
+    </div>
+
+    <div class="cart-items-container" id="cart-items-container">
+      <!-- Items dynamically populated -->
+    </div>
+
+    <!-- The Painful Delivery Fees Breakdown -->
+    <div class="cart-bill-details" id="cart-bill-details">
+      <div class="bill-line">
+        <span>Item Total:</span>
+        <span id="bill-subtotal">₹0.00</span>
+      </div>
+      <div class="bill-line">
+        <span>Delivery Partner Fee:</span>
+        <span id="bill-delivery">₹49.00</span>
+      </div>
+      <div class="bill-line">
+        <span>Platform Fee:</span>
+        <span id="bill-platform">₹10.00</span>
+      </div>
+      <div class="bill-line">
+        <span>Packaging &amp; GST (5%):</span>
+        <span id="bill-gst">₹24.00</span>
+      </div>
+      <div class="bill-line bill-surge">
+        <span>Late Night Rain Surge:</span>
+        <span id="bill-surge">₹25.00</span>
+      </div>
+      <div class="bill-line bill-grand-total">
+        <span>TO PAY:</span>
+        <strong id="bill-total">₹0.00</strong>
+      </div>
+      <div class="bill-pain-warning">
+        ⚠️ This is the exact amount you would normally throw away.
+      </div>
+    </div>
+
+    <div class="cart-footer">
+      <button class="checkout-beggy-btn" id="drawer-checkout-btn" disabled>
+        <span class="btn-text">Proceed to Checkout ➔</span>
+        <span class="btn-subtext">Look at payment options before the twist</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="cart-backdrop" id="cart-backdrop"></div>
+
+  <!-- ====================================================================
+       CHECKOUT MODAL: Greyed out payment methods + Giant Order Button
+       ==================================================================== -->
+  <div class="checkout-modal" id="checkout-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="co-title">
+    <div class="checkout-card">
+      <div class="co-header">
+        <h3 id="co-title">Confirm Delivery</h3>
+        <button class="co-close-btn" id="co-close-btn">&times;</button>
+      </div>
+
+      <div class="co-address-box">
+        <span class="co-pin">📍</span>
+        <div class="co-addr-text">
+          <strong id="co-addr-title">Home • Indiranagar</strong>
+          <span id="co-addr-desc">100ft Road, Bengaluru</span>
+        </div>
+      </div>
+
+      <div class="co-payment-section">
+        <label class="co-sec-label">Payment Method (All Simulated):</label>
+        
+        <div class="co-pay-options">
+          <div class="co-pay-row active">
+            <span class="pay-icon">⚡</span>
+            <div class="pay-info">
+              <strong>Instant UPI / GPay / PhonePe</strong>
+              <span>Fastest simulated payment</span>
+            </div>
+            <span class="pay-check">✓</span>
+          </div>
+          <div class="co-pay-row disabled">
+            <span class="pay-icon">💳</span>
+            <div class="pay-info">
+              <strong>Credit / Debit Card</strong>
+              <span>Fake card simulation</span>
+            </div>
+          </div>
+          <div class="co-pay-row disabled">
+            <span class="pay-icon">💵</span>
+            <div class="pay-info">
+              <strong>Cash on Delivery</strong>
+              <span>No cash needed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bill summary right before the slam -->
+      <div class="co-slam-box">
+        <div class="co-total-row">
+          <span>TO PAY:</span>
+          <strong class="co-big-total" id="co-big-total">₹457.00</strong>
+        </div>
+      </div>
+
+      <button class="co-place-order-btn" id="co-place-order-btn" type="button">
+        <span class="btn-place-title">Place order (nothing will come)</span>
+        <span class="btn-place-sub">Food will not arrive. Money will not leave.</span>
+      </button>
+
+      <p class="co-tiny-disclaimer">
+        *Zero rupees charged. Zero food cooked. 100% money stays in your bank account.
+      </p>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       TRACKING SCREEN: The 11-Minute Rider Mini-Movie
+       ==================================================================== -->
+  <section class="tracking-screen" id="tracking-screen" style="display: none;">
+    
+    <!-- Top Tracking Bar -->
+    <div class="tracking-top-bar">
+      <div class="tt-left">
+        <span class="tt-pulse">🔴</span>
+        <div class="tt-info">
+          <strong id="track-status-heading">Rahul is assigned</strong>
+          <span id="track-status-sub">Hero Splendor • 4.8★ (1,420 orders)</span>
+        </div>
+      </div>
+
+      <!-- Simulation Speed Controls -->
+      <div class="tracking-speed-controls" id="tracking-speed-controls" title="Simulation Speed">
+        <button class="speed-btn active" data-speed="1" id="speed-1x">1x (11m)</button>
+        <button class="speed-btn" data-speed="6" id="speed-5x">Fast (2m)</button>
+        <button class="speed-btn" data-speed="skip" id="speed-skip">Skip ⚡</button>
+      </div>
+    </div>
+
+    <!-- Leaflet Map Container -->
+    <div class="tracking-map-container" id="tracking-map">
+      <!-- Leaflet map renders here -->
+
+      <!-- Simulated Rider Live Chat Bubble overlay -->
+      <div class="rider-chat-bubble" id="rider-chat-bubble" style="display: none;">
+        <div class="rc-avatar">🛵</div>
+        <div class="rc-msg">
+          <span class="rc-sender">Rahul (Delivery Partner)</span>
+          <p class="rc-text" id="rc-text">Bhaiya 2 min, kitchen me thoda rush hai.</p>
+        </div>
+      </div>
+
+      <!-- Live ETA Floating Chip -->
+      <div class="map-eta-chip" id="map-eta-chip">
+        <span class="eta-icon">⏱️</span>
+        <span class="eta-val" id="eta-countdown">11:00</span>
+        <span class="eta-sub">sitting with the craving...</span>
+      </div>
+    </div>
+
+    <!-- Tracking Bottom Card -->
+    <div class="tracking-bottom-card">
+      
+      <!-- Event Timeline Progress -->
+      <div class="track-timeline">
+        <div class="tl-step active" id="tl-step-1">
+          <span class="tl-dot"></span>
+          <span class="tl-label">Assigned</span>
+        </div>
+        <div class="tl-step" id="tl-step-2">
+          <span class="tl-dot"></span>
+          <span class="tl-label">At Kitchen</span>
+        </div>
+        <div class="tl-step" id="tl-step-3">
+          <span class="tl-dot"></span>
+          <span class="tl-label">On The Way</span>
+        </div>
+        <div class="tl-step" id="tl-step-4">
+          <span class="tl-dot"></span>
+          <span class="tl-label">Arrived</span>
+        </div>
+      </div>
+
+      <div class="track-dish-row">
+        <div class="track-dish-info">
+          <strong id="track-dish-name">Chicken Biryani &amp; Butter Naan</strong>
+          <span id="track-restaurant-name">Koramangala Midnight Biryani Club</span>
+        </div>
+        <div class="track-dish-amount" id="track-saved-val">₹457.00</div>
+      </div>
+
+      <!-- The "Panic" Button -->
+      <div class="track-actions">
+        <button class="btn-panic" id="btn-panic" type="button">
+          <span>⚠️ Panic: I actually want the food</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Panic Modal: "Sit With It" + Amazon Affiliate Link -->
+    <div class="panic-modal" id="panic-modal" style="display: none;">
+      <div class="panic-card">
+        <h3>Actually hungry?</h3>
+        <p>Instead of blowing ₹450 on late-night delivery fees, stock your kitchen with real gourmet snacks &amp; meals at 1/3rd the cost.</p>
+        
+        <!-- Amazon Affiliate Link Box -->
+        <div class="panic-affiliate-box">
+          <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             class="btn-amazon-affiliate" 
+             id="btn-amazon-affiliate">
+            <span class="amz-icon">📦</span>
+            <span class="amz-text">Get Real Groceries on Amazon ➔</span>
+          </a>
+          <span class="amz-disclaimer">*Official Amazon Gourmet partner link (tag: beggy-21). Real food that actually arrives.</span>
+        </div>
+
+        <p class="panic-roast">Or just drink a cold glass of water and wait 5 mins.</p>
+        <button class="panic-resume-btn" id="panic-resume-btn" type="button">I'll hold out ➔</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ====================================================================
+       REVEAL SCREEN: Black Screen • Giant Rupees • 1-Tap WhatsApp
+       ==================================================================== -->
+  <section class="reveal-screen" id="reveal-screen" style="display: none;">
+    <div class="reveal-container">
+      
+      <div class="reveal-punchline-block">
+        <h1 class="reveal-main-title">Your food was never ordered.</h1>
+        <div class="reveal-giant-rupees">
+          <span class="r-curr">₹</span><span id="reveal-rupee-val">457</span>
+        </div>
+        <p class="reveal-sub-title">is still in your account.</p>
+      </div>
+
+      <div class="reveal-detail-pill">
+        <span id="reveal-dish-tag">Biryani</span>
+        <span class="pill-dot">•</span>
+        <span id="reveal-time-tag">11:42 pm</span>
+        <span class="pill-dot">•</span>
+        <span class="pill-highlight">didn't happen</span>
+      </div>
+
+      <!-- Screenshot-Ready 100% Discount Bill Receipt Card -->
+      <div class="reveal-bank-receipt" id="reveal-bank-receipt">
+        <div class="r-receipt-header">
+          <span class="r-bank-badge">🎉 100% DISCOUNT UNLOCKED</span>
+          <span class="r-receipt-time">Beggy Simulation</span>
+        </div>
+        <div class="r-receipt-dish-row">
+          <strong class="r-dish-title" id="r-receipt-dish-name">Hyderabadi Chicken Biryani</strong>
+          <span class="r-dish-original" id="r-receipt-original">₹458.00</span>
+        </div>
+        <div class="r-receipt-coupon-row">
+          <span class="r-coupon-tag">🏷️ COUPON 'WILLPOWER100'</span>
+          <span class="r-coupon-disc">-100% OFF (₹0 TO PAY)</span>
+        </div>
+        <div class="r-receipt-body">
+          <strong class="r-receipt-amt" id="r-receipt-amt">INR 458.00 KEPT IN YOUR ACCOUNT</strong>
+          <p class="r-receipt-msg">Food was fake • Rider was a simulation • Money kept 100%</p>
+        </div>
+        <div class="r-receipt-foot">
+          <span>✓ Discipline Verified</span>
+          <span>beggy.vercel.app</span>
+        </div>
+      </div>
+
+      <!-- Amazon Gourmet Savings Box on Reveal Screen -->
+      <div class="reveal-amazon-card" id="reveal-amazon-card">
+        <div class="rac-header">
+          <span class="rac-tag">👨‍🍳 15-Minute Recipe Kit</span>
+          <h4 class="rac-title" id="rac-dish-title">Cook Biryani at Home for ₹85!</h4>
+          <p class="rac-desc" id="rac-dish-desc">Stock up on fresh spices, basmati rice &amp; pantry essentials on Amazon India Pantry. Real food delivered tomorrow for 1/4th the price!</p>
+        </div>
+        <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="btn-amazon-reveal" 
+           id="btn-amazon-reveal">
+          <span class="rac-icon">🛒</span>
+          <div class="rac-btn-text">
+            <strong>Shop Gourmet Ingredients on Amazon India</strong>
+            <span>Cook restaurant dishes at home for ₹85 (tag: beggy-21) ➔</span>
+          </div>
+        </a>
+        <span class="rac-disclaimer">*Official Amazon India partner link (tag: beggy-21). Real groceries that actually arrive.</span>
+      </div>
+
+      <!-- Primary Viral Actions & Multi-Platform Sharing -->
+      <div class="reveal-actions">
+        <!-- Required First Name Field for Viral Identity -->
+        <div class="reveal-name-field-wrap">
+          <label class="reveal-name-label" for="reveal-name-input">Your first name — so the group knows who to beat</label>
+          <input id="reveal-name-input" class="reveal-name-input" type="text" maxlength="24" placeholder="e.g. Priya" autocomplete="nickname" />
+        </div>
+
+        <!-- 1-Tap WhatsApp Button -->
+        <a href="#" class="btn-reveal-whatsapp disabled" id="btn-reveal-whatsapp" target="_blank" rel="noopener noreferrer">
+          <span class="wa-icon">💬</span>
+          <span class="wa-text">Send this to the group (WhatsApp)</span>
+        </a>
+
+        <!-- Multi-Platform Quick Share Grid -->
+        <div class="social-share-grid">
+          <button class="btn-share-social btn-share-twitter" id="btn-share-twitter" type="button" title="Share on 𝕏 (Twitter)">
+            <span class="ss-icon">𝕏</span>
+            <span class="ss-label">Post on 𝕏</span>
+          </button>
+          <button class="btn-share-social btn-share-instagram" id="btn-share-instagram" type="button" title="Save Story & Copy Caption">
+            <span class="ss-icon">📸</span>
+            <span class="ss-label">Insta Story</span>
+          </button>
+          <button class="btn-share-social btn-share-telegram" id="btn-share-telegram" type="button" title="Share on Telegram">
+            <span class="ss-icon">✈️</span>
+            <span class="ss-label">Telegram</span>
+          </button>
+          <button class="btn-share-social btn-share-linkedin" id="btn-share-linkedin" type="button" title="Share on LinkedIn">
+            <span class="ss-icon">💼</span>
+            <span class="ss-label">LinkedIn</span>
+          </button>
+          <button class="btn-share-social btn-share-copy" id="btn-share-copy" type="button" title="Copy Challenge Link">
+            <span class="ss-icon" id="copy-link-icon">📋</span>
+            <span class="ss-label" id="copy-link-text">Copy Link</span>
+          </button>
+          <button class="btn-share-social btn-share-native" id="btn-share-native" type="button" title="More Share Apps">
+            <span class="ss-icon">⚡</span>
+            <span class="ss-label">More Apps</span>
+          </button>
+        </div>
+
+        <!-- Easy-to-Paste Templates Box -->
+        <div class="reveal-templates-box" id="reveal-templates-box">
+          <div class="rtb-header">
+            <span class="rtb-title">📋 Easy-to-Paste Challenge Templates</span>
+            <span class="rtb-sub">Select platform &amp; 1-tap copy formatted message</span>
+          </div>
+          <div class="rtb-tabs" id="rtb-tabs">
+            <button class="rtb-tab active" data-tab="whatsapp" type="button">WhatsApp / Chat</button>
+            <button class="rtb-tab" data-tab="twitter" type="button">𝕏 (Twitter)</button>
+            <button class="rtb-tab" data-tab="instagram" type="button">Instagram Story</button>
+            <button class="rtb-tab" data-tab="linkedin" type="button">LinkedIn</button>
+          </div>
+          <div class="rtb-content">
+            <textarea class="rtb-preview-text" id="rtb-preview-text" readonly rows="4"></textarea>
+            <button class="btn-copy-template" id="btn-copy-template" type="button">
+              <span id="copy-tpl-icon">📋</span>
+              <span id="copy-tpl-label">Copy Template to Clipboard</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Shock Proof Screenshot Card Live Preview & 1-Tap Share -->
+        <div class="shock-preview-box" id="shock-preview-box">
+          <div class="spb-header">
+            <span class="spb-title">📸 100% DISCOUNT SHOCK PROOF CARD</span>
+            <span class="spb-tag">9:16 Story &amp; Status</span>
+          </div>
+          <div class="spb-canvas-container">
+            <canvas id="receipt-canvas" width="1080" height="1920" class="receipt-canvas-preview"></canvas>
+          </div>
+          <div class="spb-actions">
+            <button class="btn-share-with-image" id="btn-share-with-image" type="button">
+              <span class="swi-icon">⚡</span>
+              <span>Share Image + FOMO Challenge</span>
+            </button>
+            <button class="btn-reveal-download" id="btn-reveal-download" type="button">
+              <span class="dl-icon">📥</span>
+              <span>Download 9:16 Story Image</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Do it again button -->
+        <button class="btn-reveal-restart" id="btn-reveal-restart" type="button">
+          <span>Resist another craving ➔</span>
+        </button>
+      </div>
+
+      <!-- Subtle Founder Tip Link -->
+      <div class="reveal-founder-subtle">
+        <span>Saved your bill? </span>
+        <button class="founder-chai-link" id="founder-chai-btn" type="button">Buy the young student founder a chai (UPI)</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       POST-DELIVERY MODAL: CRAVING DEFEATED & AMAZON RECIPE KIT POPUP
+       ==================================================================== -->
+  <div class="pdm-overlay" id="post-delivery-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pdm-title">
+    <div class="pdm-card" id="pdm-card">
+      <button class="pdm-close-btn" id="pdm-close-btn" aria-label="Close popup">&times;</button>
+
+      <div class="pdm-header">
+        <div class="pdm-badge">🎉 CRAVING DEFEATED • 100% SAVED!</div>
+        <h3 class="pdm-title" id="pdm-title">Dopamine Hit Done!</h3>
+        <p class="pdm-sub">You just saved <strong id="pdm-saved-val">₹458.00</strong> on takeout delivery!</p>
+      </div>
+
+      <div class="pdm-body">
+        <!-- TIER 1: FUND THE YOUNG STUDENT FOUNDER (1-TAP UPI + AMOUNTS: 10, 100, 1000, 2000, ANY) -->
+        <div class="pdm-section pdm-tip-section" id="pdm-founder-section">
+          <div class="pdm-sec-header">
+            <span class="pdm-sec-tag pdm-tip-tag">🎓 YOUNG STUDENT FOUNDER</span>
+            <h4 class="pdm-sec-title">Fund the Young Student Founder</h4>
+            <p class="pdm-sec-desc">Built by a solo student in a college hostel to help you defeat late-night ₹500 takeout cravings with the 100% discount hack. Zero ads, 100% free. If Beggy saved your money tonight, toss a small chai to the student creator!</p>
+          </div>
+
+          <!-- Amount Selection Pills: 10, 100, 1000, 2000, Any -->
+          <div class="pdm-pills-row" id="pdm-pills-row">
+            <button class="pdm-pill active" data-amount="10" type="button">₹10</button>
+            <button class="pdm-pill" data-amount="100" type="button">₹100</button>
+            <button class="pdm-pill" data-amount="1000" type="button">₹1,000</button>
+            <button class="pdm-pill" data-amount="2000" type="button">₹2,000</button>
+            <button class="pdm-pill pdm-pill-any" id="pdm-any-toggle" type="button">Any</button>
+          </div>
+
+          <!-- Custom Amount Input (Hidden until 'Any' is clicked) -->
+          <div class="pdm-custom-wrap" id="pdm-custom-wrap" style="display: none;">
+            <div class="pdm-custom-input-box">
+              <span class="pdm-custom-currency">₹</span>
+              <input type="number" id="pdm-custom-input" min="1" max="50000" step="1" placeholder="Enter amount" value="500">
+            </div>
+            <button class="pdm-custom-apply-btn" id="pdm-custom-apply-btn" type="button">Set</button>
+          </div>
+
+          <!-- 1-Tap UPI CTA Button -->
+          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20student%20founder" class="pdm-upi-btn" id="pdm-upi-btn">
+            <span class="pdm-btn-icon">⚡</span>
+            <div class="pdm-btn-text">
+              <strong id="pdm-upi-btn-main">Fund the Student Founder • ₹10</strong>
+              <span id="pdm-upi-btn-sub">Direct UPI • GPay, PhonePe, Paytm, CRED &amp; BHIM</span>
+            </div>
+          </a>
+
+          <!-- Desktop QR & Copy Quick Reveal -->
+          <div class="pdm-desktop-pay" id="pdm-desktop-pay">
+            <button class="pdm-qr-toggle-btn" id="pdm-qr-toggle-btn" type="button">
+              <span>💻 On Laptop? Click to Scan UPI QR Code</span>
+            </button>
+            <div class="pdm-qr-box" id="pdm-qr-box" style="display: none;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3Darunking156-2%40oksbi%26pn%3DArunachalam%2520Venkatachalapathy%26am%3D10%26cu%3DINR%26tn%3DFund%2520the%2520young%2520founder" alt="Scan UPI QR Code" id="pdm-qr-img" class="pdm-qr-img" />
+              <div class="pdm-qr-info">
+                <span>Point your phone camera, GPay or PhonePe at this QR code</span>
+                <button class="pdm-copy-upi-btn" id="pdm-copy-upi-btn" type="button">
+                  📋 Copy UPI ID
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sleek Visual Divider -->
+        <div class="pdm-divider">
+          <span>OR COOK FRESH AT HOME</span>
+        </div>
+
+        <!-- Amazon Gourmet Recipe Kit Section -->
+        <div class="pdm-section pdm-amazon-section">
+          <div class="pdm-sec-header">
+            <span class="pdm-sec-tag">👨‍🍳 15-Minute Recipe Kit</span>
+            <h4 class="pdm-sec-title" id="pdm-dish-title">Cook Biryani at Home for ₹85!</h4>
+            <p class="pdm-sec-desc" id="pdm-dish-desc">Get fresh gourmet ingredients delivered to your door via Amazon India Pantry. Total prep: 15 mins.</p>
+          </div>
+
+          <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             class="pdm-amazon-btn" 
+             id="pdm-amazon-btn">
+            <span class="pdm-btn-icon">🛒</span>
+            <div class="pdm-btn-text">
+              <strong>Shop Fresh Ingredients on Amazon India</strong>
+              <span>Cook fresh gourmet meals for 1/4th takeout price (tag: beggy-21) ➔</span>
+            </div>
+          </a>
+          <p class="pdm-amazon-disclosure">*As an Amazon Associate, Beggy earns from qualifying purchases.</p>
+        </div>
+
+        <!-- Button to continue to reveal / share screen -->
+        <button class="pdm-next-btn" id="pdm-next-btn" type="button">
+          <span>Continue to Share &amp; Challenge Friends ➔</span>
+        </button>
+      </div>
+
+      <div class="pdm-footer">
+        <button class="pdm-dismiss-link" id="pdm-dismiss-btn" type="button">I'll hold out, continue to reveal ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Feedback Toast -->
+  <div class="share-toast" id="share-toast" style="display: none;">
+    <span class="st-icon">✓</span>
+    <span class="st-msg" id="st-msg">Template copied to clipboard!</span>
+  </div>
+
+  <!-- ====================================================================
+       THE BILL YOU KEPT MODAL (Replaces academic passbook with roast ledger)
+       ==================================================================== -->
+  <div class="passbook-modal" id="passbook-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pb-title">
+    <div class="passbook-card">
+      <div class="pb-header">
+        <div>
+          <h2 id="pb-title">The bill you kept</h2>
+          <p class="pb-sub">Every rupee you didn't hand over to food delivery apps.</p>
+        </div>
+        <button class="pb-close-btn" id="pb-close-btn">&times;</button>
+      </div>
+
+      <!-- Roast Banner -->
+      <div class="pb-roast-banner" id="pb-roast-banner">
+        "This month you didn't spend ₹4,820 on food that would have been cold anyway."
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="pb-stats-grid">
+        <div class="pb-stat">
+          <span class="pb-s-label">Total Kept</span>
+          <strong class="pb-s-val" id="pb-total-val">₹0</strong>
+          <span class="pb-s-note">100% in your bank</span>
+        </div>
+        <div class="pb-stat">
+          <span class="pb-s-label">Current Streak</span>
+          <strong class="pb-s-val" id="pb-streak-val">🔥 0 Nights</strong>
+          <span class="pb-s-note">Don't open delivery apps</span>
+        </div>
+      </div>
+
+      <!-- Founder Support Area (tucked here) -->
+      <div class="pb-founder-box">
+        <div class="pb-founder-info">
+          <strong>💖 Support the Student Founder</strong>
+          <p>Built by Arunachalam Venkatachalapathy. 0% platform cuts, direct UPI.</p>
+        </div>
+        <div class="pb-upi-row">
+          <span class="upi-id-pill">arunking156-2@oksbi</span>
+          <button class="btn-copy-upi" id="btn-copy-upi" type="button">📋 Copy UPI</button>
+        </div>
+      </div>
+
+      <!-- Transaction List -->
+      <div class="pb-history-wrap">
+        <h4 class="pb-hist-title">Avoided Orders</h4>
+        <div class="pb-history-list" id="pb-history-list">
+          <!-- Populated by script -->
+        </div>
+      </div>
+
+      <div class="pb-footer">
+        <button class="pb-reset-btn" id="pb-reset-btn" type="button">Clear local history</button>
+        <button class="pb-done-btn" id="pb-done-btn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="passbook-backdrop" id="passbook-backdrop"></div>
+
+  <!-- ====================================================================
+       CRAWLABLE SEO & FAQ (Preserved for Google, Bing, LLMs, Perplexity)
+       ==================================================================== -->
+  <section class="beggy-seo-guide" id="about-beggy" aria-label="About Beggy">
+    <div class="seo-guide-container">
+      <div class="seo-guide-header">
+        <span class="seo-guide-badge">Order food for free.</span>
+        <h2 class="seo-guide-title">For the food that never comes.</h2>
+        <p class="seo-guide-intro">Beggy is India's late-night food delivery simulator. Order biryani, watch your rider on a live GPS map, and at the end keep 100% of your money. No real delivery, no real charges.</p>
+      </div>
+
+      <div class="seo-faq">
+        <details class="seo-faq-item" open>
+          <summary class="seo-faq-q">Is Beggy a Zomato alternative?</summary>
+          <p class="seo-faq-a">Yes! Beggy is India's first anti-spending Zomato alternative. Instead of paying ₹400–₹800 on takeout apps during late-night cravings, Beggy gives you the exact same dopamine rush of browsing 20 authentic menus and tracking a live simulated rider on GPS, while ensuring your bill stays ₹0.00 and 100% of your rupees remain in your bank.</p>
+        </details>
+        <details class="seo-faq-item">
+          <summary class="seo-faq-q">What is Beggy?</summary>
+          <p class="seo-faq-a">Order food for free... for the food that never comes. You keep the money. Beggy lets you browse 20 kitchens across Bengaluru, Mumbai, Delhi, and Hyderabad, add to cart, track a live delivery partner on real roads, and keep your rupees.</p>
+        </details>
+        <details class="seo-faq-item">
+          <summary class="seo-faq-q">How do I order food for free?</summary>
+          <p class="seo-faq-a">Select any restaurant dish, add it to your cart, and tap Place Order. The order is emulated with 100% discount, letting you ride out your craving for 11 minutes without spending a single rupee.</p>
+        </details>
+        <details class="seo-faq-item">
+          <summary class="seo-faq-q">Does food actually come?</summary>
+          <p class="seo-faq-a">No. Nothing will arrive. That's the entire point. It satisfies the emotional itch of ordering food without spending a single paisa.</p>
+        </details>
+        <details class="seo-faq-item">
+          <summary class="seo-faq-q">How does the challenge work?</summary>
+          <p class="seo-faq-a">When you resist a craving, send the link to your friends. They see your saved amount and try to beat you in a late-night savings duel.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="logo.png" alt="Beggy Logo" class="footer-logo-img" />
+        <span class="footer-logo">beggy</span>
+        <p>Order it. Track it. It never comes. • Crafted with ❤️ for India.</p>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Beggy • beggy.vercel.app • Zero real money charged.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- App Script -->
+  <script src="script.js"></script>
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

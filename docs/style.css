@@ -1,6 +1,6 @@
 /* ============================================================================
    BEGGY — ORDER IT. TRACK IT. IT NEVER COMES.
-   Phone-first, Swiggy-like design with brutalist punchlines.
+   Phone-first, Beggy-styled design with brutalist punchlines.
    ============================================================================ */
 
 :root, [data-theme="light"] {
@@ -12,11 +12,11 @@
   --border-color: rgba(0, 0, 0, 0.08);
   --border-bright: rgba(0, 0, 0, 0.16);
 
-  --swiggy-orange: #FC8019;
-  --swiggy-orange-glow: rgba(252, 128, 25, 0.25);
-  --swiggy-green: #059669;
-  --swiggy-green-glow: rgba(5, 150, 105, 0.2);
-  --swiggy-red: #EF4444;
+  --beggy-orange: #FC8019;
+  --beggy-orange-glow: rgba(252, 128, 25, 0.25);
+  --beggy-green: #059669;
+  --beggy-green-glow: rgba(5, 150, 105, 0.2);
+  --beggy-red: #EF4444;
 
   --text-main: #0F172A;
   --text-sub: #475569;
@@ -44,11 +44,11 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --border-bright: rgba(255, 255, 255, 0.16);
 
-  --swiggy-orange: #FC8019;
-  --swiggy-orange-glow: rgba(252, 128, 25, 0.28);
-  --swiggy-green: #10B981;
-  --swiggy-green-glow: rgba(16, 185, 129, 0.25);
-  --swiggy-red: #EF4444;
+  --beggy-orange: #FC8019;
+  --beggy-orange-glow: rgba(252, 128, 25, 0.28);
+  --beggy-green: #10B981;
+  --beggy-green-glow: rgba(16, 185, 129, 0.25);
+  --beggy-red: #EF4444;
 
   --text-main: #F8FAFC;
   --text-sub: #94A3B8;
@@ -135,7 +135,7 @@ body.beggy-body {
   font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: -0.04em;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   line-height: 1.1;
 }
 
@@ -218,11 +218,11 @@ body.beggy-body {
 
 .city-option.active {
   background: rgba(252, 128, 25, 0.14);
-  border-left: 3px solid var(--swiggy-orange);
+  border-left: 3px solid var(--beggy-orange);
 }
 
 .city-option.active strong {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 /* Header Action Buttons */
@@ -235,7 +235,7 @@ body.beggy-body {
 .header-bill-btn {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
   padding: 7px 12px;
   border-radius: var(--radius-md);
   font-family: inherit;
@@ -253,7 +253,7 @@ body.beggy-body {
 }
 
 .bill-badge {
-  background: var(--swiggy-green);
+  background: var(--beggy-green);
   color: #FFFFFF;
   padding: 1px 6px;
   border-radius: 6px;
@@ -307,7 +307,7 @@ body.beggy-body {
   position: absolute;
   top: -4px;
   right: -4px;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   font-size: 0.7rem;
   font-weight: 900;
@@ -317,7 +317,7 @@ body.beggy-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px var(--swiggy-orange-glow);
+  box-shadow: 0 2px 8px var(--beggy-orange-glow);
 }
 
 /* ====================================================================
@@ -369,7 +369,7 @@ body.beggy-body {
 .ticker-curr {
   font-size: clamp(2rem, 6vw, 3.2rem);
   font-weight: 900;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
   line-height: 1;
 }
 
@@ -408,7 +408,7 @@ body.beggy-body {
   padding: 16px 36px;
   border-radius: var(--radius-xl);
   cursor: pointer;
-  box-shadow: 0 10px 28px var(--swiggy-orange-glow);
+  box-shadow: 0 10px 28px var(--beggy-orange-glow);
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -467,7 +467,7 @@ body.beggy-body {
 .duel-skull-badge {
   display: inline-block;
   background: rgba(252, 128, 25, 0.18);
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   border: 1px solid rgba(252, 128, 25, 0.4);
   padding: 4px 14px;
   border-radius: 20px;
@@ -486,7 +486,7 @@ body.beggy-body {
 }
 
 .duel-name, .duel-dish {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 .duel-substory {
@@ -508,7 +508,7 @@ body.beggy-body {
   display: block;
   font-size: 0.72rem;
   font-weight: 800;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
   letter-spacing: 0.08em;
   margin-bottom: 6px;
 }
@@ -516,10 +516,10 @@ body.beggy-body {
 .duel-rupee-amt {
   font-size: 3rem;
   font-weight: 900;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
   line-height: 1;
   letter-spacing: -0.03em;
-  text-shadow: 0 4px 16px var(--swiggy-green-glow);
+  text-shadow: 0 4px 16px var(--beggy-green-glow);
 }
 
 .duel-rupee-foot {
@@ -547,7 +547,7 @@ body.beggy-body {
   padding: 16px 20px;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  box-shadow: 0 8px 24px var(--swiggy-green-glow);
+  box-shadow: 0 8px 24px var(--beggy-green-glow);
   transition: all 0.2s ease;
 }
 
@@ -641,7 +641,7 @@ body.beggy-body {
 
 .spb-text code {
   background: rgba(252, 128, 25, 0.2);
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 800;
@@ -683,8 +683,8 @@ body.beggy-body {
 
 .search-input:focus {
   outline: none;
-  border-color: var(--swiggy-orange);
-  box-shadow: 0 0 0 3px var(--swiggy-orange-glow);
+  border-color: var(--beggy-orange);
+  box-shadow: 0 0 0 3px var(--beggy-orange-glow);
 }
 
 .search-clear-btn {
@@ -731,10 +731,10 @@ body.beggy-body {
 }
 
 .c-chip.active {
-  background: var(--swiggy-orange);
-  border-color: var(--swiggy-orange);
+  background: var(--beggy-orange);
+  border-color: var(--beggy-orange);
   color: #FFFFFF;
-  box-shadow: 0 4px 14px var(--swiggy-orange-glow);
+  box-shadow: 0 4px 14px var(--beggy-orange-glow);
 }
 
 /* Kitchens Header */
@@ -914,11 +914,11 @@ body.beggy-body {
   flex-shrink: 0;
 }
 
-/* Swiggy Style ADD button */
+/* Delivery Style ADD button */
 .btn-add-dish {
   background: rgba(252, 128, 25, 0.1);
-  border: 1.5px solid var(--swiggy-orange);
-  color: var(--swiggy-orange);
+  border: 1.5px solid var(--beggy-orange);
+  color: var(--beggy-orange);
   font-family: inherit;
   font-size: 0.82rem;
   font-weight: 800;
@@ -929,7 +929,7 @@ body.beggy-body {
 }
 
 .btn-add-dish:hover {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
 }
 
@@ -937,7 +937,7 @@ body.beggy-body {
 .qty-stepper {
   display: flex;
   align-items: center;
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -980,7 +980,7 @@ body.beggy-body {
   max-width: 500px;
   margin: 0 auto;
   background: var(--bg-card);
-  border: 1px solid var(--swiggy-orange);
+  border: 1px solid var(--beggy-orange);
   box-shadow: var(--card-shadow);
   border-radius: var(--radius-xl);
   padding: 12px 18px;
@@ -993,7 +993,7 @@ body.beggy-body {
 
 [data-theme="dark"] .floating-cart-bar {
   background: #161B29;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px var(--swiggy-orange-glow);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px var(--beggy-orange-glow);
 }
 
 @keyframes slideUp {
@@ -1024,7 +1024,7 @@ body.beggy-body {
 }
 
 .floating-cart-btn {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
   border: none;
   font-family: inherit;
@@ -1033,7 +1033,7 @@ body.beggy-body {
   padding: 9px 18px;
   border-radius: 20px;
   cursor: pointer;
-  box-shadow: 0 4px 14px var(--swiggy-orange-glow);
+  box-shadow: 0 4px 14px var(--beggy-orange-glow);
 }
 
 /* ====================================================================
@@ -1147,7 +1147,7 @@ body.beggy-body {
   margin-top: 2px;
 }
 
-/* Painful Swiggy Fees Breakdown */
+/* Painful Delivery Fees Breakdown */
 .cart-bill-details {
   padding: 16px 20px;
   background: var(--bg-card);
@@ -1178,7 +1178,7 @@ body.beggy-body {
 }
 
 .bill-grand-total strong {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-size: 1.25rem;
 }
 
@@ -1213,7 +1213,7 @@ body.beggy-body {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  box-shadow: 0 8px 24px var(--swiggy-orange-glow);
+  box-shadow: 0 8px 24px var(--beggy-orange-glow);
   transition: all 0.2s ease;
 }
 
@@ -1338,7 +1338,7 @@ body.beggy-body {
 }
 
 .co-pay-row.active {
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
   background: rgba(252, 128, 25, 0.08);
 }
 
@@ -1359,7 +1359,7 @@ body.beggy-body {
 
 .pay-check {
   margin-left: auto;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-weight: 900;
 }
 
@@ -1386,7 +1386,7 @@ body.beggy-body {
 .co-big-total {
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
   transition: all 0.3s ease;
 }
 
@@ -1405,7 +1405,7 @@ body.beggy-body {
   padding: 16px 14px;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  box-shadow: 0 10px 30px var(--swiggy-orange-glow);
+  box-shadow: 0 10px 30px var(--beggy-orange-glow);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1505,9 +1505,9 @@ body.beggy-body {
 }
 
 .speed-btn.active {
-  background: var(--swiggy-orange);
+  background: var(--beggy-orange);
   color: #FFFFFF;
-  border-color: var(--swiggy-orange);
+  border-color: var(--beggy-orange);
 }
 
 .tracking-map-container {
@@ -1540,7 +1540,7 @@ body.beggy-body {
 .eta-val {
   font-size: 1.1rem;
   font-weight: 900;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1638,9 +1638,9 @@ body.beggy-body {
 }
 
 .tl-step.active .tl-dot {
-  background: var(--swiggy-orange);
-  border-color: var(--swiggy-orange);
-  box-shadow: 0 0 10px var(--swiggy-orange-glow);
+  background: var(--beggy-orange);
+  border-color: var(--beggy-orange);
+  box-shadow: 0 0 10px var(--beggy-orange-glow);
 }
 
 .tl-label {
@@ -1650,7 +1650,7 @@ body.beggy-body {
 }
 
 .tl-step.active .tl-label {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 .track-dish-row {
@@ -1677,7 +1677,7 @@ body.beggy-body {
 .track-dish-amount {
   font-size: 1.15rem;
   font-weight: 900;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
 }
 
 .track-actions {
@@ -1877,7 +1877,7 @@ body.beggy-body {
 }
 
 .pill-dot {
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 .pill-highlight {
@@ -2400,7 +2400,7 @@ body.beggy-body {
 .founder-chai-link {
   background: none;
   border: none;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-family: inherit;
   font-size: inherit;
   font-weight: 700;
@@ -3137,7 +3137,7 @@ body.beggy-body {
   display: block;
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
   margin: 2px 0;
 }
 
@@ -3238,7 +3238,7 @@ body.beggy-body {
 .pb-item-amt {
   font-size: 0.88rem;
   font-weight: 800;
-  color: var(--swiggy-green);
+  color: var(--beggy-green);
 }
 
 .pb-footer {
@@ -3301,7 +3301,7 @@ body.beggy-body {
   display: inline-block;
   background: rgba(252, 128, 25, 0.12);
   border: 1px solid rgba(252, 128, 25, 0.3);
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
   font-size: 0.74rem;
   font-weight: 800;
   padding: 3px 12px;
@@ -3385,7 +3385,7 @@ body.beggy-body {
 .footer-logo {
   font-size: 1.1rem;
   font-weight: 900;
-  color: var(--swiggy-orange);
+  color: var(--beggy-orange);
 }
 
 @keyframes fadeIn {
