@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Beggy — Order it. Track it. It never comes.</title>
-  <meta name="description" content="Swiggy. But the food is fake. You keep the money. Order late-night biryani, track the rider live for 11 minutes, and keep 100% of your money.">
-  <meta name="theme-color" content="#0A0D14">
+  <meta name="description" content="Swiggy. But the food is fake. You keep the money.">
   <link rel="icon" type="image/png" href="logo.png">
 
   <link rel="canonical" href="https://beggy.vercel.app/">
@@ -13,12 +12,11 @@
   <!-- Open Graph / WhatsApp / Facebook Previews -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://beggy.vercel.app/">
-  <meta property="og:title" content="Arun just didn't order biryani — ₹340 kept">
+  <meta property="og:title" content="Beggy — Order it. Track it. It never comes.">
   <meta property="og:description" content="Swiggy. But the food is fake. You keep the money.">
   <meta property="og:image" content="https://beggy.vercel.app/og-1200x630.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Beggy — Order it. Track it. It never comes.">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
@@ -164,7 +162,7 @@
   </header>
 
   <!-- ====================================================================
-       DUEL SCREEN (Shown when visiting via challenge link ?c=340&dish=Biryani&from=Arun)
+       DUEL SCREEN (Shown when visiting via challenge link ?c=610&dish=Butter+Chicken&from=Priya)
        ==================================================================== -->
   <section class="duel-screen" id="duel-screen" style="display: none;">
     <div class="duel-card">
@@ -213,9 +211,9 @@
 
       <div class="ticker-counter-row">
         <span class="ticker-curr">₹</span>
-        <span class="ticker-number" id="live-hero-ticker">12,40,580</span>
+        <span class="ticker-number" id="live-hero-ticker">0</span>
       </div>
-      <p class="ticker-subtitle">not spent on Beggy tonight</p>
+      <p class="ticker-subtitle" id="ticker-subtitle">kept so far — be the first tonight</p>
 
       <div class="hero-cta-wrap">
         <button class="hero-craving-btn" id="hero-craving-btn" type="button">
@@ -395,7 +393,7 @@
       <!-- Bill summary right before the slam -->
       <div class="co-slam-box">
         <div class="co-total-row">
-          <span>Amount to be kept:</span>
+          <span>TO PAY:</span>
           <strong class="co-big-total" id="co-big-total">₹457.00</strong>
         </div>
       </div>
@@ -426,11 +424,10 @@
         </div>
       </div>
 
-      <!-- Fast-Forward / Speed controls for testing -->
-      <div class="tracking-speed-controls" title="Simulation Speed">
+      <!-- Simulation Speed Controls (1x only by default; 5x dev-only) -->
+      <div class="tracking-speed-controls" id="tracking-speed-controls" title="Simulation Speed">
         <button class="speed-btn active" data-speed="1" id="speed-1x">1x (11m)</button>
-        <button class="speed-btn" data-speed="5" id="speed-5x">5x (2m)</button>
-        <button class="speed-btn" data-speed="30" id="speed-demo">Skip</button>
+        <button class="speed-btn dev-speed-btn" data-speed="5" id="speed-5x" style="display: none;">5x (2m)</button>
       </div>
     </div>
 
@@ -532,23 +529,29 @@
       <!-- Screenshot-Ready Bank SMS Receipt Card -->
       <div class="reveal-bank-receipt" id="reveal-bank-receipt">
         <div class="r-receipt-header">
-          <span class="r-bank-badge">🏦 HDFC BANK ALERT</span>
+          <span class="r-bank-badge">🏦 BANK ALERT</span>
           <span class="r-receipt-time">Just now</span>
         </div>
         <div class="r-receipt-body">
           <strong class="r-receipt-amt" id="r-receipt-amt">INR 457.00 NOT DEBITED</strong>
-          <p class="r-receipt-msg">Beggy order cancelled by reality. Kept 100% in your pocket.</p>
+          <p class="r-receipt-msg">Beggy order cancelled by reality.</p>
         </div>
         <div class="r-receipt-foot">
           <span>✓ Stood your ground</span>
-          <span>beggy.in</span>
+          <span>beggy.vercel.app</span>
         </div>
       </div>
 
       <!-- Primary Viral Actions -->
       <div class="reveal-actions">
+        <!-- Required First Name Field for Viral WhatsApp Identity -->
+        <div class="reveal-name-field-wrap">
+          <label class="reveal-name-label" for="reveal-name-input">Your first name — so the group knows who to beat</label>
+          <input id="reveal-name-input" class="reveal-name-input" type="text" maxlength="24" placeholder="e.g. Priya" autocomplete="nickname" />
+        </div>
+
         <!-- 1-Tap WhatsApp Button -->
-        <a href="#" class="btn-reveal-whatsapp" id="btn-reveal-whatsapp" target="_blank" rel="noopener noreferrer">
+        <a href="#" class="btn-reveal-whatsapp disabled" id="btn-reveal-whatsapp" target="_blank" rel="noopener noreferrer">
           <span class="wa-icon">💬</span>
           <span class="wa-text">Send this to the group (WhatsApp)</span>
         </a>
@@ -649,7 +652,7 @@
       <div class="seo-faq">
         <details class="seo-faq-item" open>
           <summary class="seo-faq-q">What is Beggy?</summary>
-          <p class="seo-faq-a">Swiggy. But the food is fake. You keep the money. Beggy lets you browse 30+ fictional kitchens in Bengaluru, Mumbai, Delhi, and Hyderabad, add to cart, track a live delivery partner on real roads, and keep your rupees.</p>
+          <p class="seo-faq-a">Swiggy. But the food is fake. You keep the money. Beggy lets you browse 20 kitchens across Bengaluru, Mumbai, Delhi, and Hyderabad, add to cart, track a live delivery partner on real roads, and keep your rupees.</p>
         </details>
         <details class="seo-faq-item">
           <summary class="seo-faq-q">Does food actually come?</summary>
@@ -672,7 +675,7 @@
         <p>Order it. Track it. It never comes. • Crafted with ❤️ for India.</p>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 Beggy • beggy.in • Zero real money charged.</span>
+        <span>© 2026 Beggy • beggy.vercel.app • Zero real money charged.</span>
       </div>
     </div>
   </footer>

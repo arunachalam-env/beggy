@@ -375,41 +375,30 @@
     if (el) el.textContent = `₹${Math.floor(userKeptState.totalKept)}`;
   }
 
-  // ── Live Rupee Ticker (Real stats with realistic drifting counter) ───────────
-  let liveTickerBase = 1240580;
-
+  // ── Live Rupee Ticker (Honest counter from real API) ────────────────────────
   function initLiveTicker() {
     const tickerEl = document.getElementById('live-hero-ticker');
+    const subtitleEl = document.getElementById('ticker-subtitle');
     if (!tickerEl) return;
 
-    // Attempt to fetch from real API backend
     fetch('/api/stats')
       .then(r => r.json())
       .then(d => {
         if (d && d.ok && typeof d.totalSaved === 'number' && d.totalSaved > 0) {
-          liveTickerBase = 1240580 + d.totalSaved;
+          tickerEl.textContent = Number(d.totalSaved).toLocaleString('en-IN');
+          if (subtitleEl) subtitleEl.textContent = 'kept so far';
+        } else {
+          tickerEl.textContent = '0';
+          if (subtitleEl) subtitleEl.textContent = 'kept so far — be the first tonight';
         }
-        renderTickerNumber(liveTickerBase);
       })
       .catch(() => {
-        renderTickerNumber(liveTickerBase);
+        tickerEl.textContent = '0';
+        if (subtitleEl) subtitleEl.textContent = 'kept so far — be the first tonight';
       });
-
-    // Gentle live drift: increment by ₹280-₹640 every 4-7 seconds
-    setInterval(() => {
-      const inc = Math.floor(Math.random() * 360) + 240;
-      liveTickerBase += inc;
-      renderTickerNumber(liveTickerBase);
-    }, 4500);
   }
 
-  function renderTickerNumber(num) {
-    const tickerEl = document.getElementById('live-hero-ticker');
-    if (!tickerEl) return;
-    tickerEl.textContent = Number(num).toLocaleString('en-IN');
-  }
-
-  // ── URL Duel Parser (?c=340&dish=Biryani&from=Arun) ──────────────────────────
+  // ── URL Duel Parser (?c=610&dish=Butter+Chicken&from=Priya) ──────────────────
   function parseUrlDuel() {
     const params = new URLSearchParams(window.location.search);
     const c = params.get('c');
@@ -1022,8 +1011,65 @@
     });
     saveUserKeptState();
 
+    // POST /api/stats with amount (once)
+    fetch('/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: lastOrderSummary.amount })
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.ok && typeof d.totalSaved === 'number' && d.totalSaved > 0) {
+          const tickerEl = document.getElementById('live-hero-ticker');
+          const subtitleEl = document.getElementById('ticker-subtitle');
+          if (tickerEl) tickerEl.textContent = Number(d.totalSaved).toLocaleString('en-IN');
+          if (subtitleEl) subtitleEl.textContent = 'kept so far';
+        }
+      })
+      .catch(() => {});
+
     // Trigger Black Screen Reveal!
     showRevealScreen();
+  }
+
+  // ── Name Sanitizer & WhatsApp Share Logic ──────────────────────────────────
+  function sanitizeName(s) {
+    return String(s || '')
+      .replace(/[<>"'&]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 24);
+  }
+
+  function updateWhatsAppLink() {
+    const nameInput = document.getElementById('reveal-name-input');
+    const waBtn = document.getElementById('btn-reveal-whatsapp');
+    if (!waBtn) return;
+
+    const rawName = nameInput ? nameInput.value : '';
+    const cleanName = sanitizeName(rawName);
+
+    // Disable / dim the WhatsApp button until the name field has >= 2 letters
+    if (cleanName.length < 2) {
+      waBtn.classList.add('disabled');
+      waBtn.removeAttribute('href');
+      return;
+    }
+
+    waBtn.classList.remove('disabled');
+
+    const amt = Math.round(lastOrderSummary.amount);
+    const dish = lastOrderSummary.dish;
+    const fromName = cleanName;
+
+    let waText = '';
+    if (activeDuel && activeDuel.from) {
+      waText = `I just beat ${activeDuel.from}!\nTracked a fake rider for ₹${amt} ${dish}. Never arrived.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(fromName)}`;
+    } else {
+      waText = `I just tracked a rider for food that doesn't exist.\n₹${amt} ${dish}. Never came.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(fromName)}`;
+    }
+
+    waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
   }
 
   // ── The Reveal Screen ───────────────────────────────────────────────────────
@@ -1035,7 +1081,7 @@
     const dishTag = document.getElementById('reveal-dish-tag');
     const timeTag = document.getElementById('reveal-time-tag');
     const receiptAmt = document.getElementById('r-receipt-amt');
-    const waBtn = document.getElementById('btn-reveal-whatsapp');
+    const nameInput = document.getElementById('reveal-name-input');
 
     const amt = Math.round(lastOrderSummary.amount);
     if (rupeeVal) rupeeVal.textContent = amt;
@@ -1043,17 +1089,12 @@
     if (timeTag) timeTag.textContent = lastOrderSummary.time;
     if (receiptAmt) receiptAmt.textContent = `INR ${lastOrderSummary.amount.toFixed(2)} NOT DEBITED`;
 
-    // 1-Tap WhatsApp Duel Link
-    if (waBtn) {
-      let waText = '';
-      if (activeDuel) {
-        waText = `I just beat ${activeDuel.from}!\nTracked a fake rider for ₹${amt} ${lastOrderSummary.dish}. Never arrived.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(lastOrderSummary.dish)}&from=Me`;
-      } else {
-        waText = `I just tracked a rider for food that doesn't exist.\n₹${amt} ${lastOrderSummary.dish}. Never came.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(lastOrderSummary.dish)}&from=Arun`;
-      }
-      waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+    if (nameInput) {
+      const saved = localStorage.getItem('beggyName') || '';
+      if (saved) nameInput.value = saved;
     }
 
+    updateWhatsAppLink();
     reveal.style.display = 'flex';
   }
 
@@ -1130,7 +1171,7 @@
 
     ctx.fillStyle = '#FC8019';
     ctx.font = '900 44px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('beggy.in', 540, 1580);
+    ctx.fillText('beggy.vercel.app', 540, 1580);
 
     // Convert to image & trigger download
     try {
@@ -1301,13 +1342,30 @@
     if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
     if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
 
-    // Tracking Speed Controls
+    // Tracking Speed Controls (1x only by default; 5x dev-only)
+    const dev = new URLSearchParams(window.location.search).has('dev');
     document.querySelectorAll('.speed-btn').forEach(btn => {
+      const sp = Number(btn.getAttribute('data-speed'));
+      if (sp !== 1 && !dev) {
+        btn.remove();
+      } else if (sp !== 1 && dev) {
+        btn.style.display = 'inline-block';
+      }
       btn.addEventListener('click', () => {
-        simSpeedMultiplier = Number(btn.getAttribute('data-speed')) || 1;
+        simSpeedMultiplier = sp || 1;
         updateSpeedControlsUI();
       });
     });
+
+    // Reveal Name Input Listener
+    const nameInput = document.getElementById('reveal-name-input');
+    if (nameInput) {
+      nameInput.addEventListener('input', (e) => {
+        const val = sanitizeName(e.target.value);
+        localStorage.setItem('beggyName', val);
+        updateWhatsAppLink();
+      });
+    }
 
     // Panic Button & Modal
     const btnPanic = document.getElementById('btn-panic');
