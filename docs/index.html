@@ -555,18 +555,26 @@
         <span class="pill-highlight">didn't happen</span>
       </div>
 
-      <!-- Screenshot-Ready Bank SMS Receipt Card -->
+      <!-- Screenshot-Ready 100% Discount Bill Receipt Card -->
       <div class="reveal-bank-receipt" id="reveal-bank-receipt">
         <div class="r-receipt-header">
-          <span class="r-bank-badge">🏦 BANK ALERT</span>
-          <span class="r-receipt-time">Just now</span>
+          <span class="r-bank-badge">🎉 100% DISCOUNT UNLOCKED</span>
+          <span class="r-receipt-time">Swiggy Simulation</span>
+        </div>
+        <div class="r-receipt-dish-row">
+          <strong class="r-dish-title" id="r-receipt-dish-name">Hyderabadi Chicken Biryani</strong>
+          <span class="r-dish-original" id="r-receipt-original">₹458.00</span>
+        </div>
+        <div class="r-receipt-coupon-row">
+          <span class="r-coupon-tag">🏷️ COUPON 'WILLPOWER100'</span>
+          <span class="r-coupon-disc">-100% OFF (₹0 TO PAY)</span>
         </div>
         <div class="r-receipt-body">
-          <strong class="r-receipt-amt" id="r-receipt-amt">INR 457.00 NOT DEBITED</strong>
-          <p class="r-receipt-msg">Beggy order cancelled by reality.</p>
+          <strong class="r-receipt-amt" id="r-receipt-amt">INR 458.00 KEPT IN YOUR ACCOUNT</strong>
+          <p class="r-receipt-msg">Food was fake • Rider was a simulation • Money kept 100%</p>
         </div>
         <div class="r-receipt-foot">
-          <span>✓ Stood your ground</span>
+          <span>✓ Discipline Verified</span>
           <span>beggy.vercel.app</span>
         </div>
       </div>
@@ -655,11 +663,26 @@
           </div>
         </div>
 
-        <!-- Download Story Card Button -->
-        <button class="btn-reveal-download" id="btn-reveal-download" type="button">
-          <span class="dl-icon">📸</span>
-          <span>Save Receipt Screenshot</span>
-        </button>
+        <!-- Shock Proof Screenshot Card Live Preview & 1-Tap Share -->
+        <div class="shock-preview-box" id="shock-preview-box">
+          <div class="spb-header">
+            <span class="spb-title">📸 100% DISCOUNT SHOCK PROOF CARD</span>
+            <span class="spb-tag">9:16 Story &amp; Status</span>
+          </div>
+          <div class="spb-canvas-container">
+            <canvas id="receipt-canvas" width="1080" height="1920" class="receipt-canvas-preview"></canvas>
+          </div>
+          <div class="spb-actions">
+            <button class="btn-share-with-image" id="btn-share-with-image" type="button">
+              <span class="swi-icon">⚡</span>
+              <span>Share Image + FOMO Challenge</span>
+            </button>
+            <button class="btn-reveal-download" id="btn-reveal-download" type="button">
+              <span class="dl-icon">📥</span>
+              <span>Download 9:16 Story Image</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Do it again button -->
         <button class="btn-reveal-restart" id="btn-reveal-restart" type="button">
@@ -670,7 +693,7 @@
       <!-- Subtle Founder Tip Link -->
       <div class="reveal-founder-subtle">
         <span>Saved your bill? </span>
-        <button class="founder-chai-link" id="founder-chai-btn" type="button">Buy the student founder a chai (UPI)</button>
+        <button class="founder-chai-link" id="founder-chai-btn" type="button">Buy the young student founder a chai (UPI)</button>
       </div>
 
     </div>
@@ -690,12 +713,12 @@
       </div>
 
       <div class="pdm-body">
-        <!-- TIER 1: FUND THE YOUNG FOUNDER (1-TAP UPI + AMOUNTS: 10, 100, 1000, 2000, ANY) -->
+        <!-- TIER 1: FUND THE YOUNG STUDENT FOUNDER (1-TAP UPI + AMOUNTS: 10, 100, 1000, 2000, ANY) -->
         <div class="pdm-section pdm-tip-section" id="pdm-founder-section">
           <div class="pdm-sec-header">
-            <span class="pdm-sec-tag pdm-tip-tag">💖 SUPPORT THE CREATOR</span>
-            <h4 class="pdm-sec-title">Fund the Young Founder</h4>
-            <p class="pdm-sec-desc">Saved your bill? Support the student creator building Beggy with direct 1-tap UPI.</p>
+            <span class="pdm-sec-tag pdm-tip-tag">🎓 YOUNG STUDENT FOUNDER</span>
+            <h4 class="pdm-sec-title">Fund the Young Student Founder</h4>
+            <p class="pdm-sec-desc">Built by a solo student in a college hostel to help you defeat late-night ₹500 takeout cravings with the 100% discount hack. Zero ads, 100% free. If Beggy saved your money tonight, toss a small chai to the student creator!</p>
           </div>
 
           <!-- Amount Selection Pills: 10, 100, 1000, 2000, Any -->
@@ -717,11 +740,11 @@
           </div>
 
           <!-- 1-Tap UPI CTA Button -->
-          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20founder" class="pdm-upi-btn" id="pdm-upi-btn">
+          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20student%20founder" class="pdm-upi-btn" id="pdm-upi-btn">
             <span class="pdm-btn-icon">⚡</span>
             <div class="pdm-btn-text">
-              <strong id="pdm-upi-btn-main">Fund the Young Founder • ₹10</strong>
-              <span id="pdm-upi-btn-sub">1-Tap • GPay, PhonePe, Paytm, CRED &amp; BHIM</span>
+              <strong id="pdm-upi-btn-main">Fund the Student Founder • ₹10</strong>
+              <span id="pdm-upi-btn-sub">Direct UPI • GPay, PhonePe, Paytm, CRED &amp; BHIM</span>
             </div>
           </a>
 
@@ -889,9 +912,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Hidden Canvas for generating 9:16 story receipt image -->
-  <canvas id="receipt-canvas" width="1080" height="1920" style="display: none;"></canvas>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

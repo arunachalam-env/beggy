@@ -1076,7 +1076,7 @@
     let amNum = Number(amount);
     if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
     pdmTipAmount = Math.min(50000, Math.max(1, amNum));
-    const uri = `upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=${pdmTipAmount}&cu=INR&tn=Fund%20the%20young%20founder`;
+    const uri = `upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=${pdmTipAmount}&cu=INR&tn=Fund%20the%20young%20student%20founder`;
 
     const upiBtn = document.getElementById('pdm-upi-btn');
     const upiMain = document.getElementById('pdm-upi-btn-main');
@@ -1086,7 +1086,7 @@
       upiBtn.href = uri;
     }
     if (upiMain) {
-      upiMain.textContent = `Fund the Young Founder • ₹${pdmTipAmount.toLocaleString('en-IN')}`;
+      upiMain.textContent = `Fund the Student Founder • ₹${pdmTipAmount.toLocaleString('en-IN')}`;
     }
     if (qrImg) {
       const encoded = encodeURIComponent(uri);
@@ -1148,24 +1148,24 @@
   function getChallengeData() {
     const nameInput = document.getElementById('reveal-name-input');
     const rawName = nameInput ? nameInput.value : '';
-    const cleanName = sanitizeName(rawName);
+    const cleanName = sanitizeName(rawName) || (activeDuel && activeDuel.from ? 'Someone' : 'Me');
     const amt = Math.round(lastOrderSummary.amount || 458);
     const dish = lastOrderSummary.dish || 'Biryani';
     const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : 'https://beggy.vercel.app';
-    const challengeUrl = `${origin}/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(cleanName || 'Someone')}`;
+    const challengeUrl = `${origin}/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(cleanName)}`;
 
     let whatsappText = '';
     if (activeDuel && activeDuel.from) {
-      whatsappText = `I just beat ${activeDuel.from}!\nTracked a fake rider for ₹${amt} ${dish}. Never arrived.\nBeat me: ${challengeUrl}`;
+      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI just beat ${activeDuel.from}'s savings streak!\nTracked a simulated Swiggy rider for ₹${amt} ${dish}.\nRider arrived. Food was fake. ₹${amt} stayed in my bank account! 💸\n\n0 calories. 100% money kept.\nThink you have better willpower? Beat me here 👇\n${challengeUrl}`;
     } else {
-      whatsappText = `I just tracked a rider for food that doesn't exist.\n₹${amt} ${dish}. Never came.\nBeat me: ${challengeUrl}`;
+      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI was literally about to blow ₹${amt} on Swiggy.\nTracked the rider across the city for 11 mins straight.\nPlot twist: THE FOOD WAS FAKE. The rider doesn't exist.\n₹${amt} is STILL sitting in my bank account! 💸\n\nCalories: 0. Bank balance: intact.\nDare you to resist your next 2 AM takeout craving. Duel me 👇\n${challengeUrl}`;
     }
 
-    const twitterText = `Tracked a Swiggy rider for 20 mins for ${dish}.\nRider arrived at my gate.\nPlot twist: food was fake, I kept ₹${amt} in my bank account.\n\nTry it before your next 2 AM order:\n${challengeUrl}`;
+    const twitterText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\n\nTracked a Swiggy rider for 11 mins straight.\nRider arrived at my gate. Food never existed.\nTotal paid: ₹0.00.\nTotal saved with @BeggyApp: ₹${amt}!\n\nWho has the discipline to beat this? Take the challenge 👇\n${challengeUrl}\n\n#Beggy #Swiggy #SaveMoney #100PercentOff #Discipline`;
 
-    const instagramText = `₹${amt} kept in account. ${dish} ghosted. Beggy stood its ground 🛵💨\nChallenge link: ${challengeUrl}`;
+    const instagramText = `100% DISCOUNT ON ${dish.toUpperCase()} 🛵💨\nSwiggy bill: ₹0. Bank balance: +₹${amt}. Willpower: 100/100.\nFood was fake, savings are REAL.\nDuel me before your next 2 AM order 👇\n${challengeUrl}`;
 
-    const linkedinText = `Saved ₹${amt} today with an unconventional financial hack: ordered ${dish}, tracked the rider across the city, and discovered the food is completely fake.\n\nCash kept: 100%.\nCalories: 0.\nDiscipline: 10/10.\n\nDare you to resist your next takeout impulse: ${challengeUrl}`;
+    const linkedinText = `Unlocked a 100% discount on dinner tonight using an unconventional financial experiment: ordered ${dish}, tracked the delivery partner across the city, and realized the food was a simulation.\n\nTotal spent: ₹0.\nCash saved: ₹${amt}.\nDiscipline score: 10/10.\nCalories: 0.\n\nDare you to resist your next late-night impulse: ${challengeUrl}`;
 
     return {
       name: cleanName,
@@ -1225,6 +1225,8 @@
     const dishTag = document.getElementById('reveal-dish-tag');
     const timeTag = document.getElementById('reveal-time-tag');
     const receiptAmt = document.getElementById('r-receipt-amt');
+    const receiptDishName = document.getElementById('r-receipt-dish-name');
+    const receiptOriginal = document.getElementById('r-receipt-original');
     const nameInput = document.getElementById('reveal-name-input');
     const racDishTitle = document.getElementById('rac-dish-title');
     const racDishDesc = document.getElementById('rac-dish-desc');
@@ -1235,7 +1237,9 @@
     if (rupeeVal) rupeeVal.textContent = amt;
     if (dishTag) dishTag.textContent = dish;
     if (timeTag) timeTag.textContent = lastOrderSummary.time || '11:42 pm';
-    if (receiptAmt) receiptAmt.textContent = `INR ${lastOrderSummary.amount.toFixed(2)} NOT DEBITED`;
+    if (receiptAmt) receiptAmt.textContent = `INR ${amt}.00 KEPT IN YOUR ACCOUNT`;
+    if (receiptDishName) receiptDishName.textContent = dish;
+    if (receiptOriginal) receiptOriginal.textContent = `₹${amt}.00`;
 
     if (racDishTitle) racDishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
     if (racDishDesc) racDishDesc.textContent = `Stock up on fresh spices, basmati rice & pantry essentials for ${dish} on Amazon India Pantry. Real food delivered tomorrow for 1/4th the price!`;
@@ -1247,94 +1251,273 @@
 
     updateWhatsAppLink();
     updateSharePreview();
+    renderReceiptCanvas();
     reveal.style.display = 'flex';
   }
 
-  // ── Canvas Receipt Generator for 9:16 Instagram Stories ─────────────────────
-  function generateReceiptImage() {
+  // ── 100% DISCOUNT SHOCK PROOF CANVAS GENERATOR (9:16 STORY FORMAT) ──────────
+  function renderReceiptCanvas() {
     const canvas = document.getElementById('receipt-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const data = getChallengeData();
+    const amt = data.amt;
+    const dish = data.dish;
+    const cleanName = data.name || 'Discipline Master';
+    const restaurant = lastOrderSummary.restaurant || 'Hyderabadi Spice Express';
+    const time = lastOrderSummary.time || '11:42 pm';
 
-    // 1080 x 1920 (9:16)
-    ctx.fillStyle = '#000000';
+    // Canvas dimensions: 1080 x 1920 (9:16)
+    canvas.width = 1080;
+    canvas.height = 1920;
+
+    // 1. Dark Premium Background
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, 1920);
+    bgGrad.addColorStop(0, '#090D16');
+    bgGrad.addColorStop(0.5, '#0E1422');
+    bgGrad.addColorStop(1, '#080C14');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    // Subtle orange accent line
-    ctx.strokeStyle = '#FC8019';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(60, 60, 960, 1800);
+    // 2. High-Tech Grid Pattern Accent
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.lineWidth = 1;
+    for (let x = 60; x < 1080; x += 120) {
+      ctx.beginPath();
+      ctx.moveTo(x, 60);
+      ctx.lineTo(x, 1860);
+      ctx.stroke();
+    }
+    for (let y = 60; y < 1920; y += 120) {
+      ctx.beginPath();
+      ctx.moveTo(60, y);
+      ctx.lineTo(1020, y);
+      ctx.stroke();
+    }
 
-    // Logo & Header
+    // 3. Double Outer Border with Glowing Neon Accents
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(50, 50, 980, 1820);
+
+    ctx.strokeStyle = '#FC8019';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(50, 180);
+    ctx.lineTo(50, 50);
+    ctx.lineTo(180, 50);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#10B981';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(1030, 1740);
+    ctx.lineTo(1030, 1870);
+    ctx.lineTo(900, 1870);
+    ctx.stroke();
+
+    // 4. Brand Header
     ctx.fillStyle = '#FC8019';
-    ctx.font = '900 64px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '900 68px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('beggy', 540, 220);
+    ctx.fillText('beggy', 540, 140);
 
     ctx.fillStyle = '#94A3B8';
-    ctx.font = '700 28px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('ORDER IT. TRACK IT. IT NEVER COMES.', 540, 270);
+    ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+    ctx.letterSpacing = '4px';
+    ctx.fillText('SWIGGY SIMULATION • ZERO REAL FOOD', 540, 180);
 
-    // Giant Headline
+    // 5. Simulated Swiggy Order Cancellation Notice Pill
+    ctx.fillStyle = '#161F30';
+    ctx.beginPath();
+    ctx.roundRect(120, 220, 840, 90, 45);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(252, 128, 25, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '900 62px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('YOUR FOOD WAS NEVER ORDERED.', 540, 480);
+    ctx.font = '800 27px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('🛵 Swiggy Order Cancelled • 100% Refunded to Reality', 540, 275);
 
-    // Giant Rupees
+    // 6. Massive Shock Punchline
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 64px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('100% DISCOUNT UNLOCKED!', 540, 420);
+
+    // 7. Giant Glowing Emerald Rupees
     ctx.fillStyle = '#10B981';
-    ctx.font = '900 160px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(`₹${Math.round(lastOrderSummary.amount)}`, 540, 660);
+    ctx.font = '900 170px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(`+₹${amt}`, 540, 590);
 
     ctx.fillStyle = '#CBD5E1';
-    ctx.font = '700 42px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('is still in your account.', 540, 740);
+    ctx.font = '800 36px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('IS STILL IN YOUR BANK ACCOUNT', 540, 660);
 
-    // Detail Box
-    ctx.fillStyle = '#111520';
-    ctx.fillRect(140, 860, 800, 360);
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(140, 860, 800, 360);
+    // 8. Simulated Food Delivery Bill Receipt Box
+    ctx.fillStyle = '#111726';
+    ctx.beginPath();
+    ctx.roundRect(100, 720, 880, 560, 24);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
 
+    // Food Name
     ctx.fillStyle = '#F8FAFC';
-    ctx.font = '800 40px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(lastOrderSummary.dish, 540, 950);
+    ctx.font = '900 48px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(dish, 540, 800);
 
     ctx.fillStyle = '#94A3B8';
-    ctx.font = '600 32px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(`${lastOrderSummary.restaurant} • ${lastOrderSummary.time}`, 540, 1020);
+    ctx.font = '600 28px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(`${restaurant} • ${time}`, 540, 850);
 
-    // Stamped: "NEVER ARRIVED"
+    // Bill breakdown
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '600 32px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('Original Takeout Bill:', 160, 930);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#F1F5F9';
+    ctx.fillText(`₹${amt}.00`, 920, 930);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#10B981';
+    ctx.font = '700 32px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('Coupon \'WILLPOWER100\':', 160, 990);
+    ctx.textAlign = 'right';
+    ctx.fillText(`-₹${amt}.00 (100% OFF)`, 920, 990);
+
+    // Divider line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath();
+    ctx.moveTo(160, 1030);
+    ctx.lineTo(920, 1030);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('FINAL BILL TO PAY:', 160, 1090);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#10B981';
+    ctx.fillText('₹0.00', 920, 1090);
+
+    // Slanted Stamp: CRAVING DEFEATED
     ctx.save();
-    ctx.translate(540, 1120);
-    ctx.rotate(-0.08);
+    ctx.translate(540, 1190);
+    ctx.rotate(-0.06);
     ctx.fillStyle = '#EF4444';
-    ctx.font = '900 52px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '900 44px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
     ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(-240, -45, 480, 80);
-    ctx.fillText('NEVER ARRIVED', 0, 12);
+    ctx.lineWidth = 5;
+    ctx.strokeRect(-290, -42, 580, 78);
+    ctx.fillText('CRAVING GHOSTED • 0 CALORIES', 0, 12);
     ctx.restore();
 
-    // Footer Challenge CTA
+    // 9. Shock FOMO Duel Callout
+    ctx.textAlign = 'center';
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '800 36px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('Can your willpower beat this?', 540, 1500);
+    ctx.font = '800 38px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(`${cleanName} stood ground and saved ₹${amt}.`, 540, 1370);
 
-    ctx.fillStyle = '#FC8019';
-    ctx.font = '900 44px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('beggy.vercel.app', 540, 1580);
+    ctx.fillStyle = '#F59E0B';
+    ctx.font = '700 32px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('Can your bank balance survive tonight?', 540, 1420);
 
-    // Convert to image & trigger download
+    // 10. Scannable Duel Target Box & QR Code
+    ctx.fillStyle = '#161F30';
+    ctx.beginPath();
+    ctx.roundRect(200, 1470, 680, 240, 20);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Render live QR Code into target box
+    const qrUri = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data.challengeUrl)}`;
+    const qrImg = new Image();
+    qrImg.crossOrigin = 'anonymous';
+    qrImg.onload = () => {
+      ctx.drawImage(qrImg, 230, 1500, 180, 180);
+    };
+    qrImg.src = qrUri;
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '800 32px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('SCAN OR TAP TO DUEL', 440, 1560);
+
+    ctx.fillStyle = '#10B981';
+    ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('beggy.vercel.app', 440, 1610);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '600 22px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('Beat my discipline streak!', 440, 1655);
+
+    // 11. Student Founder Footer
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#64748B';
+    ctx.font = '700 24px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('🎓 Built by Young Student Founder • 100% Free & Zero Ads', 540, 1780);
+  }
+
+  // ── 1-Tap Download Image Helper ─────────────────────────────────────────────
+  function downloadReceiptImage() {
+    renderReceiptCanvas();
+    const canvas = document.getElementById('receipt-canvas');
+    if (!canvas) return;
+
     try {
       const dataUrl = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = `beggy-receipt-saved-${Math.round(lastOrderSummary.amount)}.png`;
+      const amt = Math.round(lastOrderSummary.amount || 458);
+      const dishSlug = (lastOrderSummary.dish || 'food').toLowerCase().replace(/[^a-z0-9]/g, '-');
+      a.download = `beggy-100-discount-${dishSlug}-₹${amt}.png`;
       a.click();
+      showShareToast('✓ 100% Discount Card Downloaded! Ready to post!');
     } catch (e) {
-      alert('Screenshot saved! Take a quick screenshot of this screen to post.');
+      showShareToast('Screenshot saved! Take a screenshot to post.');
     }
+  }
+
+  // ── 1-Tap Share with Image (Web Share API with Blob) ────────────────────────
+  async function shareReceiptImageAndChallenge() {
+    const data = getChallengeData();
+    renderReceiptCanvas();
+    const canvas = document.getElementById('receipt-canvas');
+
+    if (navigator.share && canvas) {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (blob) {
+          const file = new File([blob], `beggy-100-discount-₹${data.amt}.png`, { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: 'Beggy 100% Discount Craving Challenge',
+              text: data.whatsappText,
+              files: [file]
+            });
+            showShareToast('✓ Shared with 100% discount shock proof!');
+            return;
+          }
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: Download image and open WhatsApp with formatted text
+    downloadReceiptImage();
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(data.whatsappText)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    showShareToast('✓ Shock card downloaded & WhatsApp opened!');
   }
 
   // ── "The Bill You Kept" Passbook Modal ──────────────────────────────────────
@@ -1515,6 +1698,7 @@
         const val = sanitizeName(e.target.value);
         localStorage.setItem('beggyName', val);
         updateWhatsAppLink();
+        renderReceiptCanvas();
       });
     }
 
@@ -1536,7 +1720,24 @@
     // Reveal Screen Actions
     const btnDownload = document.getElementById('btn-reveal-download');
     if (btnDownload) {
-      btnDownload.addEventListener('click', generateReceiptImage);
+      btnDownload.addEventListener('click', downloadReceiptImage);
+    }
+
+    const btnShareWithImage = document.getElementById('btn-share-with-image');
+    if (btnShareWithImage) {
+      btnShareWithImage.addEventListener('click', shareReceiptImageAndChallenge);
+    }
+
+    const waBtn = document.getElementById('btn-reveal-whatsapp');
+    if (waBtn) {
+      waBtn.addEventListener('click', (e) => {
+        // If on mobile device with file sharing, share image alongside text
+        const canvas = document.getElementById('receipt-canvas');
+        if (navigator.share && canvas && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          e.preventDefault();
+          shareReceiptImageAndChallenge();
+        }
+      });
     }
 
     const btnRestart = document.getElementById('btn-reveal-restart');
