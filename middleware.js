@@ -46,8 +46,11 @@ export default async function middleware(request) {
       .replace(/property="og:title" content="[^"]*"/i, () => `property="og:title" content="${title}"`)
       .replace(/property="og:description" content="[^"]*"/i, () => `property="og:description" content="${desc}"`)
       .replace(/property="og:url" content="[^"]*"/i, () => `property="og:url" content="${canonical}"`)
+      .replace(/property="og:image" content="[^"]*"/i, () => `property="og:image" content="https://beggy.vercel.app/og-order-food-for-free-v2.png"`)
+      .replace(/property="og:image:secure_url" content="[^"]*"/i, () => `property="og:image:secure_url" content="https://beggy.vercel.app/og-order-food-for-free-v2.png"`)
       .replace(/name="twitter:title" content="[^"]*"/i, () => `name="twitter:title" content="${title}"`)
       .replace(/name="twitter:description" content="[^"]*"/i, () => `name="twitter:description" content="${desc}"`)
+      .replace(/name="twitter:image" content="[^"]*"/i, () => `name="twitter:image" content="https://beggy.vercel.app/og-order-food-for-free-v2.png"`)
       .replace(/name="description" content="[^"]*"/i, () => `name="description" content="${desc}"`);
 
     return new Response(next, {

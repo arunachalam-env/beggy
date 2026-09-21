@@ -256,15 +256,17 @@ async function render() {
   const pngData = resvg.render();
   const pngBuffer = pngData.asPng();
 
-  const pubPath = path.join(rootDir, 'public', 'og-1200x630.png');
-  const docsPath = path.join(rootDir, 'docs', 'og-1200x630.png');
+  const targets = [
+    path.join(rootDir, 'public', 'og-1200x630.png'),
+    path.join(rootDir, 'docs', 'og-1200x630.png'),
+    path.join(rootDir, 'og-1200x630.png'),
+    path.join(rootDir, 'public', 'og-order-food-for-free-v2.png'),
+    path.join(rootDir, 'docs', 'og-order-food-for-free-v2.png'),
+    path.join(rootDir, 'og-order-food-for-free-v2.png')
+  ];
 
-  fs.writeFileSync(pubPath, pngBuffer);
-  fs.writeFileSync(docsPath, pngBuffer);
-
-  console.log(`Successfully generated updated og-1200x630.png (${pngBuffer.length} bytes) to:`);
-  console.log(' - ' + pubPath);
-  console.log(' - ' + docsPath);
+  targets.forEach(p => fs.writeFileSync(p, pngBuffer));
+  console.log(`Successfully generated updated og cards (${pngBuffer.length} bytes) to ${targets.length} targets.`);
 }
 
 render().catch(console.error);
