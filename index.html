@@ -833,6 +833,50 @@
   </div>
 
   <!-- ====================================================================
+       PLATFORM DRAFT & SHARE ASSISTANT MODAL (LINKEDIN & INSTA STORY)
+       ==================================================================== -->
+  <div class="draft-modal-overlay" id="draft-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="draft-title">
+    <div class="draft-modal-card">
+      <button class="draft-modal-close" id="draft-modal-close" aria-label="Close modal">&times;</button>
+      
+      <div class="draft-modal-header">
+        <span class="draft-badge" id="draft-badge">📋 DRAFT COPIED TO CLIPBOARD</span>
+        <h3 class="draft-title" id="draft-title">Ready to Post!</h3>
+        <p class="draft-sub" id="draft-sub">We've pre-filled and copied your viral post to your clipboard!</p>
+      </div>
+
+      <div class="draft-preview-wrap">
+        <label class="draft-label" for="draft-modal-text">Your Generated Post / Caption Draft:</label>
+        <textarea class="draft-textarea" id="draft-modal-text" readonly rows="5"></textarea>
+      </div>
+
+      <div class="draft-steps-box" id="draft-steps-box">
+        <div class="draft-step">
+          <span class="step-num">1</span>
+          <span class="step-text" id="step-1-text">Tap <strong>"Open Platform"</strong> below.</span>
+        </div>
+        <div class="draft-step">
+          <span class="step-num">2</span>
+          <span class="step-text" id="step-2-text">Press <strong>Paste (Ctrl+V / Long-Press Paste)</strong> in the box.</span>
+        </div>
+        <div class="draft-step">
+          <span class="step-num">3</span>
+          <span class="step-text" id="step-3-text">Your text + high-tech discount proof card appear instantly!</span>
+        </div>
+      </div>
+
+      <div class="draft-modal-actions">
+        <button class="btn-draft-copy" id="btn-draft-copy-again" type="button">
+          📋 Copy Draft Again
+        </button>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="btn-draft-proceed" id="btn-draft-proceed">
+          🚀 Open Composer ➔
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
        THE BILL YOU KEPT MODAL (Replaces academic passbook with roast ledger)
        ==================================================================== -->
   <div class="passbook-modal" id="passbook-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pb-title">

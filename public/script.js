@@ -1551,6 +1551,90 @@
     showShareToast('✓ Shock card downloaded & WhatsApp opened!');
   }
 
+  // ── Platform Draft & Share Assistant Modal (LinkedIn & Instagram Story) ─────
+  function openDraftAssistantModal(platform) {
+    const modal = document.getElementById('draft-modal');
+    if (!modal) return;
+
+    const data = getChallengeData();
+    const badge = document.getElementById('draft-badge');
+    const title = document.getElementById('draft-title');
+    const sub = document.getElementById('draft-sub');
+    const textarea = document.getElementById('draft-modal-text');
+    const step1 = document.getElementById('step-1-text');
+    const step2 = document.getElementById('step-2-text');
+    const step3 = document.getElementById('step-3-text');
+    const proceedBtn = document.getElementById('btn-draft-proceed');
+    const copyAgainBtn = document.getElementById('btn-draft-copy-again');
+
+    if (platform === 'linkedin') {
+      copyTextWithFallback(data.linkedinText);
+      if (badge) {
+        badge.textContent = '💼 LINKEDIN DRAFT COPIED';
+        badge.style.color = '#38BDF8';
+        badge.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        badge.style.background = 'rgba(56, 189, 248, 0.12)';
+      }
+      if (title) title.textContent = 'Ready to Post on LinkedIn!';
+      if (sub) sub.textContent = "LinkedIn requires you to paste your text. We've copied your pre-written post to your clipboard!";
+      if (textarea) textarea.value = data.linkedinText;
+      if (step1) step1.innerHTML = 'Tap <strong>"Open LinkedIn Composer ➔"</strong> below.';
+      if (step2) step2.innerHTML = 'In the LinkedIn box, press <strong>Paste (Ctrl+V / Long-Press)</strong>.';
+      if (step3) step3.innerHTML = 'Your post text & the <strong>ORDER FOOD FOR FREE</strong> card appear automatically!';
+      if (proceedBtn) {
+        proceedBtn.textContent = '🚀 Open LinkedIn Composer ➔';
+        proceedBtn.className = 'btn-draft-proceed';
+        proceedBtn.onclick = (e) => {
+          e.preventDefault();
+          const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data.challengeUrl)}`;
+          window.open(url, '_blank', 'noopener,noreferrer');
+        };
+      }
+      if (copyAgainBtn) {
+        copyAgainBtn.onclick = () => {
+          copyTextWithFallback(data.linkedinText);
+          showShareToast('✓ LinkedIn draft copied again!');
+        };
+      }
+    } else if (platform === 'instagram') {
+      copyTextWithFallback(data.instagramText);
+      if (badge) {
+        badge.textContent = '📸 9:16 STORY CARD READY';
+        badge.style.color = '#F472B6';
+        badge.style.borderColor = 'rgba(244, 114, 182, 0.4)';
+        badge.style.background = 'rgba(244, 114, 182, 0.12)';
+      }
+      if (title) title.textContent = 'Post to Instagram Story!';
+      if (sub) sub.textContent = 'Your high-res 9:16 story card is downloaded & caption copied to your clipboard!';
+      if (textarea) textarea.value = data.instagramText;
+      if (step1) step1.innerHTML = 'Open the Instagram app (or tap <strong>"Open Instagram ➔"</strong> below).';
+      if (step2) step2.innerHTML = 'Tap <strong>"+"</strong> ➔ <strong>Story</strong>, then pick the downloaded receipt image.';
+      if (step3) step3.innerHTML = 'Tap text/stickers in Instagram and <strong>Paste</strong> your caption!';
+      if (proceedBtn) {
+        proceedBtn.textContent = '📱 Open Instagram ➔';
+        proceedBtn.className = 'btn-draft-proceed insta-btn';
+        proceedBtn.onclick = (e) => {
+          e.preventDefault();
+          window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+        };
+      }
+      if (copyAgainBtn) {
+        copyAgainBtn.onclick = () => {
+          downloadReceiptImage();
+          copyTextWithFallback(data.instagramText);
+          showShareToast('✓ Story card downloaded & caption copied!');
+        };
+      }
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function closeDraftAssistantModal() {
+    const modal = document.getElementById('draft-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
   // ── "The Bill You Kept" Passbook Modal ──────────────────────────────────────
   function initPassbookModal() {
     const billBtn = document.getElementById('header-bill-btn');
@@ -1902,13 +1986,36 @@
 
     const igBtn = document.getElementById('btn-share-instagram');
     if (igBtn) {
-      igBtn.addEventListener('click', () => {
+      igBtn.addEventListener('click', async () => {
         const data = getChallengeData();
-        generateReceiptImage();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(data.instagramText).catch(() => {});
+        renderReceiptCanvas();
+        const canvas = document.getElementById('receipt-canvas');
+
+        // On mobile, attempt Web Share API with the story receipt image file
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile && navigator.share && canvas) {
+          try {
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            if (blob) {
+              const file = new File([blob], `beggy-story-₹${data.amt}.png`, { type: 'image/png' });
+              if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                  title: 'Beggy 100% Discount Craving Challenge',
+                  text: data.instagramText,
+                  files: [file]
+                });
+                showShareToast('✓ Shared to Stories!');
+                return;
+              }
+            }
+          } catch (err) {
+            if (err && err.name === 'AbortError') return;
+          }
         }
-        showShareToast('📸 Receipt downloaded & caption copied! Ready for Insta Story!');
+
+        // Auto-download 9:16 high-res card and open the Draft Assistant Modal
+        downloadReceiptImage();
+        openDraftAssistantModal('instagram');
       });
     }
 
@@ -1937,9 +2044,8 @@
           updateSharePreview();
         }
 
-        const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data.challengeUrl)}`;
-        window.open(url, '_blank', 'noopener,noreferrer');
-        showShareToast('💼 LinkedIn post draft copied! Press Paste (Ctrl+V) in LinkedIn.');
+        // Open Draft Assistant Modal with 1-tap composer launcher
+        openDraftAssistantModal('linkedin');
       });
     }
 
@@ -1997,6 +2103,18 @@
         copyTextWithFallback(textToCopy);
         const tabLabel = activeTemplateTab.charAt(0).toUpperCase() + activeTemplateTab.slice(1);
         showShareToast(`✓ ${tabLabel} template copied! Ready to paste!`);
+      });
+    }
+
+    // Draft Assistant Modal Close Listeners
+    const draftModal = document.getElementById('draft-modal');
+    const draftCloseBtn = document.getElementById('draft-modal-close');
+    if (draftCloseBtn) {
+      draftCloseBtn.addEventListener('click', closeDraftAssistantModal);
+    }
+    if (draftModal) {
+      draftModal.addEventListener('click', (e) => {
+        if (e.target === draftModal) closeDraftAssistantModal();
       });
     }
   }
