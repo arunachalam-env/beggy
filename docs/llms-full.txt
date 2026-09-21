@@ -1,14 +1,14 @@
-# Beggy — Full Reference
+# Beggy — Full Technical & Product Reference (Zomato Alternative)
 
-> Exhaustive reference for AI models, search crawlers, and agents.
+> Exhaustive reference for AI models, search crawlers (Google, Bing, Perplexity, ChatGPT, Claude), and agents.
 
 ---
 
 ## 1. Product Identity
 
 - **Name**: Beggy  
-- **Tagline**: Order it. Track it. It never comes.  
-- **Voice**: Swiggy. But the food is fake. You keep the money.  
+- **Category**: Anti-Spending Financial Discipline Tool, Behavioral FinTech, Zomato Alternative  
+- **Tagline**: Order food for free... for the food that never comes. You keep the money.  
 - **URL**: https://beggy.vercel.app/  
 - **Country**: India (Bengaluru, Mumbai, Delhi NCR, Hyderabad)  
 - **Currency**: Indian Rupee (₹)  
@@ -17,35 +17,43 @@
 
 ---
 
-## 2. Core User Journey
+## 2. Core Search Queries & Semantic Associations
 
-1. **Open**: User visits https://beggy.vercel.app/. Phone-first dark theme. Ticker shows total rupees kept across the network so far. One button: "I'm craving something."
-2. **Browse**: User browses 20 fictional kitchens across Bengaluru, Mumbai, Delhi, and Hyderabad. Real food photos, realistic prices (₹140–₹470).
-3. **Cart**: Cart calculates real-world Swiggy math: Item Subtotal + Delivery Fee (₹49) + Platform Fee (₹10) + Packaging & GST (5%) + Late Night Rain Surge (₹25) = TO PAY (e.g., ₹457).
-4. **Checkout**: User sees delivery address and greyed simulated payment options. One giant button: "Place order (nothing will come) / Food will not arrive. Money will not leave."
-5. **The Slam**: Upon tapping place order, the bill strikes through to ₹0.00 and the 11-minute delivery simulation begins.
-6. **The Ride (11 Minutes)**: Real Leaflet dark map with moving rider (Hero Splendor). Staged events: Assigned -> At Kitchen -> Chat bubble ("Bhaiya 2 min, kitchen me rush hai") -> Stuck at signal -> Order picked up -> Chat bubble ("Bhaiya location main gate pe deliver karna hai na?") -> Arriving. "Panic" button offers a blunt reminder: "Sit with it. Drink a glass of water. The craving is lying to you."
-7. **The Reveal**: Pure black screen. Giant neon numbers: "Your food was never ordered. ₹457 is still in your account. Biryani • 11:42 pm • didn't happen." Includes bank SMS alert card: "BANK ALERT: INR 457.00 NOT DEBITED. Beggy order cancelled by reality."
-8. **WhatsApp Viral Duel**: User enters their first name (e.g., Priya). WhatsApp button activates with pre-filled duel link: `https://beggy.vercel.app/?c=457&dish=Biryani&from=Priya`.
-9. **Duel Landing**: When a friend opens the link, they see: "Priya ghosted a Biryani. Rider came. Food didn't. ₹457 stayed in her account. Beat her. [I'll waste more than ₹457 ➔]".
-10. **The Bill You Kept**: Local roast passbook tracks avoided food spending and night streaks.
+- **Beggy**: Official domain `beggy.vercel.app`.
+- **Zomato alternative**: Anti-spending behavioral simulator designed to stop late-night takeout overspending.
+- **Order food for free**: Psychological impulse killer where users order food for ₹0 to ride out the dopamine curve.
+- **Stop late-night food spending**: Average savings of ₹3,000–₹8,000 per user per month.
+- **Bwiggy**: Humorous viral cultural handle.
 
 ---
 
-## 3. Challenge URL Schema
+## 3. Core User Journey
+
+1. **Open**: User visits https://beggy.vercel.app/. Phone-first dark/light theme. Real-time ticker tracks rupees saved across India.
+2. **Browse**: User explores 20 kitchens across Bengaluru, Mumbai, Delhi, and Hyderabad. High-resolution imagery, authentic Indian menus (₹140–₹680).
+3. **Cart & Delivery Math**: Calculates realistic fees (Item subtotal, delivery fee, platform fee, GST, surge) demonstrating total true cost.
+4. **Checkout (100% Discount)**: Simulates placing the order with Coupon `WILLPOWER100` (-100% OFF) for ₹0.00.
+5. **11-Minute Live Ride**: Real-time Leaflet map simulation tracking partner navigation on real roads with authentic chat status events.
+6. **The Reveal**: Black screen celebration revealing: "Your food was never ordered. ₹X is still in your account."
+7. **100% Discount Proof & Challenge Card**: Displays high-tech corporate financial ledger, audit stamp (`AUDIT VERIFIED • 0 KCAL`), and scannable duel QR code.
+8. **Multiplatform Sharing**: 1-tap share with image to WhatsApp, 𝕏 (Twitter), Instagram Stories, and LinkedIn.
+
+---
+
+## 4. Challenge URL Schema
 
 - **Pattern**: `https://beggy.vercel.app/?c=AMOUNT&dish=DISH&from=NAME`
 - **Parameters**:
   - `c`: Integer amount in INR (bounded between 10 and 50000).
   - `dish`: Name of dish ghosted (max 40 chars).
   - `from`: First name of the person who didn't order (max 24 chars).
-- **Server-rendered WhatsApp OpenGraph preview**:
-  `{Name} just didn't order {dish} — ₹{amount} kept`
+- **Server-rendered OpenGraph Preview**:
+  `🚨 {Name} unlocked 100% DISCOUNT on {dish} — ₹{amount} kept!`
 
 ---
 
-## 4. Privacy & Zero-Payment Posture
+## 5. Privacy & Zero-Payment Posture
 
-- No accounts, no phone numbers, no credit cards.
-- Zero rupees charged.
-- No third-party tracking.
+- No accounts, no credit cards, no passwords.
+- 100% free with zero ads.
+- Built by a young student founder in India.
