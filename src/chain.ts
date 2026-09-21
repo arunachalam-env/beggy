@@ -124,3 +124,21 @@ export function verifyEntireChain(): VerificationResult {
     blocks: results,
   };
 }
+
+export function getChainStats(): { totalSaved: number; count: number } {
+  const blocks = getAllBlocks();
+  let totalSaved = 0;
+  for (const b of blocks) {
+    try {
+      const parsed = JSON.parse(b.data);
+      if (typeof parsed.savedAmount === 'number' && !isNaN(parsed.savedAmount)) {
+        totalSaved += parsed.savedAmount;
+      } else if (typeof parsed.amount === 'number' && !isNaN(parsed.amount)) {
+        totalSaved += parsed.amount;
+      }
+    } catch {
+      // ignore non-json payload
+    }
+  }
+  return { totalSaved, count: blocks.length };
+}

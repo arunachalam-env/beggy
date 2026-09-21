@@ -1,3152 +1,1363 @@
 // ============================================================================
-// BEGGY — Crave It. Simulate It. Save the Bill. (Open Source)
+// BEGGY — ORDER IT. TRACK IT. IT NEVER COMES.
+// Swiggy. But the food is fake. You keep the money.
 // ============================================================================
-console.log("%c🎉 BEGGY — Dopamine Food Delivery & Anti-Spending Vault", "color:#FF5722; font-size:16px; font-weight:800;");
-console.log("Open source (MIT): https://github.com/arunachalamvenkatachalapathy-dev/beggy");
 
+(function () {
+  'use strict';
 
-// Privacy-friendly analytics tracker (satisfies Q07 & Vercel Web Analytics integration)
-const Analytics = {
-  track: function(eventName, props = {}) {
-    console.log('[Analytics]', eventName, props);
-    try {
-      if (typeof window.va === "function") {
-        window.va('event', { name: eventName, data: props });
-      }
-    } catch (e) {}
-
-    // Store recent interactions locally so creator can inspect behavior via window.getBeggyAnalytics()
-    try {
-      const logs = JSON.parse(localStorage.getItem("beggy_analytics_events") || "[]");
-      logs.unshift({ event: eventName, props, timestamp: new Date().toISOString() });
-      if (logs.length > 50) logs.length = 50;
-      localStorage.setItem("beggy_analytics_events", JSON.stringify(logs));
-    } catch (e) {}
+  // ── HTML Entity Escaper for XSS Defense ─────────────────────────────────────
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return String(str ?? '');
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
-};
 
-window.getBeggyAnalytics = function() {
-  try {
-    const logs = JSON.parse(localStorage.getItem("beggy_analytics_events") || "[]");
-    console.table(logs);
-    return logs;
-  } catch (e) {
-    return [];
-  }
-};
-
-/**
- * Robust HTML entity escaping to prevent DOM and Stored XSS.
- */
-function escapeHtml(str) {
-  if (typeof str !== "string") return String(str ?? "");
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-/**
- * Beggy — 4-Stage Food Delivery Architecture (Bengaluru, India Edition)
- * Flow: 1) Select Restaurant -> 2) Select Dishes -> 3) UPI Payment -> 4) Live GPS Tracking -> Dopamine Hit Done & Real Save
- * Fictionalized Brand Names • Natural Grocery Helper
- */
-
-const AMAZON_GROCERY_URL = "https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl";
-
-/**
- * Beggy Creator UPI Tip Configuration (0-Second Direct Bank Settlement)
- * Sanitized and sealed against prototype and memory tampering.
- */
-function sanitizeUpiId(id) {
-  if (typeof id !== "string") return "arunking156-2@oksbi";
-  const trimmed = id.trim();
-  return /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(trimmed) ? trimmed : "arunking156-2@oksbi";
-}
-
-const BEGGY_UPI_CONFIG = {
-  pa: "arunking156-2@oksbi",
-  pn: "Arunachalam Venkatachalapathy",
-  note: "Fund the young founder",
-  defaultAmount: 10
-};
-
-// ── 8 Iconic Bengaluru Partner Kitchens (Legally Safe Parodies) ──────────────
-const RESTAURANTS_DATA = [
-  {
-    id: "meghas",
-    name: "Megha's Dum Darbar",
-    cuisines: "Biryani, Andhra, Kebabs",
-    rating: 4.9,
-    eta: "20–25 mins",
-    priceTwo: "₹500 for two",
-    distanceKm: 1.2,
-    address: "100ft Road, HAL 2nd Stage, Indiranagar",
-    coords: [12.9716, 77.6412],
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
-    discount: "FLAT 100% OFF code: BEGGY100"
-  },
-  {
-    id: "imperial",
-    name: "Imperial Feast Diner",
-    cuisines: "North Indian, Mughlai, Tandoor",
-    rating: 4.9,
-    eta: "20–25 mins",
-    priceTwo: "₹550 for two",
-    distanceKm: 0.8,
-    address: "80ft Road, Indiranagar, Bengaluru",
-    coords: [12.9780, 77.6380],
-    image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80",
-    discount: "Free Delivery with Beggy Pass"
-  },
-  {
-    id: "guntur",
-    name: "Guntur Andhra Bhavan",
-    cuisines: "Andhra Meals, Chilli Chicken, Guntur Biryani",
-    rating: 4.8,
-    eta: "20–25 mins",
-    priceTwo: "₹450 for two",
-    distanceKm: 1.4,
-    address: "Double Road, Indiranagar, Bengaluru",
-    coords: [12.9740, 77.6360],
-    image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80",
-    discount: "Special Andhra Spice Fest"
-  },
-  {
-    id: "snuffles",
-    name: "Snuffles Gourmet Burgers",
-    cuisines: "Burgers, American, Shakes, Fries",
-    rating: 4.9,
-    eta: "20–25 mins",
-    priceTwo: "₹400 for two",
-    distanceKm: 1.5,
-    address: "Apex Building, 12th Main Rd, Indiranagar",
-    coords: [12.9755, 77.6440],
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
-    discount: "Buy 1 Get 1 on Burgers"
-  },
-  {
-    id: "ctb",
-    name: "Central Tiffin Bhavan",
-    cuisines: "South Indian, Benne Dosa, Thatte Idli, Filter Coffee",
-    rating: 4.9,
-    eta: "15–20 mins",
-    priceTwo: "₹250 for two",
-    distanceKm: 6.5,
-    address: "Margosa Rd, 7th Cross, Malleshwaram",
-    coords: [13.0030, 77.5680],
-    image: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80",
-    discount: "Pure Desi White Butter Special"
-  },
-  {
-    id: "squarehouse",
-    name: "Square House Creamery",
-    cuisines: "Ice Cream, DBC Sundaes, Shakes, Desserts",
-    rating: 4.9,
-    eta: "15–20 mins",
-    priceTwo: "₹350 for two",
-    distanceKm: 1.8,
-    address: "Defence Colony, Indiranagar, Bengaluru",
-    coords: [12.9698, 77.6499],
-    image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80",
-    discount: "Legendary DBC Overload"
-  },
-  {
-    id: "donvito",
-    name: "Don Vito's Pizzeria",
-    cuisines: "Woodfired Pizza, Italian, Garlic Bread",
-    rating: 4.8,
-    eta: "25–30 mins",
-    priceTwo: "₹650 for two",
-    distanceKm: 4.8,
-    address: "4th Block, Koramangala, Bengaluru",
-    coords: [12.9340, 77.6220],
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-    discount: "48-Hr Fermented Sourdough"
-  },
-  {
-    id: "dragonwok",
-    name: "Great Dragon Wok & Momo Pavilion",
-    cuisines: "Chinese, Momos, Dimsums, Hakka Noodles",
-    rating: 4.8,
-    eta: "20–25 mins",
-    priceTwo: "₹450 for two",
-    distanceKm: 4.2,
-    address: "Church Street, MG Road, Bengaluru",
-    coords: [12.9660, 77.6080],
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80",
-    discount: "Himalayan Fiery Sauce Free"
-  }
-];
-
-// ── 28 Dishes Catalog Mapped to Restaurants ──────────────────────────────────
-const DISHES_CATALOG = [
-  // Megha's Dum Darbar
-  {
-    id: 1,
-    restaurantId: "meghas",
-    category: "biryani",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: true,
-    title: "Megha's Signature Andhra Chicken Dum Biryani",
-    price: 340,
-    cookPrice: 85,
-    eta: "20–25 mins",
-    calories: 780,
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
-    desc: "Long grain aged basmati rice cooked on slow dum with aromatic spices, topped with fiery tender Andhra fried chicken gravy and boiled egg.",
-    recipe: {
-      prep: "15 mins",
-      cook: "25 mins",
-      ingredients: [
-        "Aged Basmati Rice - 2 cups",
-        "Boneless Chicken Thighs - 350g",
-        "Fried Golden Onions (Birista) - 1 cup",
-        "Pure Desi Cow Ghee - 3 tbsp",
-        "Shahi Biryani Masala & Saffron Milk",
-        "Fresh Mint, Coriander & Green Chillies"
-      ],
-      steps: [
-        "Parboil aged basmati rice in whole-spiced boiling water for 6 minutes, then drain.",
-        "Sear spiced chicken in desi ghee for 8 minutes until half cooked.",
-        "Layer rice over chicken, sprinkle golden birista, mint, coriander, and saffron milk.",
-        "Seal with tight lid and cook on lowest flame on a tawa for 15 minutes dum.",
-        "Rest 5 minutes, fluff gently, and enjoy with chilled raita!"
+  // ── 4 City Packs & 32+ Fictional Kitchens ───────────────────────────────────
+  const CITIES = {
+    bengaluru: {
+      name: 'Bengaluru',
+      area: 'Indiranagar, 100ft Road',
+      center: [12.9716, 77.5946],
+      dest: [12.9784, 77.6408], // Indiranagar
+      kitchens: [
+        {
+          id: 'blr-1',
+          name: 'Koramangala Midnight Biryani Club',
+          rating: '4.6 ★',
+          cuisines: 'Biryani, Kebabs, Mughlai',
+          eta: '25-35 mins',
+          satire: '50% OFF up to ₹0',
+          image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80',
+          coords: [12.9352, 77.6245],
+          dishes: [
+            { id: 'b1', title: 'Midnight Special Chicken Dum Biryani', price: 349, veg: false },
+            { id: 'b2', title: 'Mutton Seekh Kebab (4 pcs)', price: 289, veg: false }
+          ]
+        },
+        {
+          id: 'blr-2',
+          name: 'Indiranagar Smashed Burger Cartel',
+          rating: '4.5 ★',
+          cuisines: 'Gourmet Burgers, Truffle Fries',
+          eta: '20-30 mins',
+          satire: 'Surge Fee Active (+₹25)',
+          image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80',
+          coords: [12.9784, 77.6408],
+          dishes: [
+            { id: 'b3', title: 'Double Smash Bacon Cheese Melt', price: 399, veg: false },
+            { id: 'b4', title: 'Crispy Peri Peri Fries', price: 179, veg: true }
+          ]
+        },
+        {
+          id: 'blr-3',
+          name: 'The Butter Chicken Project',
+          rating: '4.7 ★',
+          cuisines: 'North Indian, Naan, Dal Makhani',
+          eta: '30-40 mins',
+          satire: 'Free Delivery above ₹499',
+          image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&q=80',
+          coords: [12.9750, 77.6050],
+          dishes: [
+            { id: 'b5', title: 'Old Delhi Velvet Butter Chicken', price: 380, veg: false },
+            { id: 'b6', title: 'Garlic Butter Naan (2 pcs)', price: 120, veg: true }
+          ]
+        },
+        {
+          id: 'blr-4',
+          name: 'Rameshwaram Ghee Corner',
+          rating: '4.8 ★',
+          cuisines: 'South Indian, Dosas, Ghee Podi',
+          eta: '15-25 mins',
+          satire: '2-for-1 (Min Order ₹599)',
+          image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&q=80',
+          coords: [12.9719, 77.6412],
+          dishes: [
+            { id: 'b7', title: 'Ghee Podi Masala Dosa', price: 195, veg: true },
+            { id: 'b8', title: 'Crispy Button Idlis with Sambar', price: 140, veg: true }
+          ]
+        },
+        {
+          id: 'blr-5',
+          name: 'Bangalore Kathi Roll Co.',
+          rating: '4.3 ★',
+          cuisines: 'Kathi Rolls, Shawarma, Wraps',
+          eta: '20-30 mins',
+          satire: 'Rain Fee Added',
+          image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&q=80',
+          coords: [12.9698, 77.6150],
+          dishes: [
+            { id: 'b9', title: 'Double Chicken Egg Roll', price: 220, veg: false },
+            { id: 'b10', title: 'Paneer Tikka Kathi Roll', price: 185, veg: true }
+          ]
+        },
+        {
+          id: 'blr-6',
+          name: 'Corner Scoop Death By Chocolate',
+          rating: '4.9 ★',
+          cuisines: 'Desserts, Hot Fudge Sundaes',
+          eta: '15-20 mins',
+          satire: '0 Calories (Fake)',
+          image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80',
+          coords: [12.9345, 77.6189],
+          dishes: [
+            { id: 'b11', title: 'Classic Death By Chocolate Sundae', price: 260, veg: true },
+            { id: 'b12', title: 'Warm Brownie Fudge Bowl', price: 210, veg: true }
+          ]
+        },
+        {
+          id: 'blr-7',
+          name: 'Church Street Momos Garage',
+          rating: '4.4 ★',
+          cuisines: 'Tibetan Momos, Thukpa, Wings',
+          eta: '20-30 mins',
+          satire: 'Night Craving Special',
+          image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&q=80',
+          coords: [12.9740, 77.6070],
+          dishes: [
+            { id: 'b13', title: 'Crispy Fried Chicken Momos (8 pcs)', price: 240, veg: false },
+            { id: 'b14', title: 'Steamed Cheese Corn Momos', price: 190, veg: true }
+          ]
+        },
+        {
+          id: 'blr-8',
+          name: 'HSR Midnight Pizza Syndicate',
+          rating: '4.5 ★',
+          cuisines: 'Woodfired Pizza, Garlic Bread',
+          eta: '30-40 mins',
+          satire: 'Cheesy Overload',
+          image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80',
+          coords: [12.9121, 77.6446],
+          dishes: [
+            { id: 'b15', title: 'Loaded Pepperoni & Jalapeno Pizza', price: 460, veg: false },
+            { id: 'b16', title: 'Cheesy Garlic Pull-Apart Bread', price: 199, veg: true }
+          ]
+        }
+      ]
+    },
+    mumbai: {
+      name: 'Mumbai',
+      area: 'Bandra West, Hill Road',
+      center: [19.0596, 72.8295],
+      dest: [19.0600, 72.8350],
+      kitchens: [
+        {
+          id: 'mum-1',
+          name: 'Bandra Midnight Butter Pav',
+          rating: '4.7 ★',
+          cuisines: 'Pav Bhaji, Tawa Pulao, Chaat',
+          eta: '20-30 mins',
+          satire: 'Extra Butter Alert',
+          image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80',
+          coords: [19.0550, 72.8300],
+          dishes: [
+            { id: 'm1', title: 'Cheese Burst Pav Bhaji (4 Pav)', price: 270, veg: true },
+            { id: 'm2', title: 'Spicy Mumbai Tawa Pulao', price: 220, veg: true }
+          ]
+        },
+        {
+          id: 'mum-2',
+          name: 'Carter Road Shawarma Mafia',
+          rating: '4.6 ★',
+          cuisines: 'Lebanese Shawarma, Hummus, Fries',
+          eta: '20-25 mins',
+          satire: 'Open till 4 AM',
+          image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&q=80',
+          coords: [19.0680, 72.8220],
+          dishes: [
+            { id: 'm3', title: 'Jumbo Chicken Garlic Shawarma', price: 249, veg: false },
+            { id: 'm4', title: 'Loaded Cheese Fries', price: 180, veg: true }
+          ]
+        },
+        {
+          id: 'mum-3',
+          name: 'Lower Parel Biryani Engine',
+          rating: '4.5 ★',
+          cuisines: 'Dum Biryani, Raita, Kebabs',
+          eta: '30-40 mins',
+          satire: 'Platform Fee ₹10',
+          image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80',
+          coords: [18.9950, 72.8300],
+          dishes: [
+            { id: 'm5', title: 'Hyderabadi Dum Chicken Biryani', price: 360, veg: false },
+            { id: 'm6', title: 'Reshmi Malai Kebab (6 pcs)', price: 310, veg: false }
+          ]
+        },
+        {
+          id: 'mum-4',
+          name: 'Colaba Burger Republic',
+          rating: '4.8 ★',
+          cuisines: 'Gourmet Sliders, Shakes',
+          eta: '25-35 mins',
+          satire: 'High Calorie Sin',
+          image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80',
+          coords: [18.9067, 72.8147],
+          dishes: [
+            { id: 'm7', title: 'Truffle Mushroom Swiss Burger', price: 420, veg: true },
+            { id: 'm8', title: 'Nutella Belgian Thick Shake', price: 230, veg: true }
+          ]
+        }
+      ]
+    },
+    delhi: {
+      name: 'Delhi NCR',
+      area: 'Connaught Place / Cyber Hub',
+      center: [28.6304, 77.2177],
+      dest: [28.6328, 77.2197],
+      kitchens: [
+        {
+          id: 'del-1',
+          name: 'Connaught Midnight Darbar',
+          rating: '4.8 ★',
+          cuisines: 'Makhani Gravy, Garlic Naan, Dal',
+          eta: '25-35 mins',
+          satire: 'Pure Dilli Swag',
+          image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&q=80',
+          coords: [28.6320, 77.2180],
+          dishes: [
+            { id: 'd1', title: 'Boneless Butter Chicken & 2 Naans', price: 440, veg: false },
+            { id: 'd2', title: 'Dal Makhani Slow Cooked 24hrs', price: 320, veg: true }
+          ]
+        },
+        {
+          id: 'del-2',
+          name: 'Hauz Khas Momos Garage',
+          rating: '4.6 ★',
+          cuisines: 'Afghani Momos, Kurkure Gravy',
+          eta: '20-30 mins',
+          satire: 'Spicy Red Chutney',
+          image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&q=80',
+          coords: [28.5530, 77.1940],
+          dishes: [
+            { id: 'd3', title: 'Tandoori Afghani Chicken Momos', price: 260, veg: false },
+            { id: 'd4', title: 'Kurkure Paneer Momos with Dip', price: 210, veg: true }
+          ]
+        },
+        {
+          id: 'del-3',
+          name: 'Cyber Hub Roll Corporation',
+          rating: '4.5 ★',
+          cuisines: 'Mutton Seekh, Egg Rolls, Kebabs',
+          eta: '20-25 mins',
+          satire: 'Tech Worker Late Fuel',
+          image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&q=80',
+          coords: [28.4950, 77.0890],
+          dishes: [
+            { id: 'd5', title: 'Double Mutton Seekh Kathi Roll', price: 290, veg: false },
+            { id: 'd6', title: 'Rumali Roti & Galouti Kebab', price: 340, veg: false }
+          ]
+        },
+        {
+          id: 'del-4',
+          name: 'GK-II Midnight Pizza Syndicate',
+          rating: '4.7 ★',
+          cuisines: 'Woodfired Slices, Stuffed Crust',
+          eta: '30-40 mins',
+          satire: 'Late Night Addiction',
+          image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80',
+          coords: [28.5350, 77.2400],
+          dishes: [
+            { id: 'd7', title: 'Spicy Pepperoni & Hot Honey Pizza', price: 470, veg: false },
+            { id: 'd8', title: 'Garlic Parmesan Dough Knots', price: 180, veg: true }
+          ]
+        }
+      ]
+    },
+    hyderabad: {
+      name: 'Hyderabad',
+      area: 'Jubilee Hills, Road No. 36',
+      center: [17.4319, 78.4073],
+      dest: [17.4350, 78.4090],
+      kitchens: [
+        {
+          id: 'hyd-1',
+          name: 'Charminar Zafrani Dum Biryani',
+          rating: '4.9 ★',
+          cuisines: 'Authentic Hyderabadi Dum Biryani',
+          eta: '25-35 mins',
+          satire: 'Nawabi Taste, ₹0 Bill',
+          image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80',
+          coords: [17.3616, 78.4747],
+          dishes: [
+            { id: 'h1', title: 'Special Zafrani Chicken Dum Biryani', price: 360, veg: false },
+            { id: 'h2', title: 'Double Ka Meetha (Royal Dessert)', price: 150, veg: true }
+          ]
+        },
+        {
+          id: 'hyd-2',
+          name: 'Madhapur Arabian Mandi Engine',
+          rating: '4.7 ★',
+          cuisines: 'Arabian Mandi, Juicy Chicken',
+          eta: '30-40 mins',
+          satire: 'Night Rush Active',
+          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80',
+          coords: [17.4483, 78.3915],
+          dishes: [
+            { id: 'h3', title: 'Al Faham Chicken Mandi with Soup', price: 430, veg: false },
+            { id: 'h4', title: 'Crispy Garlic Fish Bites', price: 310, veg: false }
+          ]
+        },
+        {
+          id: 'hyd-3',
+          name: 'Gachibowli Midnight Shawarma Vault',
+          rating: '4.5 ★',
+          cuisines: 'Shawarma, Falafel, Rumali',
+          eta: '15-25 mins',
+          satire: 'Extra Mayo Guaranteed',
+          image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&q=80',
+          coords: [17.4401, 78.3489],
+          dishes: [
+            { id: 'h5', title: 'Rumali Jumbo Chicken Shawarma', price: 230, veg: false },
+            { id: 'h6', title: 'Peri Peri Crispy Chicken Strips', price: 210, veg: false }
+          ]
+        },
+        {
+          id: 'hyd-4',
+          name: 'Banjara Spice Dosa Project',
+          rating: '4.6 ★',
+          cuisines: 'Guntur Karam Dosa, Vada, Upma',
+          eta: '15-20 mins',
+          satire: 'Ghee Podi Fire',
+          image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&q=80',
+          coords: [17.4156, 78.4350],
+          dishes: [
+            { id: 'h7', title: 'Fire Guntur Karam Ghee Dosa', price: 180, veg: true },
+            { id: 'h8', title: 'Cheese Corn Podi Dosa', price: 210, veg: true }
+          ]
+        }
       ]
     }
-  },
-  {
-    id: 2,
-    restaurantId: "meghas",
-    category: "biryani",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: false,
-    title: "Hyderabadi Paneer Dum Biryani",
-    price: 290,
-    cookPrice: 70,
-    eta: "20–25 mins",
-    calories: 650,
-    image: "https://images.unsplash.com/photo-1642821373181-696a54913e9a?auto=format&fit=crop&w=800&q=80",
-    desc: "Fragrant saffron basmati layered with soft tandoori-marinated paneer cubes, caramelized onions, toasted cashews, and fresh mint leaves.",
-    recipe: {
-      prep: "15 mins",
-      cook: "20 mins",
-      ingredients: [
-        "Fresh Malai Paneer - 250g cubed",
-        "Basmati Rice - 1.5 cups",
-        "Thick Yogurt - 1/2 cup",
-        "Biryani Spices, Turmeric, Kashmiri Mirch - 1 tsp each",
-        "Desi Ghee, Roasted Cashews & Kewra Water"
-      ],
-      steps: [
-        "Marinate paneer cubes in spiced yogurt and ginger-garlic paste for 15 minutes.",
-        "Boil basmati rice with bay leaf and cardamom until 75% done.",
-        "Lightly sauté marinated paneer in ghee, layer rice on top.",
-        "Drizzle saffron milk and fried cashews, dum cook for 12 minutes."
-      ]
-    }
-  },
-  {
-    id: 3,
-    restaurantId: "meghas",
-    category: "biryani",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: false,
-    title: "Ambur Royal Mutton Seeraga Samba Biryani",
-    price: 420,
-    cookPrice: 130,
-    eta: "25–30 mins",
-    calories: 890,
-    image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=80",
-    desc: "Authentic Arcot style biryani prepared using fragrant tiny Seeraga Samba short grains and tender succulent mutton cooked in curd and red chilli paste.",
-    recipe: {
-      prep: "20 mins",
-      cook: "35 mins",
-      ingredients: [
-        "Seeraga Samba Tiny Rice - 2 cups",
-        "Tender Goat Mutton - 400g",
-        "Fresh Red Chilli & Garlic Paste - 2 tbsp",
-        "Whisked Curd, Tomatoes & Mint",
-        "Pure Ghee, Cloves & Cinnamon"
-      ],
-      steps: [
-        "Pressure cook mutton with turmeric and garlic for 4 whistles.",
-        "Sauté whole spices, onions, tomatoes, and ground chilli paste in ghee.",
-        "Add cooked mutton broth and washed rice; cook until water is absorbed.",
-        "Dum cook for 15 minutes and fluff gently."
-      ]
-    }
-  },
-  {
-    id: 4,
-    restaurantId: "meghas",
-    category: "biryani",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: false,
-    title: "Kolkata Chicken Biryani with Aloo & Egg",
-    price: 360,
-    cookPrice: 95,
-    eta: "20–25 mins",
-    calories: 740,
-    image: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=800&q=80",
-    desc: "Aromatic Awadhi-style Kolkata biryani infused with meetha ittar, featuring melt-in-mouth slow cooked whole golden potato and boiled egg.",
-    recipe: {
-      prep: "20 mins",
-      cook: "25 mins",
-      ingredients: [
-        "Basmati Rice - 2 cups",
-        "Chicken Pieces - 350g",
-        "Large Potatoes - 2 fried golden",
-        "Boiled Eggs - 2 whole",
-        "Meetha Ittar - 2 drops & Saffron Milk"
-      ],
-      steps: [
-        "Shallow fry parboiled potato halves until crispy and golden.",
-        "Cook spiced chicken, layer with parboiled basmati rice, potatoes, and boiled eggs.",
-        "Sprinkle saffron-ittar milk and dum cook 15 mins on low heat."
-      ]
-    }
-  },
-
-  // Imperial Feast Diner
-  {
-    id: 5,
-    restaurantId: "imperial",
-    category: "north-indian",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: true,
-    title: "Murgh Makhani Butter Chicken & Butter Naan",
-    price: 360,
-    cookPrice: 90,
-    eta: "20–25 mins",
-    calories: 840,
-    image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80",
-    desc: "Smoky tandoori roasted chicken tikka pieces simmered in a velvety buttery tomato-cashew makhani gravy, perfumed with fragrant kasuri methi.",
-    recipe: {
-      prep: "15 mins",
-      cook: "20 mins",
-      ingredients: [
-        "Chicken Thighs - 350g diced",
-        "Tomato Puree - 1.5 cups",
-        "Cashew Nut Paste - 3 tbsp",
-        "Fresh Cream & Butter - 3 tbsp each",
-        "Kasuri Methi & Garam Masala"
-      ],
-      steps: [
-        "Pan-sear spiced chicken in 1 tbsp butter for 5 mins until charred.",
-        "Simmer tomato puree and ginger-garlic paste in butter for 8 mins.",
-        "Stir in cashew paste, cream, and chicken pieces.",
-        "Simmer 5 mins and finish with crushed kasuri methi."
-      ]
-    }
-  },
-  {
-    id: 6,
-    restaurantId: "imperial",
-    category: "north-indian",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: false,
-    title: "Paneer Tikka Lababdar & Garlic Naan",
-    price: 310,
-    cookPrice: 75,
-    eta: "20–25 mins",
-    calories: 680,
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80",
-    desc: "Char-grilled paneer tikka chunks folded into a luscious, spiced tomato, onion, and grated paneer gravy with hints of green cardamom.",
-    recipe: {
-      prep: "15 mins",
-      cook: "18 mins",
-      ingredients: [
-        "Fresh Paneer - 250g cubed + 50g grated",
-        "Chopped Onions & Tomatoes - 2 each",
-        "Cashew Paste - 2 tbsp",
-        "Fresh Cream & Butter - 2 tbsp each",
-        "Kasuri Methi & Garam Masala"
-      ],
-      steps: [
-        "Lightly grill paneer cubes until golden edges form.",
-        "Cook onion-tomato masala, blend smooth with cashew paste.",
-        "Add grilled paneer, grated paneer, and simmer with cream for 4 mins."
-      ]
-    }
-  },
-  {
-    id: 7,
-    restaurantId: "imperial",
-    category: "north-indian",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: false,
-    title: "Slow-Simmered Dal Makhani with Jeera Rice",
-    price: 260,
-    cookPrice: 50,
-    eta: "15–20 mins",
-    calories: 590,
-    image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
-    desc: "Whole black urad lentils and rajma slow-simmered overnight with fresh churned butter, tomato reduction, and cream for an authentic smoky dhaba flavor.",
-    recipe: {
-      prep: "10 mins",
-      cook: "30 mins",
-      ingredients: [
-        "Black Urad Dal - 1 cup (soaked)",
-        "Rajma - 2 tbsp",
-        "Salted Butter & Cream - 3 tbsp each",
-        "Tomato Puree - 1 cup",
-        "Kashmiri Mirch & Garam Masala"
-      ],
-      steps: [
-        "Pressure cook dal and rajma for 6 whistles until butter soft.",
-        "Cook tomato puree and ginger in butter until oil separates.",
-        "Add dal, mash lightly, and simmer on lowest heat for 20 mins with cream."
-      ]
-    }
-  },
-  {
-    id: 8,
-    restaurantId: "imperial",
-    category: "north-indian",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: false,
-    title: "Charcoal Tandoori Chicken Tikka Platter",
-    price: 380,
-    cookPrice: 110,
-    eta: "20–25 mins",
-    calories: 560,
-    image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80",
-    desc: "Succulent boneless chicken chunks marinated in mustard oil, roasted gram flour, hung curd, and Kashmiri spices, roasted to smoky perfection.",
-    recipe: {
-      prep: "20 mins",
-      cook: "15 mins",
-      ingredients: [
-        "Chicken Thighs - 400g cubed",
-        "Hung Curd - 1/2 cup",
-        "Mustard Oil - 2 tbsp",
-        "Roasted Besan - 1 tbsp",
-        "Chaat Masala & Lemon"
-      ],
-      steps: [
-        "Whisk hung curd with smoked mustard oil, besan, and spices.",
-        "Coat chicken chunks and marinate for 30 minutes.",
-        "Grill at 220°C for 14 minutes, basting with butter.",
-        "Dust with chaat masala and fresh lemon juice."
-      ]
-    }
-  },
-
-  // Guntur Andhra Bhavan
-  {
-    id: 9,
-    restaurantId: "guntur",
-    category: "south-indian",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: true,
-    title: "Guntur Fiery Andhra Chilli Chicken",
-    price: 330,
-    cookPrice: 80,
-    eta: "20–25 mins",
-    calories: 610,
-    image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80",
-    desc: "World-famous Bengaluru cult classic. Tender boneless chicken tossed with slit green chillies, garlic, curry leaves, and secret Andhra spices in rich soya reduction.",
-    recipe: {
-      prep: "15 mins",
-      cook: "15 mins",
-      ingredients: [
-        "Boneless Chicken - 350g",
-        "Green Chillies - 12 slit",
-        "Minced Garlic & Curry Leaves - 2 tbsp",
-        "Soy Sauce, Vinegar & Pepper - 1 tbsp each",
-        "Cornflour for crisping"
-      ],
-      steps: [
-        "Toss chicken in cornflour and shallow fry 4 minutes until crisp.",
-        "Sauté garlic, curry leaves, and green chillies until blistered.",
-        "Add chicken and soy reduction; stir fry on high flame for 2 mins."
-      ]
-    }
-  },
-  {
-    id: 10,
-    restaurantId: "guntur",
-    category: "south-indian",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: false,
-    title: "Flaky Malabar Parotta with Chettinad Pepper Chicken",
-    price: 280,
-    cookPrice: 70,
-    eta: "20–25 mins",
-    calories: 760,
-    image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=800&q=80",
-    desc: "Layered crispy Malabar parottas paired with intensely spiced dry-roast chicken, freshly ground Tellicherry black peppercorns, and curry leaves.",
-    recipe: {
-      prep: "15 mins",
-      cook: "20 mins",
-      ingredients: [
-        "Chicken Pieces - 350g",
-        "Coarse Black Pepper - 1.5 tbsp",
-        "Sambar Shallots - 1 cup sliced",
-        "Curry Leaves & Coconut Oil",
-        "Layered Parottas - 2 pcs"
-      ],
-      steps: [
-        "Sauté shallots, curry leaves, and chicken in coconut oil.",
-        "Toss with freshly crushed black peppercorns on high heat.",
-        "Serve hot with toasted flaky parottas."
-      ]
-    }
-  },
-
-  // Central Tiffin Bhavan (Malleshwaram)
-  {
-    id: 11,
-    restaurantId: "ctb",
-    category: "south-indian",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: true,
-    title: "Bangalore Benne Masala Dosa with White Butter",
-    price: 140,
-    cookPrice: 35,
-    eta: "15–20 mins",
-    calories: 460,
-    image: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80",
-    desc: "Legendary crisp golden-brown rice crepe roasted in generous fresh white butter (benne), smeared with spicy red chutney and stuffed with spiced potato bhaji.",
-    recipe: {
-      prep: "10 mins",
-      cook: "10 mins",
-      ingredients: [
-        "Fermented Dosa Batter - 2 cups",
-        "Fresh White Butter - 2 tbsp",
-        "Red Garlic Chutney - 2 tbsp",
-        "Spiced Potato Bhaji - 1 cup",
-        "Fresh Coconut Chutney"
-      ],
-      steps: [
-        "Pour batter on screaming hot tawa and swirl into thick crepe.",
-        "Add generous white butter dollops as it crisps.",
-        "Spread red chutney, add potato bhaji, fold and enjoy!"
-      ]
-    }
-  },
-  {
-    id: 12,
-    restaurantId: "ctb",
-    category: "south-indian",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: false,
-    title: "Ghee Podi Thatte Idli with Crispy Medu Vada",
-    price: 120,
-    cookPrice: 28,
-    eta: "15–20 mins",
-    calories: 420,
-    image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
-    desc: "Two fluffy plate-sized Thatte idlis drenched in hot bubbling desi ghee and spicy gun powder (chutney podi), paired with a crunchy medu vada.",
-    recipe: {
-      prep: "10 mins",
-      cook: "12 mins",
-      ingredients: [
-        "Thatte Idlis - 2 large steamed",
-        "Crispy Medu Vada - 1",
-        "Gun Powder (Chutney Podi) - 2 tbsp",
-        "Desi Cow Ghee - 2 tbsp",
-        "Coconut Chutney"
-      ],
-      steps: [
-        "Steam fresh idlis in wide flat plates.",
-        "Dust liberally with spicy chutney podi.",
-        "Pour hot melted desi ghee directly over the powder and serve."
-      ]
-    }
-  },
-
-  // Snuffles Gourmet Burgers (Indiranagar)
-  {
-    id: 13,
-    restaurantId: "snuffles",
-    category: "burgers-pizza",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: true,
-    title: "All American Cheese Burger with Peri Peri Fries",
-    price: 290,
-    cookPrice: 75,
-    eta: "20–25 mins",
-    calories: 820,
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
-    desc: "Bengaluru's all-time favorite thick juicy grilled patty topped with molten cheddar cheese, caramelized onions, gherkins, and house secret sauce on toasted brioche.",
-    recipe: {
-      prep: "15 mins",
-      cook: "10 mins",
-      ingredients: [
-        "Chicken or Lamb Patty - 180g",
-        "Aged Cheddar Slices - 2 pcs",
-        "Brioche Bun - 1 butter toasted",
-        "Caramelized Onions & Gherkins",
-        "Secret House Burger Sauce"
-      ],
-      steps: [
-        "Sear seasoned patty in cast iron skillet 3.5 mins per side.",
-        "Melt cheddar slices directly on patty under lid.",
-        "Assemble with toasted brioche, house sauce, and onions."
-      ]
-    }
-  },
-  {
-    id: 14,
-    restaurantId: "snuffles",
-    category: "burgers-pizza",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: false,
-    title: "Crispy Peri-Peri Paneer Gourmet Burger",
-    price: 260,
-    cookPrice: 65,
-    eta: "20–25 mins",
-    calories: 690,
-    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80",
-    desc: "Thick slab of fresh cottage cheese coated in spicy crunchy peri-peri crumb, topped with jalapeno cheese sauce and crisp iceberg lettuce on a sesame bun.",
-    recipe: {
-      prep: "15 mins",
-      cook: "8 mins",
-      ingredients: [
-        "Paneer Slab - 150g",
-        "Panko Breadcrumbs & Peri-Peri - 1/2 cup",
-        "Sesame Bun & Spicy Mayo",
-        "Jalapenos & Iceberg Lettuce"
-      ],
-      steps: [
-        "Dip seasoned paneer slab in batter and coat in panko.",
-        "Fry at 190°C for 5 minutes until crispy golden.",
-        "Assemble on toasted sesame bun with spicy mayo and lettuce."
-      ]
-    }
-  },
-
-  // Don Vito's Pizzeria (Koramangala)
-  {
-    id: 15,
-    restaurantId: "donvito",
-    category: "burgers-pizza",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: true,
-    title: "Woodfired Burrata Margherita Sourdough Pizza",
-    price: 450,
-    cookPrice: 110,
-    eta: "25–30 mins",
-    calories: 780,
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-    desc: "Slow-fermented 48-hour sourdough base smeared with San Marzano tomato sauce, fresh buffalo mozzarella, hand-torn creamy burrata, and fresh basil leaves.",
-    recipe: {
-      prep: "20 mins",
-      cook: "10 mins",
-      ingredients: [
-        "Sourdough Dough Ball - 250g",
-        "Tomato Sauce - 1/2 cup",
-        "Fresh Mozzarella - 100g",
-        "Whole Creamy Burrata Ball - 1",
-        "Fresh Basil & Extra Virgin Olive Oil"
-      ],
-      steps: [
-        "Stretch dough hand-stretched on pizza stone.",
-        "Spread tomato sauce and mozzarella; bake 10 mins at 250°C.",
-        "Tear cold creamy burrata over center, top with fresh basil and olive oil."
-      ]
-    }
-  },
-
-  // Great Dragon Wok & Momo Pavilion (MG Road)
-  {
-    id: 16,
-    restaurantId: "dragonwok",
-    category: "chinese",
-    diet: "non-veg",
-    isVeg: false,
-    isBestseller: true,
-    title: "Darjeeling Steamed Chicken Momos with Fiery Dip (8 Pcs)",
-    price: 190,
-    cookPrice: 40,
-    eta: "20–25 mins",
-    calories: 420,
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80",
-    desc: "Thin translucent dumplings packed with juicy minced chicken, ginger, and scallions, served with blistering hot Dalle red chilli chutney.",
-    recipe: {
-      prep: "20 mins",
-      cook: "10 mins",
-      ingredients: [
-        "Minced Chicken - 250g",
-        "Minced Onions & Ginger - 1/2 cup",
-        "Soy Sauce & Sesame Oil - 1 tsp each",
-        "Momo Wrappers - 8 sheets",
-        "Fiery Garlic Chilli Sauce"
-      ],
-      steps: [
-        "Mix seasoned chicken filling and pleat inside thin dough sheets.",
-        "Steam in basket for 9 minutes until translucent.",
-        "Serve hot with spicy garlic chilli chutney."
-      ]
-    }
-  },
-  {
-    id: 17,
-    restaurantId: "dragonwok",
-    category: "chinese",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: false,
-    title: "Crispy Paneer Chilli Dry with Spring Onions",
-    price: 270,
-    cookPrice: 65,
-    eta: "20–25 mins",
-    calories: 540,
-    image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80",
-    desc: "Golden-crusted paneer cubes tossed in high-heat wok with fresh bell peppers, sliced garlic, ginger, dark soy sauce, and fiery green chillies.",
-    recipe: {
-      prep: "10 mins",
-      cook: "10 mins",
-      ingredients: [
-        "Paneer Cubes - 200g fried crisp",
-        "Bell Peppers - 1 cup",
-        "Garlic & Ginger - 2 tbsp",
-        "Soy & Chilli Sauces - 1 tbsp",
-        "Spring Onions"
-      ],
-      steps: [
-        "Flash-fry bell peppers and garlic on high heat.",
-        "Toss with sauces and crisp paneer cubes.",
-        "Garnish with spring onions."
-      ]
-    }
-  },
-
-  // Square House Creamery (Indiranagar)
-  {
-    id: 18,
-    restaurantId: "squarehouse",
-    category: "desserts",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: true,
-    title: "Square House Death By Cocoa (DBC) Sundae",
-    price: 280,
-    cookPrice: 65,
-    eta: "15–20 mins",
-    calories: 720,
-    image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80",
-    desc: "The undisputed emperor of Bengaluru sundaes. Warm dense chocolate brownie cubes crowned with creamy vanilla ice cream, hot fudge sauce, whipped cream, and roasted peanuts.",
-    recipe: {
-      prep: "5 mins",
-      cook: "2 mins",
-      ingredients: [
-        "Chocolate Brownie - 2 squares warm",
-        "Vanilla Ice Cream - 2 scoops",
-        "Hot Chocolate Fudge Sauce - 4 tbsp",
-        "Roasted Peanuts & Whipped Cream",
-        "Cherry on top"
-      ],
-      steps: [
-        "Warm rich brownies for 20 seconds.",
-        "Top with two large scoops of vanilla ice cream.",
-        "Smother in boiling hot fudge sauce, peanuts, and whipped cream."
-      ]
-    }
-  }
-];
-
-// ── Real Leaflet GPS Coordinates (Bengaluru, India) ──────────────────────────
-const HOME_COORDS = [12.9784, 77.6408]; // Indiranagar 100ft Rd
-
-// ── Milestone Badges Config ──────────────────────────────────────────────────
-const BADGES_CONFIG = [
-  { id: "first_defeat", title: "First Defeat", desc: "Defeated your first impulse food craving", icon: "🏆" },
-  { id: "midnight_warrior", title: "Midnight Warrior", desc: "Resisted a late-night craving (11 PM – 4 AM)", icon: "🌙" },
-  { id: "thousand_club", title: "₹1,000 Club", desc: "Saved over ₹1,000 in your Beggy vault", icon: "💰" },
-  { id: "five_thousand_club", title: "₹5,000 Club", desc: "Saved over ₹5,000 in your Beggy vault", icon: "👑" },
-  { id: "streak_3", title: "3-Day Streak", desc: "Kept savings streaks for 3 days in a row", icon: "🔥" },
-  { id: "streak_7", title: "7-Day Streak", desc: "Master of restraint for 7 consecutive days", icon: "⚡" }
-];
-
-// ── Reactive User State & Streaks Engine (F3) ───────────────────────────────
-function loadInitialUserState() {
-  const defaultState = {
-    totalSaved: 0,
-    cravingsDefeated: 0,
-    streak: 1,
-    bestStreak: 1,
-    lastSaveDate: null,
-    history: [],
-    badges: [],
-    lastCraving: null // Caches user's previous craving to reuse on next visit
   };
 
-  try {
-    const raw = localStorage.getItem("beggy_user_state_v2");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        return {
-          totalSaved: typeof parsed.totalSaved === "number" && !isNaN(parsed.totalSaved) && parsed.totalSaved >= 0 ? parsed.totalSaved : 0,
-          cravingsDefeated: typeof parsed.cravingsDefeated === "number" && !isNaN(parsed.cravingsDefeated) && parsed.cravingsDefeated >= 0 ? parsed.cravingsDefeated : 0,
-          streak: typeof parsed.streak === "number" && !isNaN(parsed.streak) && parsed.streak >= 1 ? Math.floor(parsed.streak) : 1,
-          bestStreak: typeof parsed.bestStreak === "number" && !isNaN(parsed.bestStreak) && parsed.bestStreak >= 1 ? Math.floor(parsed.bestStreak) : 1,
-          lastSaveDate: typeof parsed.lastSaveDate === "string" ? parsed.lastSaveDate.slice(0, 50) : null,
-          history: Array.isArray(parsed.history) ? parsed.history.filter(h => h && typeof h === "object").slice(0, 50) : [],
-          badges: Array.isArray(parsed.badges) ? parsed.badges.filter(b => typeof b === "string").slice(0, 20) : [],
-          lastCraving: parsed.lastCraving && typeof parsed.lastCraving === "object" ? parsed.lastCraving : null
-        };
-      }
-    }
-  } catch (e) {
-    console.warn("Could not parse user state:", e);
-  }
-  return defaultState;
-}
+  // ── Global App State ────────────────────────────────────────────────────────
+  let currentCityKey = 'bengaluru';
+  let activeDuel = null; // { from: 'Arun', amount: 340, dish: 'Biryani' }
+  let cart = {}; // dishId -> { item, restaurant, qty }
+  let lastOrderSummary = { amount: 457, dish: 'Midnight Biryani', restaurant: 'Koramangala Club', time: '11:42 PM' };
 
-let userState = loadInitialUserState();
-
-function recordCravingVictory(dishTitle, restaurantName, amount) {
-  const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
-  const hour = today.getHours();
-
-  userState.totalSaved += amount;
-  userState.cravingsDefeated += 1;
-
-  // Cache last craving details to reuse on next visit
-  userState.lastCraving = {
-    dish: dishTitle,
-    restaurant: restaurantName,
-    amount: amount,
-    date: todayStr,
-    timestamp: Date.now()
+  // User Local Storage State: "The Bill You Kept"
+  let userKeptState = {
+    totalKept: 0,
+    streak: 0,
+    lastKeptDate: '',
+    history: []
   };
 
-  // Streak logic
-  if (!userState.lastSaveDate) {
-    userState.streak = 1;
-  } else {
-    const lastDate = new Date(userState.lastSaveDate);
-    const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) {
-      if (userState.streak === 0) userState.streak = 1;
-    } else if (diffDays === 1) {
-      userState.streak += 1;
-    } else {
-      userState.streak = 1;
+  function loadUserKeptState() {
+    try {
+      const raw = localStorage.getItem('beggy_bill_kept');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        userKeptState.totalKept = Number(parsed.totalKept) || 0;
+        userKeptState.streak = Number(parsed.streak) || 0;
+        userKeptState.lastKeptDate = parsed.lastKeptDate || '';
+        userKeptState.history = Array.isArray(parsed.history) ? parsed.history : [];
+      }
+    } catch (e) {
+      console.warn('Could not parse userKeptState', e);
     }
+    updateHeaderBillUI();
   }
 
-  if (userState.streak > userState.bestStreak) {
-    userState.bestStreak = userState.streak;
+  function saveUserKeptState() {
+    try {
+      localStorage.setItem('beggy_bill_kept', JSON.stringify(userKeptState));
+    } catch (e) {}
+    updateHeaderBillUI();
   }
-  userState.lastSaveDate = todayStr;
 
-  userState.history.unshift({
-    id: "tx_" + Date.now(),
-    date: today.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
-    dish: dishTitle,
-    restaurant: restaurantName,
-    amount: amount
-  });
-  if (userState.history.length > 50) userState.history.pop();
-
-  // Badges unlock
-  if (!userState.badges.includes("first_defeat")) userState.badges.push("first_defeat");
-  if ((hour >= 23 || hour < 4) && !userState.badges.includes("midnight_warrior")) userState.badges.push("midnight_warrior");
-  if (userState.totalSaved >= 1000 && !userState.badges.includes("thousand_club")) userState.badges.push("thousand_club");
-  if (userState.totalSaved >= 5000 && !userState.badges.includes("five_thousand_club")) userState.badges.push("five_thousand_club");
-  if (userState.streak >= 3 && !userState.badges.includes("streak_3")) userState.badges.push("streak_3");
-  if (userState.streak >= 7 && !userState.badges.includes("streak_7")) userState.badges.push("streak_7");
-
-  saveUserState();
-}
-
-function saveUserState() {
-  try {
-    localStorage.setItem("beggy_user_state_v2", JSON.stringify(userState));
-    localStorage.setItem("beggy_savings_account_bal", userState.totalSaved.toFixed(2));
-  } catch (e) {
-    console.warn("Could not save user state:", e);
+  function updateHeaderBillUI() {
+    const el = document.getElementById('header-saved-val');
+    if (el) el.textContent = `₹${Math.floor(userKeptState.totalKept)}`;
   }
-  updateUserStateUI();
-}
 
-function updateUserStateUI() {
-  if (headerStreakPill) {
-    headerStreakPill.textContent = `🔥 ${userState.streak}d`;
-  }
-  if (saBalanceVal) {
-    saBalanceVal.textContent = `₹${userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-  if (saStreakBadge) {
-    saStreakBadge.textContent = `🔥 ${userState.streak}-Day Save Streak`;
-  }
-  if (saVictoriesCount) {
-    saVictoriesCount.textContent = `${userState.cravingsDefeated} Cravings Defeated`;
-  }
-  if (pbStatTotal) {
-    pbStatTotal.textContent = `₹${userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-  if (pbStatStreak) {
-    pbStatStreak.textContent = `🔥 ${userState.streak} Days`;
-  }
-  if (pbStatBest) {
-    pbStatBest.textContent = `Best: ${userState.bestStreak} Days`;
-  }
-  if (pbStatCravings) {
-    pbStatCravings.textContent = `${userState.cravingsDefeated}`;
-  }
-  if (pbHistoryCount) {
-    pbHistoryCount.textContent = `${userState.history.length} transactions`;
-  }
-}
+  // ── Live Rupee Ticker (Real stats with realistic drifting counter) ───────────
+  let liveTickerBase = 1240580;
 
-// ── FLYING STREAK FIRE ANIMATION (CENTER-TO-HEADER IMPACT) ────────────────────
-function triggerFlyingStreakAnimation(streakCount, isInitial = false) {
-  const count = streakCount || (userState && userState.streak) || 1;
-  const targetPill = document.getElementById("header-streak-pill");
+  function initLiveTicker() {
+    const tickerEl = document.getElementById('live-hero-ticker');
+    if (!tickerEl) return;
 
-  // Prevent multiple overlapping flying flames
-  const existing = document.querySelector(".flying-streak-flame");
-  if (existing) existing.remove();
+    // Attempt to fetch from real API backend
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.ok && typeof d.totalSaved === 'number' && d.totalSaved > 0) {
+          liveTickerBase = 1240580 + d.totalSaved;
+        }
+        renderTickerNumber(liveTickerBase);
+      })
+      .catch(() => {
+        renderTickerNumber(liveTickerBase);
+      });
 
-  const badgeText = isInitial ? "🔥 1-DAY STREAK STARTED!" : "🔥 STREAK EXTENDED!";
-  const subText = isInitial ? "Daily Willpower Streak Activated" : `${count}-Day Willpower Streak • Tap to Flex`;
+    // Gentle live drift: increment by ₹280-₹640 every 4-7 seconds
+    setInterval(() => {
+      const inc = Math.floor(Math.random() * 360) + 240;
+      liveTickerBase += inc;
+      renderTickerNumber(liveTickerBase);
+    }, 4500);
+  }
 
-  // Create flying flame element
-  const flame = document.createElement("div");
-  flame.className = "flying-streak-flame";
-  flame.innerHTML = `
-    <div class="fsf-aura"></div>
-    <div class="fsf-emoji">🔥</div>
-    <div class="fsf-badge">${badgeText}</div>
-    <div class="fsf-sub">${subText}</div>
-  `;
-  document.body.appendChild(flame);
+  function renderTickerNumber(num) {
+    const tickerEl = document.getElementById('live-hero-ticker');
+    if (!tickerEl) return;
+    tickerEl.textContent = Number(num).toLocaleString('en-IN');
+  }
 
-  // Play bank chime for auditory dopamine
-  try { playBankChime(); } catch (e) {}
+  // ── URL Duel Parser (?c=340&dish=Biryani&from=Arun) ──────────────────────────
+  function parseUrlDuel() {
+    const params = new URLSearchParams(window.location.search);
+    const c = params.get('c');
+    const dish = params.get('dish');
+    const from = params.get('from');
 
-  // Initial center entrance pop
-  flame.style.transform = "translate(-50%, -50%) scale(0.2)";
-  flame.style.opacity = "0";
-  flame.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease";
+    if (c && !isNaN(parseFloat(c))) {
+      const amount = Math.min(Math.max(Math.round(parseFloat(c)), 10), 50000);
+      const challenger = (from || 'A friend').slice(0, 30);
+      const food = (dish || 'biryani').slice(0, 40);
 
-  // Force reflow
-  flame.offsetHeight;
-  flame.style.transform = "translate(-50%, -50%) scale(1)";
-  flame.style.opacity = "1";
+      activeDuel = { from: challenger, amount, dish: food };
 
-  // After 900ms celebration at center, fly to header streak pill
-  setTimeout(() => {
-    if (!targetPill) {
-      flame.remove();
-      return;
+      // Render Duel Screen
+      const duelScreen = document.getElementById('duel-screen');
+      const heroSection = document.getElementById('hero-ticker-section');
+      const nameEl = document.getElementById('duel-sender-name');
+      const dishEl = document.getElementById('duel-dish-name');
+      const amtEl = document.getElementById('duel-saved-amount');
+      const btnAmtEl = document.getElementById('duel-btn-amt');
+
+      if (nameEl) nameEl.textContent = challenger;
+      if (dishEl) dishEl.textContent = food;
+      if (amtEl) amtEl.textContent = `₹${amount}`;
+      if (btnAmtEl) btnAmtEl.textContent = `₹${amount}`;
+
+      if (duelScreen) duelScreen.style.display = 'flex';
+      if (heroSection) heroSection.style.display = 'none';
+      return true;
     }
+    return false;
+  }
 
-    const flameRect = flame.getBoundingClientRect();
-    const targetRect = targetPill.getBoundingClientRect();
+  // ── City Switcher ───────────────────────────────────────────────────────────
+  function initCitySwitcher() {
+    const btn = document.getElementById('city-selector-btn');
+    const dropdown = document.getElementById('city-dropdown');
+    const label = document.getElementById('current-city-label');
+    const cityTitle = document.getElementById('kitchens-city-title');
 
-    // Distance calculation from flame center to target pill center
-    const flameCenterX = flameRect.left + flameRect.width / 2;
-    const flameCenterY = flameRect.top + flameRect.height / 2;
-    const targetCenterX = targetRect.left + targetRect.width / 2;
-    const targetCenterY = targetRect.top + targetRect.height / 2;
+    if (!btn || !dropdown) return;
 
-    const dx = targetCenterX - flameCenterX;
-    const dy = targetCenterY - flameCenterY;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = dropdown.style.display === 'block';
+      dropdown.style.display = open ? 'none' : 'block';
+      btn.setAttribute('aria-expanded', !open);
+    });
 
-    // Smooth bezier curve flight directly to the streak spot
-    flame.style.transition = "transform 0.75s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.75s ease-in";
-    flame.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.25)`;
-    flame.style.opacity = "0.2";
+    document.addEventListener('click', () => {
+      dropdown.style.display = 'none';
+      btn.setAttribute('aria-expanded', 'false');
+    });
 
-    // On impact at header streak pill
-    setTimeout(() => {
-      flame.remove();
-      targetPill.classList.remove("streak-pill-ignite");
-      // Force reflow for re-triggering animation
-      targetPill.offsetHeight;
-      targetPill.classList.add("streak-pill-ignite");
-      targetPill.textContent = `🔥 ${count}d`;
+    dropdown.querySelectorAll('.city-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const city = opt.getAttribute('data-city');
+        if (CITIES[city]) {
+          currentCityKey = city;
+          dropdown.querySelectorAll('.city-option').forEach(o => o.classList.remove('active'));
+          opt.classList.add('active');
 
-      // Remove class after animation finishes
-      setTimeout(() => {
-        targetPill.classList.remove("streak-pill-ignite");
-      }, 1000);
-    }, 750);
-  }, 950);
-}
+          if (label) label.textContent = CITIES[city].name;
+          if (cityTitle) cityTitle.textContent = CITIES[city].name;
 
-// ── LIVE ACTIVE VISITORS / SAVERS SOCIAL PROOF (Starting at 1,000+) ───────────
-function setupLiveVisitorsCounter() {
-  const countEl = document.getElementById("lvp-count");
-  if (!countEl) return;
+          const locInfo = document.getElementById('cart-location-info');
+          if (locInfo) locInfo.textContent = `Delivering to: ${CITIES[city].area} • ~11 mins`;
 
-  // Realistic baseline starting above 1,000 with subtle organic variance
-  let currentCount = 1042 + Math.floor(Math.random() * 16);
-  countEl.textContent = currentCount.toLocaleString('en-IN');
-
-  // Subtle organic fluctuation every 14 seconds (±1 to ±2 savers online)
-  setInterval(() => {
-    const delta = Math.floor(Math.random() * 5) - 2; // -2 to +2
-    currentCount = Math.max(1015, Math.min(1098, currentCount + delta));
-    countEl.textContent = currentCount.toLocaleString('en-IN');
-  }, 14000);
-}
-
-// ── Application State ────────────────────────────────────────────────────────
-const state = {
-  currentView: "restaurants",
-  discoveryMode: "browse", // "browse" or "quick"
-  activeRestaurant: RESTAURANTS_DATA[0],
-  activeCuisine: "all",
-  activeDiet: "all",
-  cart: [],
-  paymentMethod: "gpay",
-  userState: userState,
-  lastOrderSaved: 340.00,
-  activeRecipeDish: DISHES_CATALOG[0],
-  activeChallenge: null
-};
-
-// ── DOM References ───────────────────────────────────────────────────────────
-// Views
-const viewRestaurants = document.getElementById("view-restaurants");
-const viewMenu = document.getElementById("view-menu");
-const viewPayment = document.getElementById("view-payment");
-const viewTracking = document.getElementById("view-tracking");
-
-// Header elements
-const navBrandHome = document.getElementById("nav-brand-home");
-const navHomeBtn = document.getElementById("nav-home-btn");
-const passbookTriggerBtn = document.getElementById("passbook-trigger-btn");
-const headerStreakPill = document.getElementById("header-streak-pill");
-const foodSearch = document.getElementById("food-search");
-const clearSearch = document.getElementById("clear-search");
-const cartTriggerBtn = document.getElementById("cart-trigger-btn");
-const cartCountBadge = document.getElementById("cart-count");
-
-// Discovery Mode Elements
-const friendChallengeBanner = document.getElementById("friend-challenge-banner");
-const fcbTitle = document.getElementById("fcb-title");
-const fcbDesc = document.getElementById("fcb-desc");
-const fcbAcceptBtn = document.getElementById("fcb-accept-btn");
-const tabBrowseRestaurants = document.getElementById("tab-browse-restaurants");
-const tabQuickCraving = document.getElementById("tab-quick-craving");
-const browseKitchensPanel = document.getElementById("browse-kitchens-panel");
-const quickCravingPanel = document.getElementById("quick-craving-panel");
-const qcpChipsRow = document.getElementById("qcp-chips-row");
-const qcpCustomForm = document.getElementById("qcp-custom-form");
-const customDishName = document.getElementById("custom-dish-name");
-const customDishPrice = document.getElementById("custom-dish-price");
-const btnCravingAmount = document.getElementById("btn-craving-amount");
-
-// Restaurant view elements
-const cuisinePillsRow = document.getElementById("cuisine-pills-row");
-const restaurantsGrid = document.getElementById("restaurants-grid");
-const restaurantCount = document.getElementById("restaurant-count");
-
-// Menu view elements
-const btnBackToRestaurants = document.getElementById("btn-back-to-restaurants");
-const menuRestName = document.getElementById("menu-rest-name");
-const menuRestCuisines = document.getElementById("menu-rest-cuisines");
-const menuRestAddress = document.getElementById("menu-rest-address");
-const menuRestEta = document.getElementById("menu-rest-eta");
-const menuRestPriceTwo = document.getElementById("menu-rest-price-two");
-const menuRestRating = document.getElementById("menu-rest-rating");
-const dishesListContainer = document.getElementById("dishes-list-container");
-const menuItemsCount = document.getElementById("menu-items-count");
-const floatingCartBar = document.getElementById("floating-cart-bar");
-const fcCount = document.getElementById("fc-count");
-const fcTotal = document.getElementById("fc-total");
-const fcProceedBtn = document.getElementById("fc-proceed-btn");
-
-// Payment view elements
-const btnBackToMenu = document.getElementById("btn-back-to-menu");
-const checkoutRestaurantName = document.getElementById("checkout-restaurant-name");
-const checkoutItemsList = document.getElementById("checkout-items-list");
-const billItemTotal = document.getElementById("bill-item-total");
-const billToPay = document.getElementById("bill-to-pay");
-const btnPayAndPlaceOrder = document.getElementById("btn-pay-and-place-order");
-
-// Tracking view elements
-const trackingStatusTitle = document.getElementById("tracking-status-title");
-const trackingStatusDesc = document.getElementById("tracking-status-desc");
-const trackingEtaPill = document.getElementById("tracking-eta-pill");
-const trackingOrderId = document.getElementById("tracking-order-id");
-const btnSimulateArrival = document.getElementById("btn-simulate-arrival");
-const mapKitchenLabel = document.getElementById("map-kitchen-label");
-const mapPartnerDistance = document.getElementById("map-partner-distance");
-
-// Dopamine Reveal elements
-const dopamineRevealCard = document.getElementById("dopamine-reveal-card");
-const dopamineJoke = document.getElementById("dopamine-joke");
-const challengeResultCard = document.getElementById("challenge-result-card");
-const crcTitle = document.getElementById("crc-title");
-const crcDesc = document.getElementById("crc-desc");
-const revealSavedAmount = document.getElementById("reveal-saved-amount");
-const btnRealSave = document.getElementById("btn-real-save");
-const rsAmountVal = document.getElementById("rs-amount-val");
-const saBalanceVal = document.getElementById("sa-balance-val");
-const saStreakBadge = document.getElementById("sa-streak-badge");
-const saVictoriesCount = document.getElementById("sa-victories-count");
-const crDishTitle = document.getElementById("cr-dish-title");
-const crDishSub = document.getElementById("cr-dish-sub");
-const crPrepTime = document.getElementById("cr-prep-time");
-const crCookTime = document.getElementById("cr-cook-time");
-const crHomeCost = document.getElementById("cr-home-cost");
-const crIngList = document.getElementById("cr-ing-list");
-const crStepsList = document.getElementById("cr-steps-list");
-const btnOrderAgain = document.getElementById("btn-order-again");
-
-// Share Card Generator Elements (F2)
-const shareCardCanvas = document.getElementById("share-card-canvas");
-const btnScShare = document.getElementById("btn-sc-share");
-const btnScDownload = document.getElementById("btn-sc-download");
-const btnScCopy = document.getElementById("btn-sc-copy");
-const btnScChallenge = document.getElementById("btn-sc-challenge");
-const scToastMsg = document.getElementById("sc-toast-msg");
-
-// Passbook Modal Elements (F3)
-const passbookModal = document.getElementById("passbook-modal");
-const passbookBackdrop = document.getElementById("passbook-backdrop");
-const pbCloseBtn = document.getElementById("pb-close-btn");
-const pbStatTotal = document.getElementById("pb-stat-total");
-const pbStatStreak = document.getElementById("pb-stat-streak");
-const pbStatBest = document.getElementById("pb-stat-best");
-const pbStatCravings = document.getElementById("pb-stat-cravings");
-const pbBadgesGrid = document.getElementById("pb-badges-grid");
-const pbHistoryList = document.getElementById("pb-history-list");
-const pbHistoryCount = document.getElementById("pb-history-count");
-const pbBtnReset = document.getElementById("pb-btn-reset");
-const pbBtnDone = document.getElementById("pb-btn-done");
-
-// Instant UPI Tip Module Elements ("Chai for Beggy")
-const beggyTipCard = document.getElementById("beggy-tip-card");
-const btcSavedVal = document.getElementById("btc-saved-val");
-const btcPillsRow = document.getElementById("btc-pills-row");
-const btcCustomToggle = document.getElementById("btc-custom-toggle");
-const btcCustomWrap = document.getElementById("btc-custom-wrap");
-const btcCustomInput = document.getElementById("btc-custom-input");
-const btcCustomApplyBtn = document.getElementById("btc-custom-apply-btn");
-const btcPayBtn = document.getElementById("btc-pay-btn");
-const btcPayMainText = document.getElementById("btc-pay-main-text");
-const btcQrImg = document.getElementById("btc-qr-img");
-const btcUpiIdVal = document.getElementById("btc-upi-id-val");
-const btcCopyBtn = document.getElementById("btc-copy-btn");
-const btcCopyBtnText = document.getElementById("btc-copy-btn-text");
-const pbTipBanner = document.getElementById("pb-tip-banner");
-const pbTipBtn = document.getElementById("pb-tip-btn");
-
-// Cart Drawer elements
-const cartDrawer = document.getElementById("cart-drawer");
-const cartBackdrop = document.getElementById("cart-backdrop");
-const closeCartBtn = document.getElementById("close-cart-btn");
-const cartItemsContainer = document.getElementById("cart-items-container");
-const drawerSubtotal = document.getElementById("drawer-subtotal");
-const drawerTotal = document.getElementById("drawer-total");
-const drawerCheckoutBtn = document.getElementById("drawer-checkout-btn");
-
-// Bank SMS Toast
-const bankSmsToast = document.getElementById("bank-sms-toast");
-const smsAmount = document.getElementById("sms-amount");
-const smsMessage = document.getElementById("sms-message");
-const smsCloseBtn = document.getElementById("sms-close-btn");
-
-// Confetti Canvas
-const confettiCanvas = document.getElementById("confetti-canvas");
-const ctx = confettiCanvas ? confettiCanvas.getContext("2d") : null;
-
-// ── Confetti Physics Engine ──────────────────────────────────────────────────
-let confettiParticles = [];
-function resizeConfetti() {
-  if (!confettiCanvas) return;
-  confettiCanvas.width = window.innerWidth;
-  confettiCanvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resizeConfetti);
-resizeConfetti();
-
-function triggerConfetti() {
-  if (!confettiCanvas || !ctx) return;
-  confettiParticles = [];
-  const colors = ["#FF5200", "#10B981", "#F59E0B", "#38BDF8", "#EC4899", "#FFFFFF", "#60B244"];
-  for (let i = 0; i < 180; i++) {
-    confettiParticles.push({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      vx: (Math.random() - 0.5) * 22,
-      vy: (Math.random() - 0.8) * 26,
-      size: Math.random() * 8 + 5,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      rotation: Math.random() * 360,
-      vRot: (Math.random() - 0.5) * 10,
-      opacity: 1
+          renderKitchens();
+        }
+      });
     });
   }
-  animateConfetti();
-}
 
-function animateConfetti() {
-  if (!ctx || !confettiCanvas) return;
-  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  confettiParticles.forEach((p, index) => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.45;
-    p.vx *= 0.98;
-    p.rotation += p.vRot;
-    p.opacity -= 0.007;
-
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate((p.rotation * Math.PI) / 180);
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = Math.max(p.opacity, 0);
-    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
-    ctx.restore();
-
-    if (p.opacity <= 0) confettiParticles.splice(index, 1);
-  });
-
-  if (confettiParticles.length > 0) {
-    requestAnimationFrame(animateConfetti);
-  } else {
-    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  }
-}
-
-// ── Web Audio API Bank Deposit Chime ─────────────────────────────────────────
-function playBankChime() {
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    const audioCtx = new AudioContextClass();
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
-    const now = audioCtx.currentTime;
-
-    // Tone 1: D5 (587.33 Hz)
-    const osc1 = audioCtx.createOscillator();
-    const gain1 = audioCtx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(587.33, now);
-    gain1.gain.setValueAtTime(0, now);
-    gain1.gain.linearRampToValueAtTime(0.3, now + 0.03);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-    osc1.connect(gain1);
-    gain1.connect(audioCtx.destination);
-    osc1.start(now);
-    osc1.stop(now + 0.35);
-
-    // Tone 2: A5 (880.00 Hz)
-    const osc2 = audioCtx.createOscillator();
-    const gain2 = audioCtx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(880.00, now + 0.16);
-    gain2.gain.setValueAtTime(0, now + 0.16);
-    gain2.gain.linearRampToValueAtTime(0.35, now + 0.20);
-    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.90);
-    osc2.connect(gain2);
-    gain2.connect(audioCtx.destination);
-    osc2.start(now + 0.16);
-    osc2.stop(now + 0.90);
-  } catch (err) {
-    console.warn("Audio chime error:", err);
-  }
-}
-
-// ── Multi-Stage View Switcher ────────────────────────────────────────────────
-function switchView(viewName) {
-  state.currentView = viewName;
-  const views = [viewRestaurants, viewMenu, viewPayment, viewTracking];
-  views.forEach(v => {
-    if (v) {
-      v.style.display = "none";
-      v.classList.remove("active");
-    }
-  });
-
-  let targetView = viewRestaurants;
-  if (viewName === "menu") targetView = viewMenu;
-  else if (viewName === "payment") targetView = viewPayment;
-  else if (viewName === "tracking") targetView = viewTracking;
-
-  if (targetView) {
-    targetView.style.display = "block";
-    targetView.classList.add("active");
-  }
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  if (viewName === "tracking") {
-    setTimeout(() => {
-      initLeafletMap();
-      if (map) map.invalidateSize();
-    }, 200);
-  }
-
-  // Refresh floating cart bar visibility across views
-  try { updateFloatingCartBar(); } catch (e) {}
-
-  // Sync mobile sticky pay bar amount when entering payment view
-  if (viewName === "payment") {
-    const mspToPay = document.getElementById("msp-to-pay");
-    const billToPay = document.getElementById("bill-to-pay");
-    if (mspToPay && billToPay) mspToPay.textContent = billToPay.textContent;
-  }
-}
-
-// ── STAGE 1: Render Restaurants ──────────────────────────────────────────────
-function renderRestaurants() {
-  if (!restaurantsGrid) return;
-
-  const filtered = RESTAURANTS_DATA.filter(r => {
-    if (state.activeCuisine === "all") return true;
-    return r.cuisines.toLowerCase().includes(state.activeCuisine.toLowerCase());
-  });
-
-  restaurantCount.textContent = `${filtered.length} kitchens open now in Bengaluru`;
-
-  restaurantsGrid.innerHTML = filtered.map(r => `
-    <article class="restaurant-card" data-rest-id="${r.id}">
-      <div class="rest-card-img-wrap">
-        <img src="${r.image}" alt="${r.name}" class="rest-card-img" loading="lazy" />
-        <span class="rest-discount-badge">${r.discount}</span>
-      </div>
-      <div class="rest-card-body">
-        <h3 class="rest-card-title">${r.name}</h3>
-        <div class="rest-card-meta">
-          <span class="rest-rating-pill">★ ${r.rating}</span>
-          <span class="rest-eta">⚡ ${r.eta}</span>
-          <span style="color: var(--text-muted);">•</span>
-          <span style="font-weight:700; color:var(--text-700);">${r.priceTwo}</span>
-        </div>
-        <p class="rest-card-cuisines">${r.cuisines}</p>
-        <p class="rest-card-loc">📍 ${r.address} • ${r.distanceKm} km</p>
-      </div>
-    </article>
-  `).join('');
-}
-
-function openRestaurant(restId) {
-  const rest = RESTAURANTS_DATA.find(r => r.id === restId);
-  if (!rest) return;
-
-  state.activeRestaurant = rest;
-  menuRestName.textContent = rest.name;
-  menuRestCuisines.textContent = rest.cuisines;
-  menuRestAddress.textContent = `${rest.address} • ${rest.distanceKm} km away`;
-  menuRestEta.textContent = `⚡ ${rest.eta}`;
-  menuRestPriceTwo.textContent = rest.priceTwo;
-  menuRestRating.textContent = `★ ${rest.rating}`;
-
-  renderRestaurantDishes(rest.id);
-  switchView("menu");
-  updateFloatingCartBar();
-}
-
-// ── STAGE 2: Render Dishes for Selected Restaurant ───────────────────────────
-function renderRestaurantDishes(restId) {
-  if (!dishesListContainer) return;
-
-  let dishes = DISHES_CATALOG.filter(d => d.restaurantId === restId);
-
-  if (state.activeDiet === "veg") {
-    dishes = dishes.filter(d => d.isVeg);
-  } else if (state.activeDiet === "non-veg") {
-    dishes = dishes.filter(d => !d.isVeg);
-  } else if (state.activeDiet === "bestseller") {
-    dishes = dishes.filter(d => d.isBestseller);
-  }
-
-  menuItemsCount.textContent = `Showing ${dishes.length} dishes`;
-
-  dishesListContainer.innerHTML = dishes.map(dish => `
-    <article class="dish-card" data-dish-id="${dish.id}">
-      <div class="dish-img-wrap">
-        <img src="${dish.image}" alt="${dish.title}" class="dish-img" loading="lazy" />
-        <div class="${dish.isVeg ? 'veg-badge' : 'nonveg-badge'}">
-          <span class="${dish.isVeg ? 'veg-icon' : 'nonveg-icon'}"></span>
-        </div>
-        <span class="dish-eta-badge">⚡ ${dish.eta}</span>
-      </div>
-      <div class="add-btn-wrap">
-        <button class="add-btn" data-add-dish="${dish.id}">+ ADD</button>
-      </div>
-      <div class="dish-card-body">
-        <h3 class="dish-title">${dish.title}</h3>
-        <p class="dish-desc">${dish.desc}</p>
-        <div class="dish-price-row">
-          <span class="dish-price">₹${dish.price}</span>
-          <span class="dish-cal">${dish.calories} kcal</span>
-        </div>
-      </div>
-    </article>
-  `).join('');
-}
-
-// ── Cart & Quantity Operations ───────────────────────────────────────────────
-function addToCart(dishId) {
-  const dish = DISHES_CATALOG.find(d => d.id === dishId);
-  if (!dish) return;
-
-  const existing = state.cart.find(c => c.id === dishId);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    state.cart.push({ ...dish, qty: 1 });
-  }
-
-  updateCartUI();
-  updateFloatingCartBar();
-}
-
-function updateCartQty(dishId, delta) {
-  const item = state.cart.find(c => c.id === dishId);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) {
-    state.cart = state.cart.filter(c => c.id !== dishId);
-  }
-  updateCartUI();
-  updateFloatingCartBar();
-}
-window.updateCartQty = updateCartQty;
-
-function updateCartUI() {
-  const totalCount = state.cart.reduce((sum, i) => sum + i.qty, 0);
-  cartCountBadge.textContent = totalCount.toString();
-
-  if (state.cart.length === 0) {
-    cartItemsContainer.innerHTML = `
-      <div class="empty-cart-state">
-        <span class="empty-icon">🍛</span>
-        <p>Your cart is empty</p>
-        <p class="empty-sub">Select dishes from your favorite Bengaluru kitchens to start your order.</p>
-      </div>
-    `;
-    drawerSubtotal.textContent = "₹0.00";
-    drawerTotal.textContent = "₹0.00";
-    drawerCheckoutBtn.disabled = true;
-    return;
-  }
-
-  const subtotal = state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-  drawerSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
-  drawerTotal.textContent = "₹0.00"; // Free via BEGGY100
-  drawerCheckoutBtn.disabled = false;
-
-  cartItemsContainer.innerHTML = state.cart.map(item => `
-    <div class="cart-item-row">
-      <div class="cart-item-info">
-        <strong>${escapeHtml(item.title)}</strong>
-        <span>₹${item.price} each</span>
-      </div>
-      <div class="cart-qty-ctrl">
-        <button class="qty-btn" onclick="updateCartQty(${parseInt(item.id, 10)}, -1)">−</button>
-        <span style="font-size:0.88rem; font-weight:700;">${item.qty}</span>
-        <button class="qty-btn" onclick="updateCartQty(${parseInt(item.id, 10)}, 1)">+</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function updateFloatingCartBar() {
-  if (!floatingCartBar) return;
-  if (state.cart.length === 0 || (state.currentView !== "restaurants" && state.currentView !== "menu")) {
-    floatingCartBar.style.display = "none";
-    return;
-  }
-
-  const totalCount = state.cart.reduce((sum, i) => sum + i.qty, 0);
-  const subtotal = state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-  if (fcCount) fcCount.textContent = `${totalCount} ${totalCount === 1 ? 'Item' : 'Items'}`;
-  if (fcTotal) fcTotal.textContent = `₹${subtotal.toFixed(2)}`;
-  floatingCartBar.style.display = "flex";
-}
-
-function openCartDrawer() {
-  cartDrawer.classList.add("open");
-  cartBackdrop.classList.add("open");
-}
-
-function closeCartDrawer() {
-  cartDrawer.classList.remove("open");
-  cartBackdrop.classList.remove("open");
-}
-
-// ── STAGE 3: Checkout & UPI Payment Screen ───────────────────────────────────
-function proceedToPayment() {
-  closeCartDrawer();
-  if (state.cart.length === 0) return;
-
-  const subtotal = state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-  state.lastOrderSaved = subtotal;
-
-  checkoutRestaurantName.textContent = (state.activeRestaurant && state.activeRestaurant.name) || "Megha's Dum Darbar";
-  billItemTotal.textContent = `₹${subtotal.toFixed(2)}`;
-  billToPay.textContent = "₹0.00"; // BEGGY100 auto-applied
-
-  const mspToPay = document.getElementById("msp-to-pay");
-  if (mspToPay) mspToPay.textContent = "₹0.00";
-
-  checkoutItemsList.innerHTML = state.cart.map(item => `
-    <div class="checkout-item-line">
-      <span>${item.qty} × ${escapeHtml(item.title)}</span>
-      <strong>₹${(item.price * item.qty).toFixed(2)}</strong>
-    </div>
-  `).join('');
-
-  btnPayAndPlaceOrder.querySelector(".pay-btn-main").textContent = `Pay ₹0.00 & Place Order 🚀`;
-  switchView("payment");
-}
-
-function handlePlaceOrder() {
-  if (state.cart.length === 0) return;
-
-  const mspPayBtn = document.getElementById("msp-pay-btn");
-  if (mspPayBtn) {
-    mspPayBtn.disabled = true;
-    mspPayBtn.innerHTML = "<span>Processing UPI Payment...</span>";
-  }
-
-  btnPayAndPlaceOrder.disabled = true;
-  btnPayAndPlaceOrder.querySelector(".pay-btn-main").textContent = "Processing UPI Payment...";
-  btnPayAndPlaceOrder.querySelector(".pay-btn-sub").textContent = "Connecting to bank gateway...";
-
-  // Save the primary dish for the recipe
-  state.activeRecipeDish = state.cart[0];
-
-  // Transition to Live Tracking Screen after realistic brief delay
-  setTimeout(() => {
-    btnPayAndPlaceOrder.disabled = false;
-    btnPayAndPlaceOrder.querySelector(".pay-btn-main").textContent = "Pay ₹0.00 & Place Order 🚀";
-    btnPayAndPlaceOrder.querySelector(".pay-btn-sub").textContent = "Authentic 20-min express delivery in Bengaluru";
-
-    if (mspPayBtn) {
-      mspPayBtn.disabled = false;
-      mspPayBtn.innerHTML = "<span>Pay &amp; Place Order 🚀</span>";
-    }
-
-    // Clear cart
-    state.cart = [];
-    updateCartUI();
-    updateFloatingCartBar();
-
-    // Switch to Tracking
-    switchView("tracking");
-    startLiveTracking();
-  }, 1200);
-}
-
-// ── STAGE 4: Live GPS Delivery Tracking ──────────────────────────────────────
-let map = null;
-let homeMarker = null;
-let kitchenMarker = null;
-let courierMarker = null;
-let routePolyline = null;
-let courierTimer = null;
-
-// ── Free Real Street Routing API (OSRM) & Navigation Map Helpers ───────────────
-async function fetchOsrmRoute(startCoords, endCoords) {
-  // OSRM expects [lng, lat]
-  const url = `https://router.project-osrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson`;
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const resp = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!resp.ok) throw new Error("OSRM status " + resp.status);
-    const data = await resp.json();
-    if (data.routes && data.routes.length > 0 && data.routes[0].geometry) {
-      // GeoJSON coordinates are [lng, lat], Leaflet expects [lat, lng]
-      return data.routes[0].geometry.coordinates.map(pt => [pt[1], pt[0]]);
-    }
-  } catch (err) {
-    console.warn("OSRM routing fallback:", err);
-  }
-  return null;
-}
-
-function getPointAlongPolyline(points, fraction) {
-  if (!points || points.length === 0) return null;
-  if (points.length === 1 || fraction <= 0) return points[0];
-  if (fraction >= 1) return points[points.length - 1];
-
-  const distances = [0];
-  let totalDist = 0;
-  for (let i = 0; i < points.length - 1; i++) {
-    const dLat = points[i + 1][0] - points[i][0];
-    const dLng = points[i + 1][1] - points[i][1];
-    const d = Math.sqrt(dLat * dLat + dLng * dLng);
-    totalDist += d;
-    distances.push(totalDist);
-  }
-
-  if (totalDist === 0) return points[0];
-  const targetDist = fraction * totalDist;
-
-  for (let i = 0; i < distances.length - 1; i++) {
-    if (targetDist >= distances[i] && targetDist <= distances[i + 1]) {
-      const segDist = distances[i + 1] - distances[i];
-      const segFraction = segDist > 0 ? (targetDist - distances[i]) / segDist : 0;
-      const lat = points[i][0] + (points[i + 1][0] - points[i][0]) * segFraction;
-      const lng = points[i][1] + (points[i + 1][1] - points[i][1]) * segFraction;
-      return [lat, lng];
-    }
-  }
-  return points[points.length - 1];
-}
-
-function initLeafletMap() {
-  if (typeof L === 'undefined') return;
-
-  const mapContainer = document.getElementById('real-leaflet-map');
-  if (!mapContainer) return;
-
-  if (map) {
-    map.remove();
-    map = null;
-  }
-
-  // Create Leaflet map centered at Bengaluru Home
-  map = L.map('real-leaflet-map', {
-    center: HOME_COORDS,
-    zoom: 14,
-    zoomControl: true,
-    scrollWheelZoom: false,
-    dragging: !L.Browser.mobile,
-    tap: true
-  });
-
-  // Clean, High-Contrast Bengaluru Street Navigation Tiles (Esri World Street Map: 100% Free, No Watermarks)
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '&copy; Esri, OpenStreetMap contributors',
-    maxZoom: 18
-  }).addTo(map);
-
-  // Home Delivery Marker with pulsing radar ring
-  const homeIcon = L.divIcon({
-    className: 'custom-leaflet-pin',
-    html: `
-      <div style="position:relative;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;width:34px;height:34px;background:rgba(16,185,129,0.25);border:2px solid #10B981;border-radius:50%;animation:pulsePin 1.8s infinite;"></div>
-        <div style="width:18px;height:18px;background:#10B981;border:3px solid #FFFFFF;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);position:relative;z-index:2;"></div>
-      </div>
-    `,
-    iconSize: [34, 34],
-    iconAnchor: [17, 17]
-  });
-
-  homeMarker = L.marker(HOME_COORDS, { icon: homeIcon })
-    .addTo(map)
-    .bindPopup('<strong>📍 Delivery Location</strong><br>Indiranagar 100ft Road, HAL 2nd Stage, Bengaluru');
-}
-
-function startLiveTracking() {
-  const r = state.activeRestaurant;
-  mapKitchenLabel.textContent = r.name;
-  mapPartnerDistance.textContent = `${r.distanceKm} km away from your Indiranagar location`;
-  trackingOrderId.textContent = `Order #BG-${Math.floor(1000 + Math.random() * 9000)}`;
-  trackingEtaPill.textContent = "ETA: ~18 mins";
-
-  // Hide any previous dopamine reveal card
-  dopamineRevealCard.style.display = "none";
-
-  // Reset Stepper
-  document.getElementById("step-node-1").className = "step-node completed";
-  document.getElementById("step-line-1").className = "step-line completed";
-  document.getElementById("step-node-2").className = "step-node active";
-  document.getElementById("step-line-2").className = "step-line";
-  document.getElementById("step-node-3").className = "step-node";
-  document.getElementById("step-line-3").className = "step-line";
-  document.getElementById("step-node-4").className = "step-node";
-
-  trackingStatusTitle.textContent = "Kitchen Preparing Your Order";
-  trackingStatusDesc.textContent = `${r.name} is cooking your fresh dishes. Rider arriving shortly.`;
-
-  setTimeout(() => {
-    setupMapRouteAndScooter(r);
-  }, 400);
-
-  // Auto progression
-  setTimeout(() => {
-    document.getElementById("step-node-2").className = "step-node completed";
-    document.getElementById("step-line-2").className = "step-line completed";
-    document.getElementById("step-node-3").className = "step-node active";
-    trackingStatusTitle.textContent = "Rider On The Way! 🛵";
-    trackingStatusDesc.textContent = "Manjunath picked up your order and is navigating 100ft Road.";
-  }, 3500);
-}
-
-async function setupMapRouteAndScooter(r) {
-  if (!map) initLeafletMap();
-  if (!map) return;
-
-  if (kitchenMarker) map.removeLayer(kitchenMarker);
-  if (courierMarker) map.removeLayer(courierMarker);
-  if (routePolyline) map.removeLayer(routePolyline);
-  if (courierTimer) clearInterval(courierTimer);
-
-  // Kitchen Pin with clean badge
-  const kitchenIcon = L.divIcon({
-    className: 'custom-leaflet-pin',
-    html: `<div style="background:#FFFFFF;border:2px solid #FF5200;border-radius:20px;padding:4px 10px;box-shadow:0 3px 10px rgba(0,0,0,0.18);display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:800;color:#0F172A;white-space:nowrap;">🍳 <span>${r.name}</span></div>`,
-    iconSize: [140, 32],
-    iconAnchor: [70, 16]
-  });
-  kitchenMarker = L.marker(r.coords, { icon: kitchenIcon })
-    .addTo(map)
-    .bindPopup(`<strong>${r.name}</strong><br>${r.address}`);
-
-  // Fetch real road coordinates via OSRM Driving API (100% Free, real street routing)
-  let routePoints = await fetchOsrmRoute(r.coords, HOME_COORDS);
-
-  // Fallback to realistic Bengaluru road waypoints if offline or blocked
-  if (!routePoints || routePoints.length < 2) {
-    const lat1 = r.coords[0], lng1 = r.coords[1];
-    const lat2 = HOME_COORDS[0], lng2 = HOME_COORDS[1];
-    routePoints = [
-      [lat1, lng1],
-      [lat1 + (lat2 - lat1) * 0.25, lng1 + 0.001],
-      [lat1 + (lat2 - lat1) * 0.50, lng1 + (lng2 - lng1) * 0.40],
-      [lat1 + (lat2 - lat1) * 0.75, lng2 - 0.001],
-      [lat2, lng2]
-    ];
-  }
-
-  // Draw vibrant delivery route polyline along real roads
-  routePolyline = L.polyline(routePoints, {
-    color: '#FF5200',
-    weight: 5,
-    opacity: 0.9,
-    dashArray: '8, 8',
-    lineJoin: 'round'
-  }).addTo(map);
-
-  // Fit bounds so both kitchen and home are perfectly visible
-  try {
-    map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
-  } catch (e) {}
-
-  // Animated Scooter Marker with vibrant delivery glow
-  const scooterIcon = L.divIcon({
-    className: 'custom-leaflet-pin scooter-pin',
-    html: `<div style="background:#FF5200;width:42px;height:42px;border-radius:50%;border:3px solid #FFFFFF;box-shadow:0 4px 14px rgba(255,82,0,0.6);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🛵</div>`,
-    iconSize: [44, 44],
-    iconAnchor: [22, 22]
-  });
-  courierMarker = L.marker(routePoints[0], { icon: scooterIcon }).addTo(map);
-
-  // Smooth turn-by-turn waypoint animation along real Bengaluru roads
-  let progress = 0;
-  const totalDurationMs = 12000;
-  const intervalMs = 100;
-  const step = intervalMs / totalDurationMs;
-
-  courierTimer = setInterval(() => {
-    progress += step;
-    if (progress >= 0.98) {
-      clearInterval(courierTimer);
-      triggerOrderArrival();
-      return;
-    }
-
-    const curPos = getPointAlongPolyline(routePoints, progress);
-    if (curPos && courierMarker) {
-      courierMarker.setLatLng(curPos);
-    }
-
-    const remainingMins = Math.max(Math.round((1 - progress) * 18), 1);
-    trackingEtaPill.textContent = `ETA: ~${remainingMins} mins`;
-
-    if (progress > 0.3 && progress < 0.6) {
-      trackingStatusTitle.textContent = "Rider On 100ft Road 🛵";
-      trackingStatusDesc.textContent = "Manjunath picked up your piping hot order and is on 100ft Road.";
-    } else if (progress >= 0.6 && progress < 0.9) {
-      trackingStatusTitle.textContent = "Turning Into Your Lane 📍";
-      trackingStatusDesc.textContent = "Rider is 300m away, turning towards HAL 2nd Stage.";
-    }
-  }, intervalMs);
-}
-
-// ── Rotating Comedic Second-Beat Punchlines (F4) ──────────────────────────────
-const PUNCHLINES = [
-  "Your biryani is still in the restaurant's imagination.",
-  "The rider was emotionally supportive but logistically fictional.",
-  "Congrats — you just outsmarted your own midnight stomach.",
-  "That craving? Deleted. That money? Safely in your bank.",
-  "100% of the dopamine hit. 0% of the bank balance drop.",
-  "Plot twist: Your wallet survives to see another day."
-];
-
-// ── The Dopamine Hit Arrival & Twist Reveal ──────────────────────────────────
-function triggerOrderArrival() {
-  if (courierTimer) clearInterval(courierTimer);
-  if (courierMarker) courierMarker.setLatLng(HOME_COORDS);
-
-  // Complete all stepper nodes
-  document.getElementById("step-node-3").className = "step-node completed";
-  document.getElementById("step-line-3").className = "step-line completed";
-  document.getElementById("step-node-4").className = "step-node completed active";
-
-  trackingStatusTitle.textContent = "Delivery Partner Arrived! 🎉";
-  trackingStatusDesc.textContent = "Manjunath has arrived at your Indiranagar location.";
-  trackingEtaPill.textContent = "Arrived!";
-
-  // Haptic vibration pulse if supported
-  if (navigator.vibrate) {
-    try { navigator.vibrate([100, 50, 100]); } catch (e) {}
-  }
-
-  // Trigger Confetti
-  triggerConfetti();
-
-  // Populate Dopamine Twist Reveal Card
-  const dish = state.activeRecipeDish || DISHES_CATALOG[0];
-  const savedAmount = state.lastOrderSaved || 340.00;
-
-  revealSavedAmount.textContent = `₹${savedAmount.toFixed(2)}`;
-  const revealDishNameEl = document.getElementById("reveal-dish-name");
-  if (revealDishNameEl) revealDishNameEl.textContent = dish.title;
-  const revealDishSpentEl = document.getElementById("reveal-dish-spent");
-  if (revealDishSpentEl) revealDishSpentEl.innerHTML = `₹${savedAmount.toFixed(0)} spent → <strong>₹0 charged</strong>`;
-  const cfcSavedValEl = document.getElementById("cfc-saved-val");
-  if (cfcSavedValEl) cfcSavedValEl.textContent = `₹${savedAmount.toFixed(0)}`;
-
-  if (rsAmountVal) rsAmountVal.textContent = `₹${savedAmount.toFixed(2)}`;
-
-  // Rotating joke
-  if (dopamineJoke) {
-    const randomJoke = PUNCHLINES[Math.floor(Math.random() * PUNCHLINES.length)];
-    dopamineJoke.textContent = randomJoke.replace("{amount}", savedAmount.toFixed(0));
-  }
-
-  // Friend Challenge Result Check
-  if (state.activeChallenge && challengeResultCard) {
-    challengeResultCard.style.display = "flex";
-    if (crcTitle) crcTitle.textContent = `⚔️ Craving Defeated vs ${state.activeChallenge.from}!`;
-    if (crcDesc) crcDesc.textContent = `You saved ₹${savedAmount.toFixed(0)} on ${dish.title} vs ${state.activeChallenge.from}'s ₹${state.activeChallenge.amount.toFixed(0)} save. Both wallets win!`;
-  } else if (challengeResultCard) {
-    challengeResultCard.style.display = "none";
-  }
-
-  // ── AUTOMATIC SAVINGS RECORDING (Requested by user) ───────────────────────
-  recordCravingVictory(dish.title, state.activeRestaurant.name, savedAmount);
-  playBankChime();
-
-  // Mark "Real Save" button as already recorded
-  if (btnRealSave) {
-    btnRealSave.disabled = false;
-    const strongEl = btnRealSave.querySelector("strong");
-    if (strongEl) strongEl.textContent = `✓ Saved ₹${savedAmount.toFixed(2)} in Vault • View Passbook ➔`;
-    const subEl = btnRealSave.querySelector("#rs-subtext");
-    if (subEl) subEl.textContent = "100% of your money kept in your bank • View your ledger & streaks";
-    btnRealSave.style.background = "linear-gradient(135deg, #059669, #047857)";
-  }
-
-  // Trigger Slide-Down Bank SMS Notification Toast
-  const availBalStr = userState.totalSaved.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  smsAmount.textContent = `₹${savedAmount.toFixed(2)} Saved`;
-  smsMessage.textContent = `Beggy Vault: ₹${savedAmount.toFixed(2)} credited to your Anti-Spending Savings Ledger. Avail Bal: ₹${availBalStr}. Craving defeated!`;
-
-  bankSmsToast.classList.add("show");
-  if (window._smsTimeout) clearTimeout(window._smsTimeout);
-  window._smsTimeout = setTimeout(() => {
-    bankSmsToast.classList.remove("show");
-  }, 7000);
-
-  // Update Savings Account Card Balance
-  updateUserStateUI();
-
-  // Render Recipe
-  crDishTitle.textContent = dish.title;
-  crDishSub.textContent = `Cook this exact signature dish from ${state.activeRestaurant.name} at home for just ₹${dish.cookPrice} instead of ₹${dish.price}!`;
-  crPrepTime.textContent = `⏱️ ${dish.recipe.prep} prep`;
-  crCookTime.textContent = `🍳 ${dish.recipe.cook} cook`;
-  crHomeCost.textContent = `💰 ₹${dish.cookPrice} home cost`;
-
-  crIngList.innerHTML = dish.recipe.ingredients.map(ing => `
-    <li class="cr-ing-item">✓ ${ing}</li>
-  `).join('');
-
-  crStepsList.innerHTML = dish.recipe.steps.map((step, idx) => `
-    <li class="cr-step-item">
-      <strong>Step ${idx + 1}:</strong> ${step}
-    </li>
-  `).join('');
-
-  // Generate the Canvas Share Card immediately
-  renderShareCard(dish.title, savedAmount);
-
-  // Show the Dopamine Reveal Card and scroll to it smoothly
-  dopamineRevealCard.style.display = "block";
-  dopamineRevealCard.scrollIntoView({ behavior: "smooth" });
-
-  // ── TRIGGER FLYING STREAK FIRE ANIMATION (CENTER-TO-HEADER) ───────────────
-  setTimeout(() => {
-    triggerFlyingStreakAnimation(userState.streak);
-  }, 400);
-
-  // Show clean post-delivery dual value popup (after flame lands at header)
-  setTimeout(() => {
-    showPostDeliveryModal(dish, savedAmount);
-  }, 2300);
-}
-
-// ── "Dopamine Hit Done — View Savings Passbook" Handler ───────────────────────
-function handleRealSave() {
-  openPassbookModal();
-}
-
-// ── DYNAMIC CANVAS SHARE CARD GENERATOR (F2) ──────────────────────────────────
-function renderShareCard(dishTitle, savedAmount) {
-  if (!shareCardCanvas) return;
-  const ctx = shareCardCanvas.getContext("2d");
-  if (!ctx) return;
-
-  const w = 1080;
-  const h = 1920;
-  shareCardCanvas.width = w;
-  shareCardCanvas.height = h;
-
-  // Background Gradient
-  const bgGrad = ctx.createLinearGradient(0, 0, w, h);
-  bgGrad.addColorStop(0, "#090D16");
-  bgGrad.addColorStop(0.35, "#1E1B4B");
-  bgGrad.addColorStop(0.7, "#0F172A");
-  bgGrad.addColorStop(1, "#020617");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, w, h);
-
-  // Subtle radial ambient glow
-  const radialGlow = ctx.createRadialGradient(w / 2, 600, 100, w / 2, 600, 850);
-  radialGlow.addColorStop(0, "rgba(255, 82, 0, 0.22)");
-  radialGlow.addColorStop(0.6, "rgba(99, 102, 241, 0.12)");
-  radialGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
-  ctx.fillStyle = radialGlow;
-  ctx.fillRect(0, 0, w, h);
-
-  // Subtle background grid
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
-  ctx.lineWidth = 2;
-  for (let x = 60; x < w; x += 120) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, h);
-    ctx.stroke();
-  }
-  for (let y = 60; y < h; y += 120) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
-    ctx.stroke();
-  }
-
-  // Top Badge / Eyebrow
-  ctx.save();
-  ctx.fillStyle = "#FF5200";
-  ctx.beginPath();
-  ctx.roundRect(w / 2 - 220, 140, 440, 74, 37);
-  ctx.fill();
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = "bold 32px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("BEGGY ANTI-SPEND VAULT", w / 2, 177);
-  ctx.restore();
-
-  // Punchline: I ALMOST SPENT
-  ctx.fillStyle = "#94A3B8";
-  ctx.font = "bold 52px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("I ALMOST SPENT", w / 2, 340);
-
-  // Big Saved Rupee Value
-  ctx.save();
-  const amountGrad = ctx.createLinearGradient(0, 380, 0, 560);
-  amountGrad.addColorStop(0, "#34D399");
-  amountGrad.addColorStop(1, "#10B981");
-  ctx.fillStyle = amountGrad;
-  ctx.font = "900 170px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  ctx.shadowColor = "rgba(16, 185, 129, 0.4)";
-  ctx.shadowBlur = 35;
-  ctx.fillText(`₹${savedAmount.toFixed(0)}`, w / 2, 520);
-  ctx.restore();
-
-  // Craving Dish Name Card Box
-  ctx.save();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.roundRect(140, 600, w - 280, 200, 28);
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.fillStyle = "#F8FAFC";
-  ctx.font = "800 54px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  let displayDish = dishTitle;
-  if (displayDish.length > 28) displayDish = displayDish.substring(0, 25) + "...";
-  ctx.fillText(displayDish, w / 2, 690);
-
-  ctx.fillStyle = "#94A3B8";
-  ctx.font = "600 34px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("CRAVING ORDER DEFEATED 🚀", w / 2, 755);
-  ctx.restore();
-
-  // Large Gold Stamp: BEGGY SAVED IT
-  ctx.save();
-  ctx.translate(w / 2, 930);
-  ctx.rotate(-0.06);
-  ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
-  ctx.strokeStyle = "#F59E0B";
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  ctx.roundRect(-360, -70, 720, 140, 24);
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.fillStyle = "#FBBF24";
-  ctx.font = "900 70px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("BEGGY SAVED IT 💰", 0, 0);
-  ctx.restore();
-
-  // Middle Quote
-  ctx.fillStyle = "#E2E8F0";
-  ctx.font = "italic 38px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText('"The food was imaginary. The savings are real."', w / 2, 1130);
-
-  // User Stats 3-Pill Matrix
-  const statsY = 1240;
-  const pillW = 240;
-  const gap = 30;
-  const startX = (w - (3 * pillW + 2 * gap)) / 2;
-
-  const statBoxes = [
-    { label: "STREAK", val: `🔥 ${userState.streak}d`, sub: "Daily habit" },
-    { label: "LIFETIME SAVED", val: `₹${userState.totalSaved.toFixed(0)}`, sub: "100% in bank" },
-    { label: "DEFEATED", val: `⚔️ ${userState.cravingsDefeated}`, sub: "Cravings" }
-  ];
-
-  statBoxes.forEach((s, idx) => {
-    const px = startX + idx * (pillW + gap);
-    ctx.save();
-    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(px, statsY, pillW, 210, 20);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = "#94A3B8";
-    ctx.font = "bold 26px 'Plus Jakarta Sans', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(s.label, px + pillW / 2, statsY + 50);
-
-    ctx.fillStyle = "#FFFFFF";
-    ctx.font = "900 44px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText(s.val, px + pillW / 2, statsY + 115);
-
-    ctx.fillStyle = "#64748B";
-    ctx.font = "500 24px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText(s.sub, px + pillW / 2, statsY + 165);
-    ctx.restore();
-  });
-
-  // Footer Branding & URL
-  ctx.fillStyle = "#F8FAFC";
-  ctx.font = "900 48px 'Plus Jakarta Sans', sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("beggy", w / 2, 1600);
-
-  ctx.fillStyle = "#94A3B8";
-  ctx.font = "600 32px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("Crave It. Simulate It. Save the Bill.", w / 2, 1655);
-
-  ctx.fillStyle = "#FF5722";
-  ctx.font = "bold 34px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("beggy.vercel.app", w / 2, 1715);
-
-  ctx.fillStyle = "#475569";
-  ctx.font = "500 26px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("[100% Simulation • Zero Money Charged]", w / 2, 1775);
-}
-
-// ── Share Actions Handlers ───────────────────────────────────────────────────
-function showShareToast(msg) {
-  if (!scToastMsg) return;
-  scToastMsg.textContent = msg;
-  setTimeout(() => {
-    scToastMsg.textContent = "";
-  }, 4000);
-}
-
-function getAppBaseUrl() {
-  return "https://beggy.vercel.app/";
-}
-
-function getChallengeLinkData() {
-  const dish = state.activeRecipeDish ? state.activeRecipeDish.title : "Takeout Craving";
-  const amount = Math.round(state.lastOrderSaved || 340);
-  const streak = userState.streak || 1;
-  const baseUrl = getAppBaseUrl();
-  const challengeUrl = `${baseUrl}?c=${amount}&dish=${encodeURIComponent(dish)}`;
-
-  // 𝕏 (Twitter) Punchy Draft: Ultra-crisp hook, punchline, CTA & link
-  const twitterDraft = `🍗❌ I was about to order ${dish} on an impulsive craving.
-
-My food was NEVER ordered.
-Instead, I kept ₹${amount} in my bank account with @BeggyApp! 🚀
-
-Can you defeat your cravings and beat my savings streak?
-Take the challenge 👇
-${challengeUrl}
-
-#Beggy #DopamineSaving #AntiSpending #SaveMoney`;
-
-  // LinkedIn Punchy Draft: Habit psychology, behavioral economics, zero-spending punchline
-  const linkedinDraft = `I just simulated ordering ${dish} (₹${amount}) on Beggy — and my food was NEVER ordered.
-
-Instead of losing ₹${amount} to impulsive takeout delivery fees, I kept 100% of my money in my savings account.
-
-Beggy turns impulsive spending cravings into a gamified anti-spending dopamine loop.
-
-Can you beat my streak? Test your craving resistance here:
-👉 ${challengeUrl}
-
-#PersonalFinance #BehavioralEconomics #Savings #Beggy #Fintech`;
-
-  // WhatsApp Punchy Draft: 1-Tap status & friends hook
-  const whatsappDraft = `🍗❌ I almost spent ₹${amount} ordering ${dish}!
-
-My food was NEVER ordered, but I just kept ₹${amount} in my bank account with Beggy! 🔥
-
-Can you defeat your impulsive craving and beat my streak?
-Try it here:
-👉 ${challengeUrl}`;
-
-  // Telegram Punchy Draft
-  const telegramDraft = `🍗❌ Craved ${dish}?
-My food was NEVER ordered, but I just kept ₹${amount} in my bank account with Beggy! 🔥
-
-Can you defeat your impulsive cravings and beat my streak?
-Try it here:
-👉 ${challengeUrl}`;
-
-  // Instagram Story / Reel Caption Draft
-  const instagramDraft = `🍗❌ I almost ordered ${dish}, but my food was NEVER ordered.
-Instead, ₹${amount} stayed in my bank account! 💰🔥
-
-Can you beat my savings streak?
-Try the challenge at the link:
-👉 ${challengeUrl}
-
-#Beggy #CraveItSimulateItSaveIt #AntiSpending #MoneySaved #SavingsChallenge`;
-
-  const text = whatsappDraft;
-
-  return {
-    challengeUrl,
-    text,
-    twitterDraft,
-    linkedinDraft,
-    whatsappDraft,
-    telegramDraft,
-    instagramDraft,
-    amount,
-    dish,
-    streak
-  };
-}
-
-function shareStoryCard() {
-  if (!shareCardCanvas) return;
-  const { challengeUrl, text, amount, dish } = getChallengeLinkData();
-
-  shareCardCanvas.toBlob(blob => {
-    if (!blob) return;
-    const file = new File([blob], "beggy-savings-card.png", { type: "image/png" });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({
-        title: "I defeated a food craving with Beggy!",
-        text: text,
-        files: [file],
-        url: challengeUrl
-      }).catch(err => {
-        if (err.name !== "AbortError") downloadShareCard();
+  // ── Kitchens & Dishes Renderer ──────────────────────────────────────────────
+  let activeFilter = 'all';
+  let searchQuery = '';
+
+  function renderKitchens() {
+    const grid = document.getElementById('kitchens-grid');
+    const countBadge = document.getElementById('kitchens-count-badge');
+    if (!grid) return;
+
+    const cityData = CITIES[currentCityKey] || CITIES.bengaluru;
+    let kitchens = cityData.kitchens;
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      kitchens = kitchens.filter(k =>
+        k.name.toLowerCase().includes(q) ||
+        k.cuisines.toLowerCase().includes(q) ||
+        k.dishes.some(d => d.title.toLowerCase().includes(q))
+      );
+    } else if (activeFilter !== 'all') {
+      kitchens = kitchens.filter(k => {
+        const text = (k.name + ' ' + k.cuisines).toLowerCase();
+        if (activeFilter === 'biryani') return text.includes('biryani') || text.includes('mandi');
+        if (activeFilter === 'burger') return text.includes('burger') || text.includes('fries');
+        if (activeFilter === 'pizza') return text.includes('pizza');
+        if (activeFilter === 'rolls') return text.includes('roll') || text.includes('shawarma');
+        if (activeFilter === 'south') return text.includes('dosa') || text.includes('idli');
+        if (activeFilter === 'north') return text.includes('north') || text.includes('naan') || text.includes('butter chicken');
+        if (activeFilter === 'dessert') return text.includes('dessert') || text.includes('chocolate') || text.includes('shake');
+        return true;
       });
-    } else {
-      downloadShareCard();
-      copyShareCaption();
     }
-  }, "image/png");
-}
 
-function downloadShareCard() {
-  if (!shareCardCanvas) return;
-  const link = document.createElement("a");
-  link.download = `beggy-savings-card-${Date.now()}.png`;
-  link.href = shareCardCanvas.toDataURL("image/png");
-  link.click();
-  showShareToast("✓ Savings card PNG downloaded to your device!");
-}
+    if (countBadge) countBadge.textContent = `${kitchens.length} kitchens`;
 
-function copyShareCaption() {
-  const { text, challengeUrl } = getChallengeLinkData();
-  navigator.clipboard.writeText(text).then(() => {
-    showShareToast("✓ Caption & link copied to clipboard!");
-  }).catch(() => {
-    showShareToast(`✓ Link: ${challengeUrl}`);
-  });
-}
-
-function createFriendChallengeLink() {
-  const { challengeUrl, text } = getChallengeLinkData();
-  navigator.clipboard.writeText(text).then(() => {
-    showShareToast("✓ Challenge link copied to clipboard! Send to your friends on WhatsApp 📲");
-  }).catch(() => {
-    showShareToast(`✓ Challenge link: ${challengeUrl}`);
-  });
-}
-
-// ── PASSBOOK MODAL & STREAKS LOGIC (F3) ──────────────────────────────────────
-function openPassbookModal() {
-  updateUserStateUI();
-
-  if (pbBadgesGrid) {
-    pbBadgesGrid.innerHTML = BADGES_CONFIG.map(b => {
-      const unlocked = userState.badges.includes(b.id);
-      return `
-        <div class="pb-badge-item ${unlocked ? 'unlocked' : ''}">
-          <span>${b.icon}</span>
-          <span>${b.title}</span>
-          ${unlocked ? '<span style="color:#10B981;font-weight:900;">✓</span>' : '<span style="opacity:0.4;">🔒</span>'}
+    if (kitchens.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px 16px; color: var(--text-muted);">
+          <span style="font-size: 2rem;">🍽️</span>
+          <p style="margin-top: 10px; font-weight: 700;">No cravings match "${escapeHtml(searchQuery)}".</p>
+          <p style="font-size: 0.8rem;">Try searching for biryani, burgers, pizza, rolls, or momos.</p>
         </div>
       `;
-    }).join('');
-  }
+      return;
+    }
 
-  if (pbHistoryList) {
-    if (userState.history.length === 0) {
-      pbHistoryList.innerHTML = `<div class="pb-empty-history">No savings recorded yet. Defeat your first craving to start your ledger!</div>`;
-    } else {
-      pbHistoryList.innerHTML = userState.history.map(h => `
-        <div class="pb-history-item">
-          <div class="pb-hi-left">
-            <strong>${escapeHtml(h.dish)}</strong>
-            <span>${escapeHtml(h.date)} • ${escapeHtml(h.restaurant)}</span>
-          </div>
-          <div class="pb-hi-right">+₹${Number(h.amount || 0).toFixed(2)}</div>
+    grid.innerHTML = kitchens.map(k => `
+      <div class="kitchen-card" data-kitchen-id="${escapeHtml(k.id)}">
+        <div class="kc-banner-wrap">
+          <img src="${escapeHtml(k.image)}" alt="${escapeHtml(k.name)}" class="kc-banner-img" loading="lazy" />
+          <span class="kc-satire-badge">${escapeHtml(k.satire)}</span>
+          <span class="kc-eta-badge">⏱️ ${escapeHtml(k.eta)}</span>
         </div>
-      `).join('');
-    }
+
+        <div class="kc-info">
+          <div class="kc-name-row">
+            <h3 class="kc-name">${escapeHtml(k.name)}</h3>
+            <span class="kc-rating">${escapeHtml(k.rating)}</span>
+          </div>
+          <p class="kc-cuisines">${escapeHtml(k.cuisines)}</p>
+
+          <div class="kc-dishes-list">
+            ${k.dishes.map(d => {
+              const inCart = cart[d.id];
+              return `
+                <div class="kc-dish-row">
+                  <div class="dish-text-col">
+                    <span class="dish-veg-tag">${d.veg ? '🟢' : '🔴'}</span>
+                    <strong class="dish-title">${escapeHtml(d.title)}</strong>
+                    <div class="dish-price">₹${d.price}</div>
+                  </div>
+                  <div class="dish-action-col">
+                    ${inCart ? `
+                      <div class="qty-stepper">
+                        <button class="qty-btn btn-qty-minus" data-dish-id="${escapeHtml(d.id)}">−</button>
+                        <span class="qty-val">${inCart.qty}</span>
+                        <button class="qty-btn btn-qty-plus" data-dish-id="${escapeHtml(d.id)}">+</button>
+                      </div>
+                    ` : `
+                      <button class="btn-add-dish" data-dish-id="${escapeHtml(d.id)}" data-kitchen-id="${escapeHtml(k.id)}">ADD</button>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    bindDishEvents(kitchens);
   }
 
-  if (passbookModal && passbookBackdrop) {
-    passbookModal.classList.add("show");
-    passbookBackdrop.classList.add("show");
-  }
-}
+  function bindDishEvents(kitchens) {
+    document.querySelectorAll('.btn-add-dish').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const dishId = e.currentTarget.getAttribute('data-dish-id');
+        const kitchenId = e.currentTarget.getAttribute('data-kitchen-id');
 
-function closePassbookModal() {
-  if (passbookModal && passbookBackdrop) {
-    passbookModal.classList.remove("show");
-    passbookBackdrop.classList.remove("show");
-  }
-  // As requested: if user was directed to tipping area from post-delivery and cancels/closes, advance to WhatsApp sharing
-  if (state.pendingShareModalAfterTip) {
-    state.pendingShareModalAfterTip = false;
-    setTimeout(() => {
-      showWhatsAppShareModal();
-    }, 200);
-  }
-}
-
-function resetAllUserData() {
-  if (confirm("Reset all your Beggy savings history and streaks?")) {
-    userState = {
-      totalSaved: 0,
-      cravingsDefeated: 0,
-      streak: 0,
-      bestStreak: 0,
-      lastSaveDate: null,
-      history: [],
-      badges: []
-    };
-    saveUserState();
-    closePassbookModal();
-    showShareToast("✓ All local data reset cleanly.");
-  }
-}
-
-// ── SINGLE FOUNDER SUPPORT PLACEMENT (COLLAPSED IN PASSBOOK) ─────────────────
-function generateUpiUri(amount = 10, note = "Fund the young founder") {
-  // pa must have literal @. DO NOT use encodeURIComponent on the @ sign!
-  const pa = (BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi").trim();
-  const pn = encodeURIComponent(BEGGY_UPI_CONFIG.pn || "Arunachalam Venkatachalapathy");
-  let amNum = Number(amount);
-  if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
-  const am = Number.isInteger(amNum) ? String(amNum) : amNum.toFixed(2);
-  const cu = "INR";
-  const tn = encodeURIComponent(note || BEGGY_UPI_CONFIG.note || "Fund the young founder");
-  return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
-}
-
-function setupPassbookFounderSupport() {
-  const pbTipPills = document.getElementById("pb-tip-pills");
-  const pbAnyToggle = document.getElementById("pb-any-toggle");
-  const pbCustomWrap = document.getElementById("pb-custom-wrap");
-  const pbCustomInput = document.getElementById("pb-custom-input");
-  const pbCustomApplyBtn = document.getElementById("pb-custom-apply-btn");
-  const pbTipCtaBtn = document.getElementById("pb-tip-cta-btn");
-  const pbQrToggleBtn = document.getElementById("pb-qr-toggle-btn");
-  const pbQrBox = document.getElementById("pb-qr-box");
-  const pbQrImg = document.getElementById("pb-qr-img");
-  const pbCopyUpiBtn = document.getElementById("pb-copy-upi-btn");
-
-  let selectedAmount = 10;
-
-  function updatePassbookTip(amount) {
-    selectedAmount = Math.max(1, Math.min(50000, Number(amount) || 10));
-    const upiUri = generateUpiUri(selectedAmount, "Fund the young founder");
-    if (pbTipCtaBtn) {
-      pbTipCtaBtn.href = upiUri;
-      pbTipCtaBtn.innerHTML = `<span>⚡ Fund ₹${selectedAmount} via UPI</span>`;
-    }
-    if (pbQrImg) {
-      pbQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiUri)}`;
-    }
-  }
-
-  if (pbTipPills) {
-    const pills = pbTipPills.querySelectorAll(".pb-tip-pill:not(#pb-any-toggle)");
-    pills.forEach(pill => {
-      pill.addEventListener("click", () => {
-        pbTipPills.querySelectorAll(".pb-tip-pill").forEach(p => p.classList.remove("active"));
-        pill.classList.add("active");
-        if (pbCustomWrap) pbCustomWrap.style.display = "none";
-        const amt = Number(pill.dataset.amount) || 10;
-        updatePassbookTip(amt);
-      });
-    });
-  }
-
-  if (pbAnyToggle) {
-    pbAnyToggle.addEventListener("click", () => {
-      if (pbTipPills) {
-        pbTipPills.querySelectorAll(".pb-tip-pill").forEach(p => p.classList.remove("active"));
-      }
-      pbAnyToggle.classList.add("active");
-      if (pbCustomWrap) {
-        const isHidden = pbCustomWrap.style.display === "none" || !pbCustomWrap.style.display;
-        pbCustomWrap.style.display = isHidden ? "flex" : "none";
-        if (isHidden && pbCustomInput) {
-          pbCustomInput.focus();
+        let foundDish = null;
+        let foundKitchen = null;
+        for (const k of kitchens) {
+          const d = k.dishes.find(x => x.id === dishId);
+          if (d) { foundDish = d; foundKitchen = k; break; }
         }
-      }
-    });
-  }
 
-  if (pbCustomApplyBtn && pbCustomInput) {
-    const applyCustom = () => {
-      const amt = Math.max(1, Math.min(50000, Number(pbCustomInput.value) || 100));
-      pbCustomInput.value = amt;
-      updatePassbookTip(amt);
-    };
-    pbCustomApplyBtn.addEventListener("click", applyCustom);
-    pbCustomInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        applyCustom();
-      }
+        if (foundDish) {
+          cart[dishId] = {
+            item: foundDish,
+            restaurant: foundKitchen,
+            qty: 1
+          };
+          updateCartUI();
+          renderKitchens();
+        }
+      });
     });
-  }
 
-  if (pbQrToggleBtn && pbQrBox) {
-    pbQrToggleBtn.addEventListener("click", () => {
-      const isHidden = pbQrBox.style.display === "none" || !pbQrBox.style.display;
-      pbQrBox.style.display = isHidden ? "flex" : "none";
-      pbQrToggleBtn.textContent = isHidden ? "✕ Hide QR Code" : "💻 On Laptop? Click to Scan UPI QR Code";
+    document.querySelectorAll('.btn-qty-plus').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const dishId = e.currentTarget.getAttribute('data-dish-id');
+        if (cart[dishId]) {
+          cart[dishId].qty += 1;
+          updateCartUI();
+          renderKitchens();
+        }
+      });
     });
-  }
 
-  if (pbCopyUpiBtn) {
-    pbCopyUpiBtn.addEventListener("click", () => {
-      const upiId = (BEGGY_UPI_CONFIG.pa || "arunking156-2@oksbi").trim();
-      navigator.clipboard.writeText(upiId).then(() => {
-        pbCopyUpiBtn.textContent = "✓ UPI ID Copied!";
-        setTimeout(() => {
-          pbCopyUpiBtn.textContent = "📋 Copy UPI ID";
-        }, 2500);
-      }).catch(() => {
-        prompt("Copy UPI ID:", upiId);
+    document.querySelectorAll('.btn-qty-minus').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const dishId = e.currentTarget.getAttribute('data-dish-id');
+        if (cart[dishId]) {
+          cart[dishId].qty -= 1;
+          if (cart[dishId].qty <= 0) {
+            delete cart[dishId];
+          }
+          updateCartUI();
+          renderKitchens();
+        }
       });
     });
   }
 
-  updatePassbookTip(10);
-}
+  // ── Cart & The Painful Swiggy Math ──────────────────────────────────────────
+  function calculateCartMath() {
+    let subtotal = 0;
+    let itemCount = 0;
+    let firstDish = '';
+    let firstRest = '';
 
-// ── QUICK CRAVING MODE & URL CHALLENGE (F1, F9) ──────────────────────────────
-function switchDiscoveryMode(mode) {
-  state.discoveryMode = mode;
-  if (mode === "quick") {
-    if (tabBrowseRestaurants) tabBrowseRestaurants.classList.remove("active");
-    if (tabQuickCraving) tabQuickCraving.classList.add("active");
-    if (browseKitchensPanel) browseKitchensPanel.style.display = "none";
-    if (quickCravingPanel) quickCravingPanel.style.display = "block";
-  } else {
-    if (tabQuickCraving) tabQuickCraving.classList.remove("active");
-    if (tabBrowseRestaurants) tabBrowseRestaurants.classList.add("active");
-    if (quickCravingPanel) quickCravingPanel.style.display = "none";
-    if (browseKitchensPanel) browseKitchensPanel.style.display = "block";
-  }
-}
-
-function handleSimulateCustomCraving(e) {
-  if (e) e.preventDefault();
-  const rawTitle = customDishName ? customDishName.value.trim() : "";
-  const dishTitle = (rawTitle ? rawTitle.slice(0, 60) : "") || "Chicken Dum Biryani";
-  const rawPrice = customDishPrice ? parseFloat(customDishPrice.value) : 340;
-  const price = (!isNaN(rawPrice) && isFinite(rawPrice) && rawPrice > 0)
-    ? Math.max(10, Math.min(Math.round(rawPrice), 10000))
-    : 340;
-
-  const customRest = {
-    id: "custom_kitchen",
-    name: "Craving Central (Indiranagar)",
-    cuisines: "Fast Food, Indian, Tandoor",
-    rating: 4.9,
-    eta: "15–20 mins",
-    priceTwo: `₹${(price * 1.5).toFixed(0)} for two`,
-    distanceKm: 1.2,
-    address: "100ft Road, Indiranagar, Bengaluru",
-    coords: [12.9716, 77.6412],
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
-    discount: "FLAT 100% OFF code: BEGGY100"
-  };
-
-  const customDish = {
-    id: 9999,
-    restaurantId: "custom_kitchen",
-    category: "custom",
-    diet: "veg",
-    isVeg: true,
-    isBestseller: true,
-    title: dishTitle,
-    price: price,
-    cookPrice: Math.round(price * 0.28),
-    eta: "15–20 mins",
-    calories: 650,
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
-    desc: `Piping hot signature ${dishTitle} cooked fresh with premium spices.`,
-    recipe: {
-      prep: "15 mins",
-      cook: "20 mins",
-      ingredients: [
-        "Fresh ingredients for " + dishTitle,
-        "Pure Desi Cow Ghee / Olive Oil",
-        "Aromatic spices & seasonings",
-        "Garnish & herbs"
-      ],
-      steps: [
-        "Prep and slice fresh ingredients.",
-        "Sauté seasonings in a hot pan.",
-        "Simmer for 15 minutes to lock in authentic flavours.",
-        "Serve hot at home for a fraction of the takeout cost!"
-      ]
+    for (const id in cart) {
+      const entry = cart[id];
+      subtotal += entry.item.price * entry.qty;
+      itemCount += entry.qty;
+      if (!firstDish) firstDish = entry.item.title;
+      if (!firstRest && entry.restaurant) firstRest = entry.restaurant.name;
     }
-  };
 
-  state.activeRestaurant = customRest;
-  state.activeRecipeDish = customDish;
-  state.cart = [{ ...customDish, qty: 1 }];
-  state.lastOrderSaved = price;
+    if (itemCount === 0) {
+      return {
+        itemCount: 0,
+        subtotal: 0,
+        delivery: 0,
+        platform: 0,
+        gst: 0,
+        surge: 0,
+        total: 0,
+        firstDish: '',
+        firstRest: ''
+      };
+    }
 
-  updateCartUI();
-  proceedToPayment();
-}
+    const delivery = 49;
+    const platform = 10;
+    const gst = Math.round(subtotal * 0.05) + 8; // Packaging + 5% GST
+    const surge = 25; // Rain / late night surge
+    const total = subtotal + delivery + platform + gst + surge;
 
-function checkUrlChallenge() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const cParam = params.get("c") || (params.get("challenge") === "1" ? params.get("amount") : null);
-    if (cParam) {
-      const rawNum = parseFloat(cParam);
-      const amount = (!isNaN(rawNum) && isFinite(rawNum) && rawNum > 0)
-        ? Math.max(10, Math.min(Math.round(rawNum), 50000))
-        : 340;
-      const rawFrom = params.get("from") || "A friend";
-      const from = rawFrom.trim().slice(0, 30);
-      const rawDish = params.get("dish") || "Takeout Craving";
-      const dish = rawDish.trim().slice(0, 50);
+    return {
+      itemCount,
+      subtotal,
+      delivery,
+      platform,
+      gst,
+      surge,
+      total,
+      firstDish,
+      firstRest
+    };
+  }
 
-      state.activeChallenge = { from, amount, dish };
+  function updateCartUI() {
+    const math = calculateCartMath();
 
-      if (friendChallengeBanner) {
-        friendChallengeBanner.style.display = "flex";
-        if (fcbTitle) fcbTitle.textContent = `⚔️ Friend Challenge: Can you save ₹${amount}?`;
-        if (fcbDesc) fcbDesc.textContent = `${from} challenged you to resist ordering ${dish} and save ₹${amount}. Can you resist your craving?`;
-      }
+    // Floating cart bar
+    const floatingBar = document.getElementById('floating-cart-bar');
+    const fcCount = document.getElementById('fc-count');
+    const fcTotal = document.getElementById('fc-total');
+    const headerCartBadge = document.getElementById('header-cart-count');
 
-      switchDiscoveryMode("quick");
-      if (customDishName) customDishName.value = dish;
-      if (customDishPrice) {
-        customDishPrice.value = amount;
-        if (btnCravingAmount) btnCravingAmount.textContent = String(amount);
+    if (math.itemCount > 0) {
+      if (floatingBar) floatingBar.style.display = 'flex';
+      if (fcCount) fcCount.textContent = `${math.itemCount} ${math.itemCount === 1 ? 'Item' : 'Items'}`;
+      if (fcTotal) fcTotal.textContent = `₹${math.total.toFixed(2)}`;
+      if (headerCartBadge) {
+        headerCartBadge.textContent = math.itemCount;
+        headerCartBadge.style.display = 'flex';
       }
     } else {
-      if (friendChallengeBanner) {
-        friendChallengeBanner.style.display = "none";
-      }
+      if (floatingBar) floatingBar.style.display = 'none';
+      if (headerCartBadge) headerCartBadge.style.display = 'none';
     }
-  } catch (e) {
-    console.warn("Challenge parse error:", e);
-  }
-}
 
-// ── Event Handlers ───────────────────────────────────────────────────────────
-function setupEventListeners() {
-  // Brand Home / Nav Home button
-  if (navBrandHome) {
-    navBrandHome.addEventListener("click", e => {
-      e.preventDefault();
-      switchView("restaurants");
-    });
-  }
-  if (navHomeBtn) {
-    navHomeBtn.addEventListener("click", () => switchView("restaurants"));
-  }
-
-  // Cuisine pills
-  if (cuisinePillsRow) {
-    cuisinePillsRow.addEventListener("click", e => {
-      const btn = e.target.closest(".cuisine-pill");
-      if (!btn) return;
-      document.querySelectorAll(".cuisine-pill").forEach(p => p.classList.remove("active"));
-      btn.classList.add("active");
-      state.activeCuisine = btn.dataset.cuisine;
-      renderRestaurants();
-    });
-  }
-
-  // Restaurant card clicks (Stage 1 -> Stage 2)
-  if (restaurantsGrid) {
-    restaurantsGrid.addEventListener("click", e => {
-      const card = e.target.closest("[data-rest-id]");
-      if (!card) return;
-      openRestaurant(card.dataset.restId);
-    });
-  }
-
-  // Back to restaurants
-  if (btnBackToRestaurants) {
-    btnBackToRestaurants.addEventListener("click", () => switchView("restaurants"));
-  }
-
-  // Dietary filters in menu view
-  const dietBtns = document.querySelectorAll(".diet-btn");
-  dietBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      dietBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.activeDiet = btn.dataset.diet;
-      renderRestaurantDishes(state.activeRestaurant.id);
-    });
-  });
-
-  // Food dish clicks (Add to Cart)
-  if (dishesListContainer) {
-    dishesListContainer.addEventListener("click", e => {
-      const btn = e.target.closest("[data-add-dish]");
-      if (!btn) return;
-      const dishId = parseInt(btn.dataset.addDish, 10);
-      addToCart(dishId);
-    });
-  }
-
-  // Floating cart bar and proceed button
-  if (fcProceedBtn) {
-    fcProceedBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openCartDrawer();
-    });
-  }
-  if (floatingCartBar) {
-    floatingCartBar.addEventListener("click", () => {
-      openCartDrawer();
-    });
-  }
-
-  // Cart Drawer open/close
-  if (cartTriggerBtn) cartTriggerBtn.addEventListener("click", openCartDrawer);
-  if (closeCartBtn) closeCartBtn.addEventListener("click", closeCartDrawer);
-  if (cartBackdrop) cartBackdrop.addEventListener("click", closeCartDrawer);
-  if (drawerCheckoutBtn) drawerCheckoutBtn.addEventListener("click", proceedToPayment);
-
-  // Back to Menu from Payment
-  if (btnBackToMenu) {
-    btnBackToMenu.addEventListener("click", () => switchView("menu"));
-  }
-
-  // Payment Method Selection
-  const payOptions = document.querySelectorAll(".payment-option");
-  payOptions.forEach(opt => {
-    opt.addEventListener("click", () => {
-      payOptions.forEach(o => o.classList.remove("selected"));
-      opt.classList.add("selected");
-      const input = opt.querySelector("input");
-      if (input) {
-        input.checked = true;
-        state.paymentMethod = input.value;
-      }
-    });
-  });
-
-  // Pay and Place Order (Stage 3 -> Stage 4)
-  if (btnPayAndPlaceOrder) {
-    btnPayAndPlaceOrder.addEventListener("click", handlePlaceOrder);
-  }
-  const mspPayBtn = document.getElementById("msp-pay-btn");
-  if (mspPayBtn) {
-    mspPayBtn.addEventListener("click", handlePlaceOrder);
-  }
-
-  // Fast-Forward Arrival button on Map
-  if (btnSimulateArrival) {
-    btnSimulateArrival.addEventListener("click", triggerOrderArrival);
-  }
-
-  // THE REAL SAVE BUTTON
-  if (btnRealSave) {
-    btnRealSave.addEventListener("click", handleRealSave);
-  }
-
-  // Order Again button
-  if (btnOrderAgain) {
-    btnOrderAgain.addEventListener("click", () => {
-      switchView("restaurants");
-    });
-  }
-
-  // Close Bank SMS Toast
-  if (smsCloseBtn) {
-    smsCloseBtn.addEventListener("click", () => {
-      bankSmsToast.classList.remove("show");
-    });
-  }
-
-  // Passbook modal triggers (F3)
-  if (passbookTriggerBtn) passbookTriggerBtn.addEventListener("click", openPassbookModal);
-  if (headerStreakPill) {
-    headerStreakPill.style.cursor = "pointer";
-    headerStreakPill.title = "View Streak & Passbook";
-    headerStreakPill.addEventListener("click", (e) => {
-      e.stopPropagation();
-      triggerFlyingStreakAnimation(userState.streak);
-      setTimeout(openPassbookModal, 1800);
-    });
-  }
-  if (pbCloseBtn) pbCloseBtn.addEventListener("click", closePassbookModal);
-  if (passbookBackdrop) passbookBackdrop.addEventListener("click", closePassbookModal);
-  if (pbBtnDone) pbBtnDone.addEventListener("click", closePassbookModal);
-  if (pbBtnReset) pbBtnReset.addEventListener("click", resetAllUserData);
-
-  // ── SINGLE FOUNDER SUPPORT IN PASSBOOK MODAL ──
-  setupPassbookFounderSupport();
-
-  // ── VIRAL SHARE & CHALLENGE A FRIEND ACTIONS ──
-  const btnScWhatsapp = document.getElementById("btn-sc-whatsapp");
-  if (btnScWhatsapp) {
-    btnScWhatsapp.addEventListener("click", () => {
-      const { text } = getChallengeLinkData();
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-      Analytics.track("share_card_whatsapp");
-    });
-  }
-
-  const btnCfcWhatsapp = document.getElementById("btn-cfc-whatsapp");
-  const btnCfcCopy = document.getElementById("btn-cfc-copy");
-  if (btnCfcWhatsapp) {
-    btnCfcWhatsapp.addEventListener("click", () => {
-      const { text } = getChallengeLinkData();
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-      Analytics.track("challenge_whatsapp");
-    });
-  }
-  if (btnCfcCopy) {
-    btnCfcCopy.addEventListener("click", () => {
-      const { challengeUrl, text } = getChallengeLinkData();
-      const btnText = document.getElementById("btn-cfc-copy-text");
-      navigator.clipboard.writeText(text).then(() => {
-        showShareToast("✓ Challenge link copied! Share with friends on WhatsApp 📲");
-        if (btnText) btnText.textContent = "✓ Copied Link!";
-        setTimeout(() => {
-          if (btnText) btnText.textContent = "Copy Challenge Link";
-        }, 3000);
-      }).catch(() => {
-        showShareToast(`✓ Challenge link: ${challengeUrl}`);
-      });
-      Analytics.track("challenge_copied");
-    });
-  }
-
-  if (btnRealSave) {
-    btnRealSave.addEventListener("click", () => {
-      openPassbookModal();
-    });
-  }
-
-  // Discovery Mode tabs (F1)
-  if (tabBrowseRestaurants) {
-    tabBrowseRestaurants.addEventListener("click", () => switchDiscoveryMode("browse"));
-  }
-  if (tabQuickCraving) {
-    tabQuickCraving.addEventListener("click", () => switchDiscoveryMode("quick"));
-  }
-
-  // Quick Craving chips
-  if (qcpChipsRow) {
-    qcpChipsRow.addEventListener("click", e => {
-      const chip = e.target.closest(".craving-chip");
-      if (!chip) return;
-      document.querySelectorAll(".craving-chip").forEach(c => c.classList.remove("selected"));
-      chip.classList.add("selected");
-
-      const dish = chip.dataset.dish;
-      const price = chip.dataset.price;
-      if (customDishName) customDishName.value = dish;
-      if (customDishPrice) customDishPrice.value = price;
-      if (btnCravingAmount) btnCravingAmount.textContent = price;
-    });
-  }
-
-  // Custom price input live sync
-  if (customDishPrice) {
-    customDishPrice.addEventListener("input", e => {
-      const val = parseInt(e.target.value, 10);
-      if (btnCravingAmount) btnCravingAmount.textContent = isNaN(val) ? "0" : val;
-    });
-  }
-
-  // Quick Craving form submit
-  if (qcpCustomForm) {
-    qcpCustomForm.addEventListener("submit", handleSimulateCustomCraving);
-  }
-
-  // Friend challenge accept
-  if (fcbAcceptBtn) {
-    fcbAcceptBtn.addEventListener("click", () => {
-      switchDiscoveryMode("quick");
-      if (customDishName) customDishName.focus();
-    });
-  }
-
-  // Share card actions (F2)
-  if (btnScShare) btnScShare.addEventListener("click", shareStoryCard);
-  if (btnScDownload) btnScDownload.addEventListener("click", downloadShareCard);
-  if (btnScCopy) btnScCopy.addEventListener("click", copyShareCaption);
-  if (btnScChallenge) btnScChallenge.addEventListener("click", createFriendChallengeLink);
-
-  // Search input
-  if (foodSearch) {
-    foodSearch.addEventListener("input", e => {
-      const q = e.target.value.toLowerCase().trim();
-      clearSearch.style.display = q ? "block" : "none";
-
-      if (state.currentView === "restaurants") {
-        const cards = document.querySelectorAll(".restaurant-card");
-        cards.forEach(c => {
-          const text = c.textContent.toLowerCase();
-          c.style.display = text.includes(q) ? "flex" : "none";
-        });
-      } else if (state.currentView === "menu") {
-        const dishes = document.querySelectorAll(".dish-card");
-        dishes.forEach(d => {
-          const text = d.textContent.toLowerCase();
-          d.style.display = text.includes(q) ? "flex" : "none";
-        });
-      }
-    });
-  }
-
-  if (clearSearch) {
-    clearSearch.addEventListener("click", () => {
-      foodSearch.value = "";
-      clearSearch.style.display = "none";
-      if (state.currentView === "restaurants") renderRestaurants();
-      else if (state.currentView === "menu") renderRestaurantDishes(state.activeRestaurant.id);
-    });
-  }
-}
-
-// ── LANDING SLIDE BANNER (DISABLED PER USER FEEDBACK — NO SCREEN-BLOCKING POPUP) ─
-function showAmazonSlideBanner() {}
-function setupAmazonSlideBanner() {}
-
-// ── POST-DELIVERY MODAL — SEGMENT 1: CRAVING DEFEATED & RECIPE KIT ──────────
-function showPostDeliveryModal(dish, savedAmount) {
-  const modal = document.getElementById("post-delivery-modal");
-  if (!modal) return;
-
-  const currentDish = dish || state.activeRecipeDish || DISHES_CATALOG[0];
-  const amount = savedAmount || state.lastOrderSaved || 340.00;
-
-  // Populate dynamic copy
-  const savedValEl = document.getElementById("pdm-saved-val");
-  if (savedValEl) savedValEl.textContent = `₹${amount.toFixed(2)}`;
-
-  const dealTitleEl = document.getElementById("pdm-dish-title");
-  if (dealTitleEl) dealTitleEl.textContent = `Cook ${currentDish.title} at Home for ₹${currentDish.cookPrice || 85}!`;
-
-  const dealDescEl = document.getElementById("pdm-dish-desc");
-  if (dealDescEl) dealDescEl.textContent = `Get fresh ingredients delivered via Amazon India Pantry. Total prep: ${currentDish.recipe?.prep || '15 mins'}.`;
-
-  const amazonBtn = document.getElementById("pdm-amazon-btn");
-  if (amazonBtn) amazonBtn.href = AMAZON_GROCERY_URL;
-
-  modal.style.display = "flex";
-  Analytics.track("post_delivery_segment1_opened", { dish: currentDish.title, amount });
-}
-
-function setupPostDeliveryModal() {
-  const modal = document.getElementById("post-delivery-modal");
-  const card = document.getElementById("pdm-card");
-  const closeBtn = document.getElementById("pdm-close-btn");
-  const nextBtn = document.getElementById("pdm-next-btn");
-  const dismissBtn = document.getElementById("pdm-dismiss-btn");
-  const amazonBtn = document.getElementById("pdm-amazon-btn");
-  const founderBtn = document.getElementById("pdm-founder-btn");
-
-  if (!modal) return;
-
-  const closeFirstModalAndOpenWhatsApp = () => {
-    modal.style.display = "none";
-    // As instructed: when the user closes the 1st popup post delivery, the WhatsApp share popup should come!
-    setTimeout(() => {
-      showWhatsAppShareModal();
-    }, 150);
-  };
-
-  // Top Layer: Fund the Young Founder link
-  if (founderBtn) {
-    founderBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-      state.pendingShareModalAfterTip = true;
-      openPassbookModal();
-      const supportDetails = document.getElementById("pb-support-details");
-      if (supportDetails) {
-        supportDetails.open = true;
-        supportDetails.classList.add("pb-highlight-pulse");
-        setTimeout(() => {
-          supportDetails.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 120);
-        setTimeout(() => {
-          supportDetails.classList.remove("pb-highlight-pulse");
-        }, 3000);
-      }
-      Analytics.track("post_delivery_founder_clicked");
-    });
-  }
-
-  if (closeBtn) closeBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
-  if (nextBtn) nextBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
-  if (dismissBtn) dismissBtn.addEventListener("click", closeFirstModalAndOpenWhatsApp);
-  if (amazonBtn) {
-    amazonBtn.addEventListener("click", () => {
-      setTimeout(closeFirstModalAndOpenWhatsApp, 500);
-    });
-  }
-
-  // Click outside card on backdrop closes modal 1 and opens modal 2
-  modal.addEventListener("click", (e) => {
-    if (card && !card.contains(e.target)) {
-      closeFirstModalAndOpenWhatsApp();
-    }
-  });
-
-  // Escape key closes modal 1 and opens modal 2
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.style.display === "flex") {
-      closeFirstModalAndOpenWhatsApp();
-    }
-  });
-}
-
-// ── POST-DELIVERY MODAL — SEGMENT 2: WHATSAPP & SOCIAL VIRAL SHARE ───────────
-function showWhatsAppShareModal() {
-  const modal = document.getElementById("whatsapp-share-modal");
-  if (!modal) return;
-
-  const dish = state.activeRecipeDish || DISHES_CATALOG[0];
-  const amount = state.lastOrderSaved || 340.00;
-
-  // Update saved amount headline
-  const savedAmountEl = document.getElementById("wsm-saved-amount");
-  if (savedAmountEl) savedAmountEl.textContent = Math.round(amount);
-
-  // Ensure canvas has rendered with current dish & amount
-  renderShareCard(dish.title, amount);
-
-  // Update preview image from canvas data URL
-  const previewImg = document.getElementById("wsm-preview-img");
-  if (previewImg && shareCardCanvas) {
-    try {
-      previewImg.src = shareCardCanvas.toDataURL("image/png");
-    } catch (e) {
-      console.warn("Could not export canvas to preview img:", e);
-    }
-  }
-
-  modal.style.display = "flex";
-  Analytics.track("whatsapp_share_modal_opened", { dish: dish.title, amount });
-}
-
-function setupWhatsAppShareModal() {
-  const modal = document.getElementById("whatsapp-share-modal");
-  const card = document.getElementById("wsm-card");
-  const closeBtn = document.getElementById("wsm-close-btn");
-  const dismissBtn = document.getElementById("wsm-dismiss-btn");
-  const waBtn = document.getElementById("wsm-btn-whatsapp");
-  const copyBtn = document.getElementById("wsm-btn-copy");
-  const downloadBtn = document.getElementById("wsm-btn-download");
-  const twitterBtn = document.getElementById("wsm-btn-twitter");
-  const instagramBtn = document.getElementById("wsm-btn-instagram");
-  const telegramBtn = document.getElementById("wsm-btn-telegram");
-  const linkedinBtn = document.getElementById("wsm-btn-linkedin");
-  const nativeShareBtn = document.getElementById("wsm-btn-native-share");
-
-  if (!modal) return;
-
-  const closeSecondModal = () => {
-    modal.style.display = "none";
-  };
-
-  if (closeBtn) closeBtn.addEventListener("click", closeSecondModal);
-  if (dismissBtn) dismissBtn.addEventListener("click", closeSecondModal);
-
-  // Click outside card on backdrop closes modal 2
-  modal.addEventListener("click", (e) => {
-    if (card && !card.contains(e.target)) {
-      closeSecondModal();
-    }
-  });
-
-  // Escape key closes modal 2
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.style.display === "flex") {
-      closeSecondModal();
-    }
-  });
-
-  // 1-Tap WhatsApp Share: Pre-filled punchy draft
-  if (waBtn) {
-    waBtn.addEventListener("click", () => {
-      const { whatsappDraft } = getChallengeLinkData();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(whatsappDraft).catch(() => {});
-      }
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappDraft)}`, "_blank", "noopener,noreferrer");
-      showShareToast("💬 Punchy draft loaded! Pick friend or status & tap Send!");
-      Analytics.track("whatsapp_share_modal_shared");
-    });
-  }
-
-  // 𝕏 (Twitter) Share: Pre-filled punchy draft, only press Post!
-  if (twitterBtn) {
-    twitterBtn.addEventListener("click", () => {
-      const { twitterDraft } = getChallengeLinkData();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(twitterDraft).catch(() => {});
-      }
-      window.open(`https://x.com/intent/post?text=${encodeURIComponent(twitterDraft)}`, "_blank", "noopener,noreferrer");
-      showShareToast("𝕏 Punchy draft loaded! Just press Post!");
-      Analytics.track("share_modal_twitter");
-    });
-  }
-
-  // Instagram Story Share: Download story image & copy punchy caption
-  if (instagramBtn) {
-    instagramBtn.addEventListener("click", () => {
-      const { instagramDraft } = getChallengeLinkData();
-      downloadShareCard();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(instagramDraft).catch(() => {});
-      }
-      showShareToast("📸 Story card saved & punchy draft copied! Just paste & post on Instagram!");
-      setTimeout(() => {
-        window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
-      }, 700);
-      Analytics.track("share_modal_instagram");
-    });
-  }
-
-  // Telegram Share: Pre-filled punchy draft
-  if (telegramBtn) {
-    telegramBtn.addEventListener("click", () => {
-      const { telegramDraft, challengeUrl } = getChallengeLinkData();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(telegramDraft).catch(() => {});
-      }
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(challengeUrl)}&text=${encodeURIComponent(telegramDraft)}`, "_blank", "noopener,noreferrer");
-      showShareToast("✈️ Punchy draft loaded! Pick chat & tap Send!");
-      Analytics.track("share_modal_telegram");
-    });
-  }
-
-  // LinkedIn Share: Open post modal with pre-filled punchy draft & auto-copied to clipboard
-  if (linkedinBtn) {
-    linkedinBtn.addEventListener("click", () => {
-      const { linkedinDraft } = getChallengeLinkData();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(linkedinDraft).catch(() => {});
-      }
-      window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(linkedinDraft)}`, "_blank", "noopener,noreferrer");
-      showShareToast("💼 Punchy draft loaded & copied! Just press Post on LinkedIn.");
-      Analytics.track("share_modal_linkedin");
-    });
-  }
-
-  // Native Share Sheet (Snapchat, SMS, Reddit, etc.)
-  if (nativeShareBtn) {
-    nativeShareBtn.addEventListener("click", async () => {
-      const { twitterDraft, challengeUrl } = getChallengeLinkData();
-      if (navigator.share) {
-        try {
-          if (shareCardCanvas && navigator.canShare) {
-            shareCardCanvas.toBlob(async (blob) => {
-              try {
-                if (blob && navigator.canShare({ files: [new File([blob], "beggy-savings.png", { type: "image/png" })] })) {
-                  const file = new File([blob], "beggy-savings.png", { type: "image/png" });
-                  await navigator.share({
-                    title: "Beggy Savings Challenge",
-                    text: twitterDraft,
-                    files: [file]
-                  });
-                } else {
-                  await navigator.share({
-                    title: "Beggy Savings Challenge",
-                    text: twitterDraft,
-                    url: challengeUrl
-                  });
-                }
-              } catch (err) {
-                if (err && err.name !== "AbortError") {
-                  showShareToast(`✓ Challenge link: ${challengeUrl}`);
-                }
-              }
-            }, "image/png");
-          } else {
-            await navigator.share({
-              title: "Beggy Savings Challenge",
-              text: twitterDraft,
-              url: challengeUrl
-            });
-          }
-          Analytics.track("share_modal_native_shared");
-        } catch (err) {
-          if (err && err.name !== "AbortError") {
-            showShareToast(`✓ Challenge link: ${challengeUrl}`);
-          }
-        }
+    // Cart Drawer items
+    const container = document.getElementById('cart-items-container');
+    if (container) {
+      if (math.itemCount === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 16px; color: var(--text-muted);">
+            <span style="font-size: 2.4rem;">🍛</span>
+            <p style="margin-top: 10px; font-weight: 700; color: #FFFFFF;">Your cart is empty.</p>
+            <p style="font-size: 0.8rem;">Select dishes from midnight kitchens to simulate the bill.</p>
+          </div>
+        `;
       } else {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(twitterDraft).then(() => {
-            showShareToast("✓ Punchy draft & link copied!");
+        container.innerHTML = Object.keys(cart).map(id => {
+          const entry = cart[id];
+          return `
+            <div class="cart-item-row">
+              <div class="ci-info">
+                <strong class="ci-title">${escapeHtml(entry.item.title)}</strong>
+                <span class="ci-price">₹${entry.item.price} each</span>
+              </div>
+              <div class="qty-stepper">
+                <button class="qty-btn drawer-qty-minus" data-dish-id="${escapeHtml(id)}">−</button>
+                <span class="qty-val">${entry.qty}</span>
+                <button class="qty-btn drawer-qty-plus" data-dish-id="${escapeHtml(id)}">+</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Bind drawer buttons
+        container.querySelectorAll('.drawer-qty-plus').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const did = btn.getAttribute('data-dish-id');
+            if (cart[did]) { cart[did].qty += 1; updateCartUI(); renderKitchens(); }
           });
+        });
+        container.querySelectorAll('.drawer-qty-minus').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const did = btn.getAttribute('data-dish-id');
+            if (cart[did]) {
+              cart[did].qty -= 1;
+              if (cart[did].qty <= 0) delete cart[did];
+              updateCartUI();
+              renderKitchens();
+            }
+          });
+        });
+      }
+    }
+
+    // Bill lines
+    const billSubtotal = document.getElementById('bill-subtotal');
+    const billDelivery = document.getElementById('bill-delivery');
+    const billPlatform = document.getElementById('bill-platform');
+    const billGst = document.getElementById('bill-gst');
+    const billSurge = document.getElementById('bill-surge');
+    const billTotal = document.getElementById('bill-total');
+    const drawerBtn = document.getElementById('drawer-checkout-btn');
+
+    if (billSubtotal) billSubtotal.textContent = `₹${math.subtotal.toFixed(2)}`;
+    if (billDelivery) billDelivery.textContent = `₹${math.delivery.toFixed(2)}`;
+    if (billPlatform) billPlatform.textContent = `₹${math.platform.toFixed(2)}`;
+    if (billGst) billGst.textContent = `₹${math.gst.toFixed(2)}`;
+    if (billSurge) billSurge.textContent = `₹${math.surge.toFixed(2)}`;
+    if (billTotal) billTotal.textContent = `₹${math.total.toFixed(2)}`;
+
+    if (drawerBtn) {
+      drawerBtn.disabled = (math.itemCount === 0);
+    }
+  }
+
+  // ── Checkout & The Slam ─────────────────────────────────────────────────────
+  function initCheckout() {
+    const drawerCheckoutBtn = document.getElementById('drawer-checkout-btn');
+    const checkoutModal = document.getElementById('checkout-modal');
+    const closeBtn = document.getElementById('co-close-btn');
+    const placeOrderBtn = document.getElementById('co-place-order-btn');
+    const bigTotalEl = document.getElementById('co-big-total');
+
+    if (drawerCheckoutBtn) {
+      drawerCheckoutBtn.addEventListener('click', () => {
+        closeCartDrawer();
+        const math = calculateCartMath();
+        if (bigTotalEl) bigTotalEl.textContent = `₹${math.total.toFixed(2)}`;
+        if (checkoutModal) checkoutModal.style.display = 'flex';
+      });
+    }
+
+    if (closeBtn && checkoutModal) {
+      closeBtn.addEventListener('click', () => {
+        checkoutModal.style.display = 'none';
+      });
+    }
+
+    if (placeOrderBtn) {
+      placeOrderBtn.addEventListener('click', () => {
+        const math = calculateCartMath();
+        const finalAmount = math.total;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+        lastOrderSummary = {
+          amount: finalAmount,
+          dish: math.firstDish || 'Midnight Biryani',
+          restaurant: math.firstRest || 'Koramangala Midnight Biryani Club',
+          time: timeStr
+        };
+
+        // The Laugh: Strike through the bill to ₹0.00
+        if (bigTotalEl) {
+          bigTotalEl.classList.add('slammed');
+          setTimeout(() => {
+            bigTotalEl.textContent = '₹0.00 SAVED!';
+          }, 200);
         }
+
+        // Transition into tracking mini-movie after brief pause
+        setTimeout(() => {
+          if (checkoutModal) checkoutModal.style.display = 'none';
+          if (bigTotalEl) bigTotalEl.classList.remove('slammed');
+          cart = {}; // Clear cart
+          updateCartUI();
+          renderKitchens();
+          startTrackingMovie(lastOrderSummary);
+        }, 800);
+      });
+    }
+  }
+
+  function openCartDrawer() {
+    const drawer = document.getElementById('cart-drawer');
+    const backdrop = document.getElementById('cart-backdrop');
+    if (drawer) drawer.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+  }
+
+  function closeCartDrawer() {
+    const drawer = document.getElementById('cart-drawer');
+    const backdrop = document.getElementById('cart-backdrop');
+    if (drawer) drawer.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+  }
+
+  // ── Tracking Screen — The 11-Minute Rider Mini-Movie ─────────────────────────
+  let trackingMap = null;
+  let riderMarker = null;
+  let trackingTimer = null;
+  let simSpeedMultiplier = 1; // 1 = 11 mins, 5 = ~2 mins, 30 = quick demo
+  let totalSimSeconds = 660; // 11 minutes
+  let elapsedSimSeconds = 0;
+
+  function startTrackingMovie(order) {
+    const trackingScreen = document.getElementById('tracking-screen');
+    const dishNameEl = document.getElementById('track-dish-name');
+    const restNameEl = document.getElementById('track-restaurant-name');
+    const savedValEl = document.getElementById('track-saved-val');
+
+    if (dishNameEl) dishNameEl.textContent = order.dish;
+    if (restNameEl) restNameEl.textContent = order.restaurant;
+    if (savedValEl) savedValEl.textContent = `₹${order.amount.toFixed(2)}`;
+
+    if (trackingScreen) trackingScreen.style.display = 'flex';
+
+    // Init or refresh map
+    initTrackingMap();
+
+    // Reset timeline & countdown
+    elapsedSimSeconds = 0;
+    simSpeedMultiplier = 1;
+    updateSpeedControlsUI();
+
+    if (trackingTimer) clearInterval(trackingTimer);
+
+    trackingTimer = setInterval(() => {
+      elapsedSimSeconds += simSpeedMultiplier;
+      updateTrackingProgress();
+
+      if (elapsedSimSeconds >= totalSimSeconds) {
+        clearInterval(trackingTimer);
+        finishTrackingMovie();
+      }
+    }, 1000);
+
+    updateTrackingProgress();
+  }
+
+  function updateSpeedControlsUI() {
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      const sp = Number(btn.getAttribute('data-speed'));
+      if (sp === simSpeedMultiplier) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
       }
     });
   }
 
-  // Copy Challenge Link & Text
-  if (copyBtn) {
-    copyBtn.addEventListener("click", () => {
-      const { challengeUrl, text } = getChallengeLinkData();
-      const textEl = document.getElementById("wsm-btn-copy-text");
-      const iconEl = document.getElementById("wsm-btn-copy-icon");
+  function initTrackingMap() {
+    const mapContainer = document.getElementById('tracking-map');
+    if (!mapContainer) return;
 
-      navigator.clipboard.writeText(text).then(() => {
-        if (textEl) textEl.textContent = "✓ Copied Link!";
-        if (iconEl) iconEl.textContent = "✅";
-        setTimeout(() => {
-          if (textEl) textEl.textContent = "Copy Challenge Link";
-          if (iconEl) iconEl.textContent = "📋";
-        }, 3000);
-      }).catch(() => {
-        if (textEl) textEl.textContent = "✓ Link Copied";
+    const cityData = CITIES[currentCityKey] || CITIES.bengaluru;
+    const start = cityData.kitchens[0].coords;
+    const end = cityData.dest;
+
+    if (!trackingMap) {
+      trackingMap = L.map('tracking-map', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView(start, 14);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+      }).addTo(trackingMap);
+
+      // Destination Pin
+      const destIcon = L.divIcon({
+        className: 'dest-map-pin',
+        html: `<div style="font-size: 28px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));">📍</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
       });
-      Analytics.track("whatsapp_share_modal_copied");
+      L.marker(end, { icon: destIcon }).addTo(trackingMap);
+
+      // Rider Marker
+      const riderIcon = L.divIcon({
+        className: 'rider-map-icon',
+        html: `<div style="font-size: 32px; filter: drop-shadow(0 4px 12px rgba(252,128,25,0.6));">🛵</div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+      riderMarker = L.marker(start, { icon: riderIcon }).addTo(trackingMap);
+    } else {
+      trackingMap.invalidateSize();
+      riderMarker.setLatLng(start);
+      trackingMap.setView(start, 14);
+    }
+  }
+
+  function updateTrackingProgress() {
+    const remaining = Math.max(0, totalSimSeconds - elapsedSimSeconds);
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
+    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+    const etaEl = document.getElementById('eta-countdown');
+    if (etaEl) etaEl.textContent = timeStr;
+
+    // Move Rider along straight interpolation or road
+    const cityData = CITIES[currentCityKey] || CITIES.bengaluru;
+    const start = cityData.kitchens[0].coords;
+    const end = cityData.dest;
+    const progress = Math.min(1, elapsedSimSeconds / totalSimSeconds);
+
+    const curLat = start[0] + (end[0] - start[0]) * progress;
+    const curLng = start[1] + (end[1] - start[1]) * progress;
+    if (riderMarker) riderMarker.setLatLng([curLat, curLng]);
+
+    // Update Staged Timeline Dots & Status
+    const headingEl = document.getElementById('track-status-heading');
+    const subEl = document.getElementById('track-status-sub');
+    const chatBubble = document.getElementById('rider-chat-bubble');
+    const chatText = document.getElementById('rc-text');
+
+    const s1 = document.getElementById('tl-step-1');
+    const s2 = document.getElementById('tl-step-2');
+    const s3 = document.getElementById('tl-step-3');
+    const s4 = document.getElementById('tl-step-4');
+
+    [s1, s2, s3, s4].forEach(s => s && s.classList.remove('active'));
+
+    if (progress < 0.15) {
+      if (s1) s1.classList.add('active');
+      if (headingEl) headingEl.textContent = 'Rahul is assigned';
+      if (subEl) subEl.textContent = 'Hero Splendor • 4.8★ (1,420 orders)';
+      if (chatBubble) chatBubble.style.display = 'none';
+    } else if (progress < 0.45) {
+      if (s2) s2.classList.add('active');
+      if (headingEl) headingEl.textContent = 'At restaurant. Waiting for food.';
+      if (subEl) subEl.textContent = 'Order is being packed in the kitchen';
+
+      // Chat bubble 1
+      if (progress >= 0.20 && progress <= 0.40) {
+        if (chatBubble) chatBubble.style.display = 'flex';
+        if (chatText) chatText.textContent = 'Bhaiya 2 min, kitchen me thoda rush hai.';
+      } else {
+        if (chatBubble) chatBubble.style.display = 'none';
+      }
+    } else if (progress < 0.85) {
+      if (s3) s3.classList.add('active');
+      if (headingEl) headingEl.textContent = 'Order picked up · On the way';
+      if (subEl) subEl.textContent = 'Rider moving along your city roads';
+
+      // Chat bubble 2
+      if (progress >= 0.55 && progress <= 0.75) {
+        if (chatBubble) chatBubble.style.display = 'flex';
+        if (chatText) chatText.textContent = 'Bhaiya location main gate pe delivery chalega na?';
+      } else {
+        if (chatBubble) chatBubble.style.display = 'none';
+      }
+    } else {
+      if (s4) s4.classList.add('active');
+      if (headingEl) headingEl.textContent = 'Arriving at your doorstep';
+      if (subEl) subEl.textContent = 'Delivery partner is outside your building';
+      if (chatBubble) chatBubble.style.display = 'none';
+    }
+  }
+
+  function finishTrackingMovie() {
+    const trackingScreen = document.getElementById('tracking-screen');
+    if (trackingScreen) trackingScreen.style.display = 'none';
+
+    // Log savings to local ledger
+    userKeptState.totalKept += lastOrderSummary.amount;
+    userKeptState.streak += 1;
+    userKeptState.history.unshift({
+      amount: lastOrderSummary.amount,
+      dish: lastOrderSummary.dish,
+      restaurant: lastOrderSummary.restaurant,
+      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+      time: lastOrderSummary.time
     });
+    saveUserKeptState();
+
+    // Trigger Black Screen Reveal!
+    showRevealScreen();
   }
 
-  // Download Story Image
-  if (downloadBtn) {
-    downloadBtn.addEventListener("click", () => {
-      downloadShareCard();
-      Analytics.track("whatsapp_share_modal_downloaded");
+  // ── The Reveal Screen ───────────────────────────────────────────────────────
+  function showRevealScreen() {
+    const reveal = document.getElementById('reveal-screen');
+    if (!reveal) return;
+
+    const rupeeVal = document.getElementById('reveal-rupee-val');
+    const dishTag = document.getElementById('reveal-dish-tag');
+    const timeTag = document.getElementById('reveal-time-tag');
+    const receiptAmt = document.getElementById('r-receipt-amt');
+    const waBtn = document.getElementById('btn-reveal-whatsapp');
+
+    const amt = Math.round(lastOrderSummary.amount);
+    if (rupeeVal) rupeeVal.textContent = amt;
+    if (dishTag) dishTag.textContent = lastOrderSummary.dish;
+    if (timeTag) timeTag.textContent = lastOrderSummary.time;
+    if (receiptAmt) receiptAmt.textContent = `INR ${lastOrderSummary.amount.toFixed(2)} NOT DEBITED`;
+
+    // 1-Tap WhatsApp Duel Link
+    if (waBtn) {
+      let waText = '';
+      if (activeDuel) {
+        waText = `I just beat ${activeDuel.from}!\nTracked a fake rider for ₹${amt} ${lastOrderSummary.dish}. Never arrived.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(lastOrderSummary.dish)}&from=Me`;
+      } else {
+        waText = `I just tracked a rider for food that doesn't exist.\n₹${amt} ${lastOrderSummary.dish}. Never came.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(lastOrderSummary.dish)}&from=Arun`;
+      }
+      waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+    }
+
+    reveal.style.display = 'flex';
+  }
+
+  // ── Canvas Receipt Generator for 9:16 Instagram Stories ─────────────────────
+  function generateReceiptImage() {
+    const canvas = document.getElementById('receipt-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    // 1080 x 1920 (9:16)
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // Subtle orange accent line
+    ctx.strokeStyle = '#FC8019';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(60, 60, 960, 1800);
+
+    // Logo & Header
+    ctx.fillStyle = '#FC8019';
+    ctx.font = '900 64px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('beggy', 540, 220);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '700 28px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('ORDER IT. TRACK IT. IT NEVER COMES.', 540, 270);
+
+    // Giant Headline
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 62px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('YOUR FOOD WAS NEVER ORDERED.', 540, 480);
+
+    // Giant Rupees
+    ctx.fillStyle = '#10B981';
+    ctx.font = '900 160px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(`₹${Math.round(lastOrderSummary.amount)}`, 540, 660);
+
+    ctx.fillStyle = '#CBD5E1';
+    ctx.font = '700 42px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('is still in your account.', 540, 740);
+
+    // Detail Box
+    ctx.fillStyle = '#111520';
+    ctx.fillRect(140, 860, 800, 360);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(140, 860, 800, 360);
+
+    ctx.fillStyle = '#F8FAFC';
+    ctx.font = '800 40px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(lastOrderSummary.dish, 540, 950);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '600 32px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(`${lastOrderSummary.restaurant} • ${lastOrderSummary.time}`, 540, 1020);
+
+    // Stamped: "NEVER ARRIVED"
+    ctx.save();
+    ctx.translate(540, 1120);
+    ctx.rotate(-0.08);
+    ctx.fillStyle = '#EF4444';
+    ctx.font = '900 52px "Plus Jakarta Sans", sans-serif';
+    ctx.strokeStyle = '#EF4444';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(-240, -45, 480, 80);
+    ctx.fillText('NEVER ARRIVED', 0, 12);
+    ctx.restore();
+
+    // Footer Challenge CTA
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '800 36px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('Can your willpower beat this?', 540, 1500);
+
+    ctx.fillStyle = '#FC8019';
+    ctx.font = '900 44px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('beggy.in', 540, 1580);
+
+    // Convert to image & trigger download
+    try {
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `beggy-receipt-saved-${Math.round(lastOrderSummary.amount)}.png`;
+      a.click();
+    } catch (e) {
+      alert('Screenshot saved! Take a quick screenshot of this screen to post.');
+    }
+  }
+
+  // ── "The Bill You Kept" Passbook Modal ──────────────────────────────────────
+  function initPassbookModal() {
+    const billBtn = document.getElementById('header-bill-btn');
+    const modal = document.getElementById('passbook-modal');
+    const closeBtn = document.getElementById('pb-close-btn');
+    const doneBtn = document.getElementById('pb-done-btn');
+    const resetBtn = document.getElementById('pb-reset-btn');
+    const copyUpiBtn = document.getElementById('btn-copy-upi');
+    const founderChaiBtn = document.getElementById('founder-chai-btn');
+
+    function openModal() {
+      const totalEl = document.getElementById('pb-total-val');
+      const streakEl = document.getElementById('pb-streak-val');
+      const roastEl = document.getElementById('pb-roast-banner');
+      const listEl = document.getElementById('pb-history-list');
+
+      if (totalEl) totalEl.textContent = `₹${Math.floor(userKeptState.totalKept)}`;
+      if (streakEl) streakEl.textContent = `🔥 ${userKeptState.streak} ${userKeptState.streak === 1 ? 'Night' : 'Nights'}`;
+
+      if (roastEl) {
+        if (userKeptState.totalKept > 0) {
+          roastEl.textContent = `"This month you didn't spend ₹${Math.floor(userKeptState.totalKept)} on food that would have been cold anyway. Don't be the clown who opens Swiggy tonight."`;
+        } else {
+          roastEl.textContent = `"Your bill is ₹0. Order your first fake takeout and keep the rupees in your pocket."`;
+        }
+      }
+
+      if (listEl) {
+        if (userKeptState.history.length === 0) {
+          listEl.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:12px;">No avoided orders yet. Go crave something.</p>`;
+        } else {
+          listEl.innerHTML = userKeptState.history.slice(0, 15).map(h => `
+            <div class="pb-item">
+              <div>
+                <div class="pb-item-dish">${escapeHtml(h.dish)}</div>
+                <div class="pb-item-meta">${escapeHtml(h.restaurant)} • ${escapeHtml(h.date)}</div>
+              </div>
+              <div class="pb-item-amt">₹${Math.round(h.amount)}</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    if (billBtn) billBtn.addEventListener('click', openModal);
+    if (founderChaiBtn) founderChaiBtn.addEventListener('click', openModal);
+
+    if (closeBtn && modal) closeBtn.addEventListener('click', () => modal.style.display = 'none');
+    if (doneBtn && modal) doneBtn.addEventListener('click', () => modal.style.display = 'none');
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (confirm('Reset your saved bills and streak?')) {
+          userKeptState = { totalKept: 0, streak: 0, lastKeptDate: '', history: [] };
+          saveUserKeptState();
+          openModal();
+        }
+      });
+    }
+
+    if (copyUpiBtn) {
+      copyUpiBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText('arunking156-2@oksbi').then(() => {
+          copyUpiBtn.textContent = '✓ Copied UPI!';
+          setTimeout(() => { copyUpiBtn.textContent = '📋 Copy UPI'; }, 2000);
+        }).catch(() => {
+          alert('UPI ID: arunking156-2@oksbi');
+        });
+      });
+    }
+  }
+
+  // ── Event Handlers & Page Initialization ────────────────────────────────────
+  function initEvents() {
+    // Craving button scrolls to kitchens
+    const cravingBtn = document.getElementById('hero-craving-btn');
+    if (cravingBtn) {
+      cravingBtn.addEventListener('click', () => {
+        const browseSec = document.getElementById('browse-section');
+        if (browseSec) browseSec.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    // Duel Accept Button
+    const duelAcceptBtn = document.getElementById('duel-accept-btn');
+    if (duelAcceptBtn) {
+      duelAcceptBtn.addEventListener('click', () => {
+        const duelScreen = document.getElementById('duel-screen');
+        const activeDuelStrip = document.getElementById('active-duel-strip');
+        const adsName = document.getElementById('ads-name');
+        const adsTarget = document.getElementById('ads-target');
+
+        if (duelScreen) duelScreen.style.display = 'none';
+
+        if (activeDuel && activeDuelStrip) {
+          if (adsName) adsName.textContent = activeDuel.from;
+          if (adsTarget) adsTarget.textContent = `₹${activeDuel.amount}`;
+          activeDuelStrip.style.display = 'flex';
+        }
+
+        const browseSec = document.getElementById('browse-section');
+        if (browseSec) browseSec.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    // Dismiss active duel strip
+    const adsDismiss = document.getElementById('ads-dismiss');
+    if (adsDismiss) {
+      adsDismiss.addEventListener('click', () => {
+        const strip = document.getElementById('active-duel-strip');
+        if (strip) strip.style.display = 'none';
+        activeDuel = null;
+      });
+    }
+
+    // Search filter
+    const searchInput = document.getElementById('search-input');
+    const searchClear = document.getElementById('search-clear-btn');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.trim();
+        if (searchClear) searchClear.style.display = searchQuery ? 'block' : 'none';
+        renderKitchens();
+      });
+    }
+    if (searchClear && searchInput) {
+      searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        searchQuery = '';
+        searchClear.style.display = 'none';
+        renderKitchens();
+      });
+    }
+
+    // Cuisine Chips
+    document.querySelectorAll('.c-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.c-chip').forEach(c => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        activeFilter = e.currentTarget.getAttribute('data-filter') || 'all';
+        renderKitchens();
+      });
     });
+
+    // Cart Open / Close
+    const headerCartBtn = document.getElementById('header-cart-btn');
+    const floatingProceedBtn = document.getElementById('fc-proceed-btn');
+    const closeCartBtn = document.getElementById('close-cart-btn');
+    const cartBackdrop = document.getElementById('cart-backdrop');
+
+    if (headerCartBtn) headerCartBtn.addEventListener('click', openCartDrawer);
+    if (floatingProceedBtn) floatingProceedBtn.addEventListener('click', openCartDrawer);
+    if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
+    if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
+
+    // Tracking Speed Controls
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        simSpeedMultiplier = Number(btn.getAttribute('data-speed')) || 1;
+        updateSpeedControlsUI();
+      });
+    });
+
+    // Panic Button & Modal
+    const btnPanic = document.getElementById('btn-panic');
+    const panicModal = document.getElementById('panic-modal');
+    const panicResume = document.getElementById('panic-resume-btn');
+    if (btnPanic && panicModal) {
+      btnPanic.addEventListener('click', () => {
+        panicModal.style.display = 'flex';
+      });
+    }
+    if (panicResume && panicModal) {
+      panicResume.addEventListener('click', () => {
+        panicModal.style.display = 'none';
+      });
+    }
+
+    // Reveal Screen Actions
+    const btnDownload = document.getElementById('btn-reveal-download');
+    if (btnDownload) {
+      btnDownload.addEventListener('click', generateReceiptImage);
+    }
+
+    const btnRestart = document.getElementById('btn-reveal-restart');
+    if (btnRestart) {
+      btnRestart.addEventListener('click', () => {
+        const reveal = document.getElementById('reveal-screen');
+        if (reveal) reveal.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   }
-}
 
-// ── App Initialization ───────────────────────────────────────────────────────
-function init() {
-  updateUserStateUI();
-  renderRestaurants();
-  updateCartUI();
-  setupEventListeners();
-  checkUrlChallenge();
-  setupAmazonSlideBanner();
-  setupPostDeliveryModal();
-  setupWhatsAppShareModal();
-  setupLiveVisitorsCounter();
+  // ── Initialization Entry Point ──────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadUserKeptState();
+    initLiveTicker();
+    initCitySwitcher();
+    initCheckout();
+    initPassbookModal();
+    initEvents();
 
-  // Trigger Flying Streak Fire on initial landing right from the beginning
-  setTimeout(() => {
-    triggerFlyingStreakAnimation(userState.streak || 1, true);
-  }, 600);
+    const isDuel = parseUrlDuel();
+    renderKitchens();
+    updateCartUI();
 
-  // Reuse cached last craving on next visit
-  if (userState.lastCraving && customDishName && customDishPrice) {
-    if (!customDishName.value || customDishName.value === "Chicken Dum Biryani") {
-      customDishName.value = userState.lastCraving.dish;
+    if (!isDuel) {
+      // Regular home
+      const hero = document.getElementById('hero-ticker-section');
+      if (hero) hero.style.display = 'block';
     }
-    if (customDishPrice && userState.lastCraving.amount) {
-      customDishPrice.value = userState.lastCraving.amount;
-    }
-    if (btnCravingAmount && userState.lastCraving.amount) {
-      btnCravingAmount.textContent = userState.lastCraving.amount;
-    }
-  }
+  });
 
-  // Pre-load default active restaurant dishes in background
-  renderRestaurantDishes(RESTAURANTS_DATA[0].id);
-}
-
-document.addEventListener("DOMContentLoaded", init);
-
-
+})();

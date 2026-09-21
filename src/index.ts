@@ -11,7 +11,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { initDb, getBlockCount, closeDb } from './db.js';
-import { submitReading, getChain, getLatestBlocks, verifyEntireChain } from './chain.js';
+import { submitReading, getChain, getLatestBlocks, verifyEntireChain, getChainStats } from './chain.js';
 import { generateKeypair } from './keystore.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -116,6 +116,17 @@ app.get('/api/health', (_req: Request, res: Response) => {
     blocks: getBlockCount(),
     timestamp: new Date().toISOString(),
     env: isDev ? 'development' : 'production',
+  });
+});
+
+/** GET /api/stats — real total rupees not spent and total order count across ledger */
+app.get('/api/stats', (_req: Request, res: Response) => {
+  const stats = getChainStats();
+  res.json({
+    ok: true,
+    totalSaved: stats.totalSaved,
+    count: stats.count,
+    timestamp: new Date().toISOString(),
   });
 });
 
