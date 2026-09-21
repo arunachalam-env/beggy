@@ -2479,6 +2479,278 @@ body.beggy-body {
   background: rgba(255, 153, 0, 0.08);
 }
 
+/* TIER 1: FUND THE FOUNDER IN POST-DELIVERY MODAL */
+.pdm-tip-section {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 82, 0, 0.04) 100%);
+}
+
+[data-theme="dark"] .pdm-tip-section {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, rgba(255, 82, 0, 0.05) 100%);
+}
+
+.pdm-tip-tag {
+  color: #D97706;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+[data-theme="dark"] .pdm-tip-tag {
+  color: #F59E0B;
+}
+
+/* Amount Pills Row in Post-Delivery Modal */
+.pdm-pills-row {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 10px;
+  justify-content: space-between;
+}
+
+.pdm-pill {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+[data-theme="dark"] .pdm-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #E5E7EB;
+}
+
+.pdm-pill:hover {
+  background: rgba(255, 82, 0, 0.15);
+  border-color: #FF5200;
+  color: var(--text-main);
+}
+
+.pdm-pill.active {
+  background: linear-gradient(135deg, #FF5200, #EA580C);
+  border-color: #FF5200;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(255, 82, 0, 0.35);
+}
+
+.pdm-custom-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pdm-custom-input-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  border: 1.5px solid rgba(255, 82, 0, 0.5);
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.pdm-custom-currency {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #FF5200;
+  margin-right: 4px;
+}
+
+.pdm-custom-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 8px 0;
+  outline: none;
+}
+
+.pdm-custom-apply-btn {
+  background: #FF5200;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdm-custom-apply-btn:hover {
+  background: #EA580C;
+}
+
+/* 1-Tap UPI Button */
+.pdm-upi-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #FF5200 0%, #EA580C 100%);
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 16px rgba(255, 82, 0, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pdm-upi-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255, 82, 0, 0.5);
+  color: #FFFFFF;
+}
+
+.pdm-upi-btn .pdm-btn-text strong {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.pdm-upi-btn .pdm-btn-text span {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+/* Desktop QR & Copy Quick Reveal */
+.pdm-desktop-pay {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pdm-qr-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s ease;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pdm-qr-toggle-btn:hover {
+  color: #F59E0B;
+}
+
+.pdm-qr-box {
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+[data-theme="dark"] .pdm-qr-box {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.pdm-qr-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  padding: 6px;
+}
+
+.pdm-qr-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdm-qr-info span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.pdm-copy-upi-btn {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .pdm-copy-upi-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.pdm-copy-upi-btn:hover {
+  background: #10B981;
+  border-color: #10B981;
+  color: #FFFFFF;
+}
+
+/* Sleek Visual Divider between Founder and Amazon Deal */
+.pdm-divider {
+  text-align: center;
+  position: relative;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdm-divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border-color);
+  z-index: 1;
+}
+
+.pdm-divider span {
+  position: relative;
+  z-index: 2;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  background: var(--bg-card);
+  padding: 0 10px;
+}
+
+[data-theme="dark"] .pdm-divider span {
+  background: #171B24;
+}
+
 .pdm-sec-tag {
   display: inline-block;
   background: rgba(255, 153, 0, 0.15);

@@ -1069,7 +1069,31 @@
     }, 2800);
   }
 
-  // ── Post-Delivery Celebration Modal (Amazon Recipe Kit) ─────────────────────
+  // ── Post-Delivery Celebration Modal (Founder Support & Amazon Recipe Kit) ──
+  let pdmTipAmount = 10;
+
+  function updatePdmTipUI(amount) {
+    let amNum = Number(amount);
+    if (isNaN(amNum) || !isFinite(amNum) || amNum <= 0) amNum = 10;
+    pdmTipAmount = Math.min(50000, Math.max(1, amNum));
+    const uri = `upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=${pdmTipAmount}&cu=INR&tn=Fund%20the%20young%20founder`;
+
+    const upiBtn = document.getElementById('pdm-upi-btn');
+    const upiMain = document.getElementById('pdm-upi-btn-main');
+    const qrImg = document.getElementById('pdm-qr-img');
+
+    if (upiBtn) {
+      upiBtn.href = uri;
+    }
+    if (upiMain) {
+      upiMain.textContent = `Fund the Young Founder • ₹${pdmTipAmount.toLocaleString('en-IN')}`;
+    }
+    if (qrImg) {
+      const encoded = encodeURIComponent(uri);
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encoded}`;
+    }
+  }
+
   function showPostDeliveryModal() {
     const modal = document.getElementById('post-delivery-modal');
     const savedVal = document.getElementById('pdm-saved-val');
@@ -1082,6 +1106,19 @@
     if (savedVal) savedVal.textContent = `₹${amt.toFixed(2)}`;
     if (dishTitle) dishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
     if (dishDesc) dishDesc.textContent = `Get fresh gourmet ingredients for authentic ${dish} delivered via Amazon India Pantry. Total prep: 15 mins.`;
+
+    // Reset Founder tip to default ₹10 and sync pills UI
+    updatePdmTipUI(10);
+    const pdmPillsRow = document.getElementById('pdm-pills-row');
+    if (pdmPillsRow) {
+      pdmPillsRow.querySelectorAll('.pdm-pill').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-amount') === '10');
+      });
+    }
+    const pdmCustomWrap = document.getElementById('pdm-custom-wrap');
+    if (pdmCustomWrap) pdmCustomWrap.style.display = 'none';
+    const pdmQrBox = document.getElementById('pdm-qr-box');
+    if (pdmQrBox) pdmQrBox.style.display = 'none';
 
     // Always ensure reveal screen underneath is loaded and populated
     showRevealScreen();
@@ -1530,6 +1567,96 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') hidePostDeliveryModal();
     });
+
+    // Post-Delivery Modal Founder Tip Controls
+    const pdmPillsRow = document.getElementById('pdm-pills-row');
+    const pdmCustomWrap = document.getElementById('pdm-custom-wrap');
+    const pdmCustomInput = document.getElementById('pdm-custom-input');
+    const pdmCustomApplyBtn = document.getElementById('pdm-custom-apply-btn');
+    const pdmAnyToggle = document.getElementById('pdm-any-toggle');
+
+    if (pdmPillsRow) {
+      const pills = pdmPillsRow.querySelectorAll('.pdm-pill:not(#pdm-any-toggle)');
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          pdmPillsRow.querySelectorAll('.pdm-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          if (pdmCustomWrap) pdmCustomWrap.style.display = 'none';
+          const amt = Number(pill.getAttribute('data-amount')) || 10;
+          updatePdmTipUI(amt);
+        });
+      });
+    }
+
+    if (pdmAnyToggle) {
+      pdmAnyToggle.addEventListener('click', () => {
+        if (pdmPillsRow) {
+          pdmPillsRow.querySelectorAll('.pdm-pill').forEach(p => p.classList.remove('active'));
+        }
+        pdmAnyToggle.classList.add('active');
+        if (pdmCustomWrap) {
+          const isHidden = pdmCustomWrap.style.display === 'none' || !pdmCustomWrap.style.display;
+          pdmCustomWrap.style.display = isHidden ? 'flex' : 'none';
+          if (isHidden && pdmCustomInput) {
+            pdmCustomInput.focus();
+            const amt = Number(pdmCustomInput.value) || 500;
+            updatePdmTipUI(amt);
+          }
+        }
+      });
+    }
+
+    if (pdmCustomApplyBtn && pdmCustomInput) {
+      pdmCustomApplyBtn.addEventListener('click', () => {
+        const amt = Math.max(1, Math.min(50000, Number(pdmCustomInput.value) || 500));
+        pdmCustomInput.value = amt;
+        updatePdmTipUI(amt);
+      });
+      pdmCustomInput.addEventListener('input', () => {
+        const val = Number(pdmCustomInput.value);
+        if (val && val > 0) updatePdmTipUI(Math.min(50000, val));
+      });
+    }
+
+    // Desktop QR code toggle in Post-Delivery Modal
+    const pdmQrToggleBtn = document.getElementById('pdm-qr-toggle-btn');
+    const pdmQrBox = document.getElementById('pdm-qr-box');
+    if (pdmQrToggleBtn && pdmQrBox) {
+      pdmQrToggleBtn.addEventListener('click', () => {
+        const isHidden = pdmQrBox.style.display === 'none' || !pdmQrBox.style.display;
+        pdmQrBox.style.display = isHidden ? 'flex' : 'none';
+      });
+    }
+
+    // Copy UPI ID in Post-Delivery Modal
+    const pdmCopyUpiBtn = document.getElementById('pdm-copy-upi-btn');
+    if (pdmCopyUpiBtn) {
+      pdmCopyUpiBtn.addEventListener('click', () => {
+        const idToCopy = 'arunking156-2@oksbi';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(idToCopy).then(() => {
+            showShareToast('✓ UPI ID copied: ' + idToCopy);
+            pdmCopyUpiBtn.textContent = '✓ Copied to Clipboard!';
+            setTimeout(() => { pdmCopyUpiBtn.textContent = '📋 Copy UPI ID'; }, 2500);
+          }).catch(() => {
+            showShareToast('UPI ID: ' + idToCopy);
+          });
+        } else {
+          showShareToast('UPI ID: ' + idToCopy);
+        }
+      });
+    }
+
+    // UPI Button Click helper (if desktop, automatically show QR)
+    const pdmUpiBtn = document.getElementById('pdm-upi-btn');
+    if (pdmUpiBtn) {
+      pdmUpiBtn.addEventListener('click', () => {
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!isMobile && pdmQrBox) {
+          pdmQrBox.style.display = 'flex';
+        }
+      });
+    }
 
     // Multi-Platform Social Share Buttons
     const twitterBtn = document.getElementById('btn-share-twitter');

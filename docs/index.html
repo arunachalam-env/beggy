@@ -690,6 +690,63 @@
       </div>
 
       <div class="pdm-body">
+        <!-- TIER 1: FUND THE YOUNG FOUNDER (1-TAP UPI + AMOUNTS: 10, 100, 1000, 2000, ANY) -->
+        <div class="pdm-section pdm-tip-section" id="pdm-founder-section">
+          <div class="pdm-sec-header">
+            <span class="pdm-sec-tag pdm-tip-tag">💖 SUPPORT THE CREATOR</span>
+            <h4 class="pdm-sec-title">Fund the Young Founder</h4>
+            <p class="pdm-sec-desc">Saved your bill? Support the student creator building Beggy with direct 1-tap UPI.</p>
+          </div>
+
+          <!-- Amount Selection Pills: 10, 100, 1000, 2000, Any -->
+          <div class="pdm-pills-row" id="pdm-pills-row">
+            <button class="pdm-pill active" data-amount="10" type="button">₹10</button>
+            <button class="pdm-pill" data-amount="100" type="button">₹100</button>
+            <button class="pdm-pill" data-amount="1000" type="button">₹1,000</button>
+            <button class="pdm-pill" data-amount="2000" type="button">₹2,000</button>
+            <button class="pdm-pill pdm-pill-any" id="pdm-any-toggle" type="button">Any</button>
+          </div>
+
+          <!-- Custom Amount Input (Hidden until 'Any' is clicked) -->
+          <div class="pdm-custom-wrap" id="pdm-custom-wrap" style="display: none;">
+            <div class="pdm-custom-input-box">
+              <span class="pdm-custom-currency">₹</span>
+              <input type="number" id="pdm-custom-input" min="1" max="50000" step="1" placeholder="Enter amount" value="500">
+            </div>
+            <button class="pdm-custom-apply-btn" id="pdm-custom-apply-btn" type="button">Set</button>
+          </div>
+
+          <!-- 1-Tap UPI CTA Button -->
+          <a href="upi://pay?pa=arunking156-2@oksbi&pn=Arunachalam%20Venkatachalapathy&am=10&cu=INR&tn=Fund%20the%20young%20founder" class="pdm-upi-btn" id="pdm-upi-btn">
+            <span class="pdm-btn-icon">⚡</span>
+            <div class="pdm-btn-text">
+              <strong id="pdm-upi-btn-main">Fund the Young Founder • ₹10</strong>
+              <span id="pdm-upi-btn-sub">1-Tap • GPay, PhonePe, Paytm, CRED &amp; BHIM</span>
+            </div>
+          </a>
+
+          <!-- Desktop QR & Copy Quick Reveal -->
+          <div class="pdm-desktop-pay" id="pdm-desktop-pay">
+            <button class="pdm-qr-toggle-btn" id="pdm-qr-toggle-btn" type="button">
+              <span>💻 On Laptop? Click to Scan UPI QR Code</span>
+            </button>
+            <div class="pdm-qr-box" id="pdm-qr-box" style="display: none;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3Darunking156-2%40oksbi%26pn%3DArunachalam%2520Venkatachalapathy%26am%3D10%26cu%3DINR%26tn%3DFund%2520the%2520young%2520founder" alt="Scan UPI QR Code" id="pdm-qr-img" class="pdm-qr-img" />
+              <div class="pdm-qr-info">
+                <span>Point your phone camera, GPay or PhonePe at this QR code</span>
+                <button class="pdm-copy-upi-btn" id="pdm-copy-upi-btn" type="button">
+                  📋 Copy UPI ID
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sleek Visual Divider -->
+        <div class="pdm-divider">
+          <span>OR COOK FRESH AT HOME</span>
+        </div>
+
         <!-- Amazon Gourmet Recipe Kit Section -->
         <div class="pdm-section pdm-amazon-section">
           <div class="pdm-sec-header">
