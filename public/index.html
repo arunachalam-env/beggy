@@ -571,9 +571,30 @@
         </div>
       </div>
 
-      <!-- Primary Viral Actions -->
+      <!-- Amazon Gourmet Savings Box on Reveal Screen -->
+      <div class="reveal-amazon-card" id="reveal-amazon-card">
+        <div class="rac-header">
+          <span class="rac-tag">👨‍🍳 15-Minute Recipe Kit</span>
+          <h4 class="rac-title" id="rac-dish-title">Cook Biryani at Home for ₹85!</h4>
+          <p class="rac-desc" id="rac-dish-desc">Stock up on fresh spices, basmati rice &amp; pantry essentials on Amazon India Pantry. Real food delivered tomorrow for 1/4th the price!</p>
+        </div>
+        <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="btn-amazon-reveal" 
+           id="btn-amazon-reveal">
+          <span class="rac-icon">🛒</span>
+          <div class="rac-btn-text">
+            <strong>Shop Gourmet Ingredients on Amazon India</strong>
+            <span>Cook restaurant dishes at home for ₹85 (tag: beggy-21) ➔</span>
+          </div>
+        </a>
+        <span class="rac-disclaimer">*Official Amazon India partner link (tag: beggy-21). Real groceries that actually arrive.</span>
+      </div>
+
+      <!-- Primary Viral Actions & Multi-Platform Sharing -->
       <div class="reveal-actions">
-        <!-- Required First Name Field for Viral WhatsApp Identity -->
+        <!-- Required First Name Field for Viral Identity -->
         <div class="reveal-name-field-wrap">
           <label class="reveal-name-label" for="reveal-name-input">Your first name — so the group knows who to beat</label>
           <input id="reveal-name-input" class="reveal-name-input" type="text" maxlength="24" placeholder="e.g. Priya" autocomplete="nickname" />
@@ -584,6 +605,55 @@
           <span class="wa-icon">💬</span>
           <span class="wa-text">Send this to the group (WhatsApp)</span>
         </a>
+
+        <!-- Multi-Platform Quick Share Grid -->
+        <div class="social-share-grid">
+          <button class="btn-share-social btn-share-twitter" id="btn-share-twitter" type="button" title="Share on 𝕏 (Twitter)">
+            <span class="ss-icon">𝕏</span>
+            <span class="ss-label">Post on 𝕏</span>
+          </button>
+          <button class="btn-share-social btn-share-instagram" id="btn-share-instagram" type="button" title="Save Story & Copy Caption">
+            <span class="ss-icon">📸</span>
+            <span class="ss-label">Insta Story</span>
+          </button>
+          <button class="btn-share-social btn-share-telegram" id="btn-share-telegram" type="button" title="Share on Telegram">
+            <span class="ss-icon">✈️</span>
+            <span class="ss-label">Telegram</span>
+          </button>
+          <button class="btn-share-social btn-share-linkedin" id="btn-share-linkedin" type="button" title="Share on LinkedIn">
+            <span class="ss-icon">💼</span>
+            <span class="ss-label">LinkedIn</span>
+          </button>
+          <button class="btn-share-social btn-share-copy" id="btn-share-copy" type="button" title="Copy Challenge Link">
+            <span class="ss-icon" id="copy-link-icon">📋</span>
+            <span class="ss-label" id="copy-link-text">Copy Link</span>
+          </button>
+          <button class="btn-share-social btn-share-native" id="btn-share-native" type="button" title="More Share Apps">
+            <span class="ss-icon">⚡</span>
+            <span class="ss-label">More Apps</span>
+          </button>
+        </div>
+
+        <!-- Easy-to-Paste Templates Box -->
+        <div class="reveal-templates-box" id="reveal-templates-box">
+          <div class="rtb-header">
+            <span class="rtb-title">📋 Easy-to-Paste Challenge Templates</span>
+            <span class="rtb-sub">Select platform &amp; 1-tap copy formatted message</span>
+          </div>
+          <div class="rtb-tabs" id="rtb-tabs">
+            <button class="rtb-tab active" data-tab="whatsapp" type="button">WhatsApp / Chat</button>
+            <button class="rtb-tab" data-tab="twitter" type="button">𝕏 (Twitter)</button>
+            <button class="rtb-tab" data-tab="instagram" type="button">Instagram Story</button>
+            <button class="rtb-tab" data-tab="linkedin" type="button">LinkedIn</button>
+          </div>
+          <div class="rtb-content">
+            <textarea class="rtb-preview-text" id="rtb-preview-text" readonly rows="4"></textarea>
+            <button class="btn-copy-template" id="btn-copy-template" type="button">
+              <span id="copy-tpl-icon">📋</span>
+              <span id="copy-tpl-label">Copy Template to Clipboard</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Download Story Card Button -->
         <button class="btn-reveal-download" id="btn-reveal-download" type="button">
@@ -605,6 +675,60 @@
 
     </div>
   </section>
+
+  <!-- ====================================================================
+       POST-DELIVERY MODAL: CRAVING DEFEATED & AMAZON RECIPE KIT POPUP
+       ==================================================================== -->
+  <div class="pdm-overlay" id="post-delivery-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pdm-title">
+    <div class="pdm-card" id="pdm-card">
+      <button class="pdm-close-btn" id="pdm-close-btn" aria-label="Close popup">&times;</button>
+
+      <div class="pdm-header">
+        <div class="pdm-badge">🎉 CRAVING DEFEATED • 100% SAVED!</div>
+        <h3 class="pdm-title" id="pdm-title">Dopamine Hit Done!</h3>
+        <p class="pdm-sub">You just saved <strong id="pdm-saved-val">₹458.00</strong> on takeout delivery!</p>
+      </div>
+
+      <div class="pdm-body">
+        <!-- Amazon Gourmet Recipe Kit Section -->
+        <div class="pdm-section pdm-amazon-section">
+          <div class="pdm-sec-header">
+            <span class="pdm-sec-tag">👨‍🍳 15-Minute Recipe Kit</span>
+            <h4 class="pdm-sec-title" id="pdm-dish-title">Cook Biryani at Home for ₹85!</h4>
+            <p class="pdm-sec-desc" id="pdm-dish-desc">Get fresh gourmet ingredients delivered to your door via Amazon India Pantry. Total prep: 15 mins.</p>
+          </div>
+
+          <a href="https://www.amazon.in/Gourmet-Specialty-Foods/b?ie=UTF8&node=2454178031&linkCode=ll2&tag=beggy-21&linkId=43981496550283e4382e6a47cdc1667b&ref_=as_li_ss_tl" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             class="pdm-amazon-btn" 
+             id="pdm-amazon-btn">
+            <span class="pdm-btn-icon">🛒</span>
+            <div class="pdm-btn-text">
+              <strong>Shop Fresh Ingredients on Amazon India</strong>
+              <span>Cook fresh gourmet meals for 1/4th takeout price (tag: beggy-21) ➔</span>
+            </div>
+          </a>
+          <p class="pdm-amazon-disclosure">*As an Amazon Associate, Beggy earns from qualifying purchases.</p>
+        </div>
+
+        <!-- Button to continue to reveal / share screen -->
+        <button class="pdm-next-btn" id="pdm-next-btn" type="button">
+          <span>Continue to Share &amp; Challenge Friends ➔</span>
+        </button>
+      </div>
+
+      <div class="pdm-footer">
+        <button class="pdm-dismiss-link" id="pdm-dismiss-btn" type="button">I'll hold out, continue to reveal ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Feedback Toast -->
+  <div class="share-toast" id="share-toast" style="display: none;">
+    <span class="st-icon">✓</span>
+    <span class="st-msg" id="st-msg">Template copied to clipboard!</span>
+  </div>
 
   <!-- ====================================================================
        THE BILL YOU KEPT MODAL (Replaces academic passbook with roast ledger)

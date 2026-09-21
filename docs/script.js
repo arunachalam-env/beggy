@@ -1051,17 +1051,111 @@
       })
       .catch(() => {});
 
-    // Trigger Black Screen Reveal!
-    showRevealScreen();
+    // Trigger Post-Delivery Celebration Modal & Reveal!
+    showPostDeliveryModal();
   }
 
-  // ── Name Sanitizer & WhatsApp Share Logic ──────────────────────────────────
+  // ── Share Toast Notification ───────────────────────────────────────────────
+  let shareToastTimer = null;
+  function showShareToast(message) {
+    const toast = document.getElementById('share-toast');
+    const msgEl = document.getElementById('st-msg');
+    if (!toast) return;
+    if (msgEl) msgEl.textContent = message;
+    toast.style.display = 'flex';
+    if (shareToastTimer) clearTimeout(shareToastTimer);
+    shareToastTimer = setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2800);
+  }
+
+  // ── Post-Delivery Celebration Modal (Amazon Recipe Kit) ─────────────────────
+  function showPostDeliveryModal() {
+    const modal = document.getElementById('post-delivery-modal');
+    const savedVal = document.getElementById('pdm-saved-val');
+    const dishTitle = document.getElementById('pdm-dish-title');
+    const dishDesc = document.getElementById('pdm-dish-desc');
+
+    const amt = lastOrderSummary.amount || 458;
+    const dish = lastOrderSummary.dish || 'Biryani';
+
+    if (savedVal) savedVal.textContent = `₹${amt.toFixed(2)}`;
+    if (dishTitle) dishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
+    if (dishDesc) dishDesc.textContent = `Get fresh gourmet ingredients for authentic ${dish} delivered via Amazon India Pantry. Total prep: 15 mins.`;
+
+    // Always ensure reveal screen underneath is loaded and populated
+    showRevealScreen();
+
+    // Show celebration popup
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  function hidePostDeliveryModal() {
+    const modal = document.getElementById('post-delivery-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  // ── Name Sanitizer & Viral Challenge Formatter ──────────────────────────────
   function sanitizeName(s) {
     return String(s || '')
       .replace(/[<>"'&]/g, '')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 24);
+  }
+
+  let activeTemplateTab = 'whatsapp';
+
+  function getChallengeData() {
+    const nameInput = document.getElementById('reveal-name-input');
+    const rawName = nameInput ? nameInput.value : '';
+    const cleanName = sanitizeName(rawName);
+    const amt = Math.round(lastOrderSummary.amount || 458);
+    const dish = lastOrderSummary.dish || 'Biryani';
+    const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : 'https://beggy.vercel.app';
+    const challengeUrl = `${origin}/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(cleanName || 'Someone')}`;
+
+    let whatsappText = '';
+    if (activeDuel && activeDuel.from) {
+      whatsappText = `I just beat ${activeDuel.from}!\nTracked a fake rider for ₹${amt} ${dish}. Never arrived.\nBeat me: ${challengeUrl}`;
+    } else {
+      whatsappText = `I just tracked a rider for food that doesn't exist.\n₹${amt} ${dish}. Never came.\nBeat me: ${challengeUrl}`;
+    }
+
+    const twitterText = `Tracked a Swiggy rider for 20 mins for ${dish}.\nRider arrived at my gate.\nPlot twist: food was fake, I kept ₹${amt} in my bank account.\n\nTry it before your next 2 AM order:\n${challengeUrl}`;
+
+    const instagramText = `₹${amt} kept in account. ${dish} ghosted. Beggy stood its ground 🛵💨\nChallenge link: ${challengeUrl}`;
+
+    const linkedinText = `Saved ₹${amt} today with an unconventional financial hack: ordered ${dish}, tracked the rider across the city, and discovered the food is completely fake.\n\nCash kept: 100%.\nCalories: 0.\nDiscipline: 10/10.\n\nDare you to resist your next takeout impulse: ${challengeUrl}`;
+
+    return {
+      name: cleanName,
+      amt,
+      dish,
+      challengeUrl,
+      whatsappText,
+      twitterText,
+      instagramText,
+      linkedinText
+    };
+  }
+
+  function updateSharePreview() {
+    const previewEl = document.getElementById('rtb-preview-text');
+    if (!previewEl) return;
+    const data = getChallengeData();
+
+    if (activeTemplateTab === 'whatsapp') {
+      previewEl.value = data.whatsappText;
+    } else if (activeTemplateTab === 'twitter') {
+      previewEl.value = data.twitterText;
+    } else if (activeTemplateTab === 'instagram') {
+      previewEl.value = data.instagramText;
+    } else if (activeTemplateTab === 'linkedin') {
+      previewEl.value = data.linkedinText;
+    }
   }
 
   function updateWhatsAppLink() {
@@ -1076,23 +1170,13 @@
     if (cleanName.length < 2) {
       waBtn.classList.add('disabled');
       waBtn.removeAttribute('href');
-      return;
-    }
-
-    waBtn.classList.remove('disabled');
-
-    const amt = Math.round(lastOrderSummary.amount);
-    const dish = lastOrderSummary.dish;
-    const fromName = cleanName;
-
-    let waText = '';
-    if (activeDuel && activeDuel.from) {
-      waText = `I just beat ${activeDuel.from}!\nTracked a fake rider for ₹${amt} ${dish}. Never arrived.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(fromName)}`;
     } else {
-      waText = `I just tracked a rider for food that doesn't exist.\n₹${amt} ${dish}. Never came.\nBeat me: https://beggy.vercel.app/?c=${amt}&dish=${encodeURIComponent(dish)}&from=${encodeURIComponent(fromName)}`;
+      waBtn.classList.remove('disabled');
+      const data = getChallengeData();
+      waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(data.whatsappText)}`;
     }
 
-    waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+    updateSharePreview();
   }
 
   // ── The Reveal Screen ───────────────────────────────────────────────────────
@@ -1105,12 +1189,19 @@
     const timeTag = document.getElementById('reveal-time-tag');
     const receiptAmt = document.getElementById('r-receipt-amt');
     const nameInput = document.getElementById('reveal-name-input');
+    const racDishTitle = document.getElementById('rac-dish-title');
+    const racDishDesc = document.getElementById('rac-dish-desc');
 
-    const amt = Math.round(lastOrderSummary.amount);
+    const amt = Math.round(lastOrderSummary.amount || 458);
+    const dish = lastOrderSummary.dish || 'Biryani';
+
     if (rupeeVal) rupeeVal.textContent = amt;
-    if (dishTag) dishTag.textContent = lastOrderSummary.dish;
-    if (timeTag) timeTag.textContent = lastOrderSummary.time;
+    if (dishTag) dishTag.textContent = dish;
+    if (timeTag) timeTag.textContent = lastOrderSummary.time || '11:42 pm';
     if (receiptAmt) receiptAmt.textContent = `INR ${lastOrderSummary.amount.toFixed(2)} NOT DEBITED`;
+
+    if (racDishTitle) racDishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
+    if (racDishDesc) racDishDesc.textContent = `Stock up on fresh spices, basmati rice & pantry essentials for ${dish} on Amazon India Pantry. Real food delivered tomorrow for 1/4th the price!`;
 
     if (nameInput) {
       const saved = localStorage.getItem('beggyName') || '';
@@ -1118,6 +1209,7 @@
     }
 
     updateWhatsAppLink();
+    updateSharePreview();
     reveal.style.display = 'flex';
   }
 
@@ -1416,6 +1508,146 @@
         const reveal = document.getElementById('reveal-screen');
         if (reveal) reveal.style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Post-Delivery Celebration Modal Controls
+    const pdmClose = document.getElementById('pdm-close-btn');
+    const pdmNext = document.getElementById('pdm-next-btn');
+    const pdmDismiss = document.getElementById('pdm-dismiss-btn');
+    const pdmModal = document.getElementById('post-delivery-modal');
+
+    if (pdmClose) pdmClose.addEventListener('click', hidePostDeliveryModal);
+    if (pdmNext) pdmNext.addEventListener('click', hidePostDeliveryModal);
+    if (pdmDismiss) pdmDismiss.addEventListener('click', hidePostDeliveryModal);
+    if (pdmModal) {
+      pdmModal.addEventListener('click', (e) => {
+        if (e.target === pdmModal) hidePostDeliveryModal();
+      });
+    }
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hidePostDeliveryModal();
+    });
+
+    // Multi-Platform Social Share Buttons
+    const twitterBtn = document.getElementById('btn-share-twitter');
+    if (twitterBtn) {
+      twitterBtn.addEventListener('click', () => {
+        const data = getChallengeData();
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(data.twitterText)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    }
+
+    const igBtn = document.getElementById('btn-share-instagram');
+    if (igBtn) {
+      igBtn.addEventListener('click', () => {
+        const data = getChallengeData();
+        generateReceiptImage();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(data.instagramText).catch(() => {});
+        }
+        showShareToast('📸 Receipt downloaded & caption copied! Ready for Insta Story!');
+      });
+    }
+
+    const tgBtn = document.getElementById('btn-share-telegram');
+    if (tgBtn) {
+      tgBtn.addEventListener('click', () => {
+        const data = getChallengeData();
+        const url = `https://t.me/share/url?url=${encodeURIComponent(data.challengeUrl)}&text=${encodeURIComponent(data.whatsappText)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    }
+
+    const liBtn = document.getElementById('btn-share-linkedin');
+    if (liBtn) {
+      liBtn.addEventListener('click', () => {
+        const data = getChallengeData();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(data.linkedinText).catch(() => {});
+        }
+        const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data.challengeUrl)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+        showShareToast('💼 Post copied! Paste into LinkedIn share window.');
+      });
+    }
+
+    const copyBtn = document.getElementById('btn-share-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const data = getChallengeData();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(data.challengeUrl).then(() => {
+            showShareToast('📋 Challenge link copied to clipboard!');
+          }).catch(() => {
+            showShareToast(`Link: ${data.challengeUrl}`);
+          });
+        } else {
+          showShareToast(`Link: ${data.challengeUrl}`);
+        }
+      });
+    }
+
+    const nativeBtn = document.getElementById('btn-share-native');
+    if (nativeBtn) {
+      nativeBtn.addEventListener('click', async () => {
+        const data = getChallengeData();
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: 'Beggy Savings Challenge',
+              text: data.whatsappText,
+              url: data.challengeUrl
+            });
+          } catch (err) {
+            if (err && err.name !== 'AbortError') {
+              showShareToast('📋 Challenge link copied!');
+            }
+          }
+        } else {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(data.challengeUrl).then(() => {
+              showShareToast('📋 Challenge link copied to clipboard!');
+            });
+          }
+        }
+      });
+    }
+
+    // Easy-to-Paste Template Tabs
+    const rtbTabs = document.querySelectorAll('.rtb-tab');
+    rtbTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        rtbTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeTemplateTab = tab.getAttribute('data-tab') || 'whatsapp';
+        updateSharePreview();
+      });
+    });
+
+    // Easy-to-Paste Copy Button
+    const copyTplBtn = document.getElementById('btn-copy-template');
+    if (copyTplBtn) {
+      copyTplBtn.addEventListener('click', () => {
+        const previewEl = document.getElementById('rtb-preview-text');
+        if (!previewEl) return;
+        const textToCopy = previewEl.value;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            showShareToast('✓ Template copied! Ready to paste!');
+          }).catch(() => {
+            previewEl.select();
+            document.execCommand('copy');
+            showShareToast('✓ Template copied!');
+          });
+        } else {
+          previewEl.select();
+          document.execCommand('copy');
+          showShareToast('✓ Template copied!');
+        }
       });
     }
   }
