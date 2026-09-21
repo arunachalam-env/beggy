@@ -1,6 +1,5 @@
 // ============================================================================
-// BEGGY — ORDER IT. TRACK IT. IT NEVER COMES.
-// Swiggy. But the food is fake. You keep the money.
+// Beggy — Order food for free... for the food that never comes. You keep the money.
 // ============================================================================
 
 (function () {
@@ -617,7 +616,7 @@
     });
   }
 
-  // ── Cart & The Painful Swiggy Math ──────────────────────────────────────────
+  // ── Cart & The Painful Delivery Math ──────────────────────────────────────────
   function calculateCartMath() {
     let subtotal = 0;
     let itemCount = 0;
@@ -1550,7 +1549,7 @@
 
       if (roastEl) {
         if (userKeptState.totalKept > 0) {
-          roastEl.textContent = `"This month you didn't spend ₹${Math.floor(userKeptState.totalKept)} on food that would have been cold anyway. Don't be the clown who opens Swiggy tonight."`;
+          roastEl.textContent = `"This month you didn't spend ₹${Math.floor(userKeptState.totalKept)} on food that would have been cold anyway. Don't be the clown who opens delivery apps tonight."`;
         } else {
           roastEl.textContent = `"Your bill is ₹0. Order your first fake takeout and keep the rupees in your pocket."`;
         }
