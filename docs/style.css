@@ -1985,12 +1985,12 @@ body.beggy-body {
 /* Zepto 10-Minute Craving Card on Reveal Screen */
 .reveal-zepto-card {
   width: 100%;
-  background: linear-gradient(180deg, #1C1220 0%, #120A16 100%);
-  border: 1.5px solid rgba(234, 0, 84, 0.45);
+  background: linear-gradient(180deg, #180D24 0%, #0E0716 100%);
+  border: 1.5px solid rgba(112, 32, 188, 0.45);
   border-radius: var(--radius-lg);
   padding: 16px;
   text-align: left;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(234, 0, 84, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(112, 32, 188, 0.2);
   margin-bottom: 12px;
 }
 
@@ -2000,9 +2000,9 @@ body.beggy-body {
 
 .rzc-tag {
   display: inline-block;
-  background: rgba(234, 0, 84, 0.15);
-  border: 1px solid rgba(234, 0, 84, 0.35);
-  color: #FF2A7A;
+  background: rgba(112, 32, 188, 0.18);
+  border: 1px solid rgba(112, 32, 188, 0.45);
+  color: #B250FF;
   font-size: 0.72rem;
   font-weight: 800;
   padding: 3px 10px;
@@ -2028,18 +2028,18 @@ body.beggy-body {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #EA0054 0%, #C20042 100%);
+  background: linear-gradient(135deg, #7020bc 0%, #52158c 100%);
   color: #FFFFFF;
   text-decoration: none;
   border-radius: var(--radius-md);
   padding: 12px 14px;
-  box-shadow: 0 4px 14px rgba(234, 0, 84, 0.4);
+  box-shadow: 0 4px 14px rgba(112, 32, 188, 0.4);
   transition: all 0.2s ease;
 }
 
 .btn-zepto-reveal:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(234, 0, 84, 0.55);
+  box-shadow: 0 6px 20px rgba(112, 32, 188, 0.6);
   color: #FFFFFF;
 }
 
@@ -2064,7 +2064,7 @@ body.beggy-body {
 .rzc-btn-text span {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #FFE4EC;
+  color: #E9D5FF;
 }
 
 /* Amazon Savings Recipe Kit Box on Reveal Screen */
@@ -2971,8 +2971,8 @@ body.beggy-body {
 
 /* Zepto 10-Minute Section in Post-Delivery Modal */
 .pdm-zepto-section {
-  background: linear-gradient(180deg, rgba(234, 0, 84, 0.08) 0%, rgba(234, 0, 84, 0.02) 100%);
-  border: 1.5px solid rgba(234, 0, 84, 0.4);
+  background: linear-gradient(180deg, rgba(112, 32, 188, 0.1) 0%, rgba(112, 32, 188, 0.03) 100%);
+  border: 1.5px solid rgba(112, 32, 188, 0.45);
   border-radius: var(--radius-lg);
   padding: 14px;
   text-align: left;
@@ -2980,27 +2980,27 @@ body.beggy-body {
 }
 
 .pdm-zepto-tag {
-  background: rgba(234, 0, 84, 0.15) !important;
-  border: 1px solid rgba(234, 0, 84, 0.35) !important;
-  color: #FF2A7A !important;
+  background: rgba(112, 32, 188, 0.18) !important;
+  border: 1px solid rgba(112, 32, 188, 0.45) !important;
+  color: #B250FF !important;
 }
 
 .pdm-zepto-btn {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #EA0054 0%, #C20042 100%);
+  background: linear-gradient(135deg, #7020bc 0%, #52158c 100%);
   color: #FFFFFF;
   text-decoration: none;
   border-radius: 12px;
   padding: 12px 14px;
-  box-shadow: 0 4px 16px rgba(234, 0, 84, 0.35);
+  box-shadow: 0 4px 16px rgba(112, 32, 188, 0.4);
   transition: all 0.2s ease;
 }
 
 .pdm-zepto-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(234, 0, 84, 0.55);
+  box-shadow: 0 6px 22px rgba(112, 32, 188, 0.6);
   color: #FFFFFF;
 }
 
@@ -3009,7 +3009,7 @@ body.beggy-body {
 }
 
 .pdm-zepto-btn .pdm-btn-text span {
-  color: #FFE4EC !important;
+  color: #E9D5FF !important;
 }
 
 .pdm-sec-tag {
@@ -3763,10 +3763,10 @@ body.beggy-body {
 }
 
 .zsb-inner {
-  background: rgba(22, 13, 24, 0.96);
+  background: rgba(18, 10, 28, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(234, 0, 84, 0.4);
+  border-top: 1px solid rgba(112, 32, 188, 0.5);
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
@@ -3818,7 +3818,7 @@ body.beggy-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, #EA0054 0%, #C20042 100%);
+  background: linear-gradient(135deg, #7020bc 0%, #52158c 100%);
   color: #FFFFFF;
   text-decoration: none;
   font-size: 0.8rem;
@@ -3826,13 +3826,13 @@ body.beggy-body {
   padding: 9px 16px;
   border-radius: 10px;
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(234, 0, 84, 0.35);
+  box-shadow: 0 4px 14px rgba(112, 32, 188, 0.4);
   transition: all 0.2s ease;
 }
 
 .zsb-cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(234, 0, 84, 0.5);
+  box-shadow: 0 6px 20px rgba(112, 32, 188, 0.6);
   color: #FFFFFF;
 }
 
