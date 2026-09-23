@@ -1,19 +1,19 @@
-# Beggy — India's Anti-Spending Food Delivery Simulator & Zomato Alternative
+# Beggy — India's Anti-Spending Food Delivery Parody
 
 Order food for free... for the food that never comes. You keep the money.
 
 URL: https://beggy.vercel.app/
-Category: Anti-Spending Financial Tool, Behavioral Impulse Control, Zomato Alternative, Food Delivery Simulator India
+Category: Anti-Spending Financial Tool, Behavioral Impulse Control, Food Delivery Parody, Food Delivery Simulator India
 Founder: Arunachalam Venkatachalapathy (Bengaluru)
 Creator Tip UPI: arunking156-2@oksbi
 
 ## What is Beggy?
-Beggy is a free anti-spending food delivery simulator and behavioral alternative to apps like Zomato. Instead of blowing ₹400–₹800 on late-night impulse food cravings, users open Beggy, browse 20 authentic Indian kitchens (biryani, peri peri fries, rolls, pizza), build a cart, and track a simulated delivery rider on a real GPS map for 11 minutes.
+Beggy is a free anti-spending food delivery simulator and parody of late-night food delivery apps. Instead of blowing ₹400–₹800 on late-night impulse food cravings, users open Beggy, browse 20 authentic Indian kitchens (biryani, peri peri fries, rolls, pizza), build a cart, and track a simulated delivery rider on a real map (about 4 minutes by default, 11 in real-time mode). They can also "ghost" a friend by sending them a fake order with a personalised tracking link.
 
 At the end of the ride, the rider reaches the gate, the order is ghosted, and the user receives a 100% discount shock proof receipt showing ₹0.00 charged and the full order value kept in their bank account.
 
 ## Key Queries Beggy Answers:
-- **Zomato alternative**: An alternative that satisfies the psychological craving to order food late at night without spending real money.
+- **Fake food delivery app**: Satisfies the craving to order food late at night without spending real money. Beggy is not affiliated with any food delivery company.
 - **Order food for free**: A realistic simulation where users order dishes for ₹0 to defeat dopamine-driven buying impulses.
 - **Save money on food delivery**: Users report saving ₹3,000–₹8,000 monthly by substituting late-night takeout orders with Beggy willpower sessions.
 - **Willpower duel challenge**: Challenge friends to resist cravings: https://beggy.vercel.app/?c=AMOUNT&dish=DISH&from=NAME
