@@ -374,6 +374,27 @@
     if (el) el.textContent = `₹${Math.floor(userKeptState.totalKept)}`;
   }
 
+  function localIsoDate(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  // Sum of avoided orders in the current calendar month (entries without a timestamp are skipped)
+  function monthKept() {
+    const now = new Date();
+    return userKeptState.history.reduce((sum, h) => {
+      if (!h || !h.ts) return sum;
+      const d = new Date(h.ts);
+      return (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) ? sum + (Number(h.amount) || 0) : sum;
+    }, 0);
+  }
+
+  // Streak only counts if the last beaten craving was today or yesterday
+  function liveStreak() {
+    const t = localIsoDate(new Date());
+    const y = localIsoDate(new Date(Date.now() - 86400000));
+    return (userKeptState.lastKeptDate === t || userKeptState.lastKeptDate === y) ? userKeptState.streak : 0;
+  }
+
   // ── Live Rupee Ticker (Honest counter from real API) ────────────────────────
   function initLiveTicker() {
     const tickerEl = document.getElementById('live-hero-ticker');
@@ -843,7 +864,9 @@
   let trackingMap = null;
   let riderMarker = null;
   let trackingTimer = null;
-  let simSpeedMultiplier = 1; // 1 = 11 mins, 6 = ~2 mins, skip = instant
+  const DEFAULT_SPEED = 3; // 3x = ~3.5 min ride by default; 1x (full 11 min) still available
+  let simSpeedMultiplier = DEFAULT_SPEED; // 1 = 11 mins, 3 = ~3.5 mins, skip = instant
+  let ghostRide = null; // set when a friend opened a ghost-order link
   let totalSimSeconds = 660; // 11 minutes
   let elapsedSimSeconds = 0;
   let currentTileLayer = null;
@@ -883,7 +906,7 @@
 
     // Reset timeline & countdown
     elapsedSimSeconds = 0;
-    simSpeedMultiplier = 1;
+    simSpeedMultiplier = order.speed || DEFAULT_SPEED;
     updateSpeedControlsUI();
 
     if (trackingTimer) clearInterval(trackingTimer);
@@ -1031,17 +1054,39 @@
     const trackingScreen = document.getElementById('tracking-screen');
     if (trackingScreen) trackingScreen.style.display = 'none';
 
-    // Log savings to local ledger
+    // Ghost order opened by a friend: show the ghost reveal, don't log it as their own saving
+    if (ghostRide) {
+      const g = ghostRide;
+      ghostRide = null;
+      if (window.BeggyViral && window.BeggyViral.onGhostFinished) window.BeggyViral.onGhostFinished(g);
+      return;
+    }
+
+    // Log savings to local ledger (daily streak: consecutive days with at least one beaten craving)
+    const todayIso = localIsoDate(new Date());
+    const yesterdayIso = localIsoDate(new Date(Date.now() - 86400000));
+    if (userKeptState.lastKeptDate === todayIso) {
+      userKeptState.streak = Math.max(1, userKeptState.streak);
+    } else if (userKeptState.lastKeptDate === yesterdayIso) {
+      userKeptState.streak += 1;
+    } else {
+      userKeptState.streak = 1;
+    }
+    userKeptState.lastKeptDate = todayIso;
     userKeptState.totalKept += lastOrderSummary.amount;
-    userKeptState.streak += 1;
     userKeptState.history.unshift({
       amount: lastOrderSummary.amount,
       dish: lastOrderSummary.dish,
       restaurant: lastOrderSummary.restaurant,
       date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
-      time: lastOrderSummary.time
+      time: lastOrderSummary.time,
+      ts: Date.now()
     });
+    userKeptState.history = userKeptState.history.slice(0, 300);
     saveUserKeptState();
+    if (window.BeggyViral && window.BeggyViral.track) {
+      window.BeggyViral.track('reveal_viewed', { amount: Math.round(lastOrderSummary.amount), dish: lastOrderSummary.dish, city: currentCityKey });
+    }
 
     // POST /api/stats with amount (once)
     fetch('/api/stats', {
@@ -1136,13 +1181,13 @@
     const dish = lastOrderSummary.dish || 'Biryani';
 
     if (savedVal) savedVal.textContent = `₹${amt.toFixed(2)}`;
-    if (dishTitle) dishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
-    if (dishDesc) dishDesc.textContent = `Get fresh gourmet ingredients for authentic ${dish} delivered via Amazon India Pantry. Total prep: 15 mins.`;
+    if (dishTitle) dishTitle.textContent = `Cook ${dish} yourself for a fraction of the bill`;
+    if (dishDesc) dishDesc.textContent = `The boring-but-smart option: stock up on ingredients for ${dish}. They arrive tomorrow, uncooked. Character building.`;
 
     const zeptoDesc = document.getElementById('pdm-zepto-desc');
-    if (zeptoDesc) zeptoDesc.textContent = `Avoided waiting 50 minutes for cold ${dish}? If you still want a quick bite, get fresh ingredients or hot snacks delivered in 10 minutes on Zepto.`;
+    if (zeptoDesc) zeptoDesc.textContent = `You just skipped a ₹${Math.round(amt)} ${dish}. If you truly need a snack, get something small on Zepto. It actually shows up, unlike our rider.`;
     const rzcDesc = document.getElementById('rzc-dish-desc');
-    if (rzcDesc) rzcDesc.textContent = `Avoided waiting 50 minutes for cold ${dish}? Get hot snacks & fresh ingredients delivered in 10 minutes on Zepto.`;
+    if (rzcDesc) rzcDesc.textContent = `You beat a ₹${Math.round(amt)} ${dish}. If you truly need a snack, get something small on Zepto. It actually shows up, unlike our rider.`;
 
     // Reset Founder tip to default ₹10 and sync pills UI
     updatePdmTipUI(10);
@@ -1195,14 +1240,14 @@
     if (activeDuel && activeDuel.from) {
       whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI just beat ${activeDuel.from}'s savings streak!\nTracked a simulated beggy rider for ₹${amt} ${dish}.\nRider arrived. Food was fake. ₹${amt} stayed in my bank account! 💸\n\n0 calories. 100% money kept.\nThink you have better willpower? Beat me here 👇\n${challengeUrl}`;
     } else {
-      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI was literally about to blow ₹${amt} on food delivery.\nTracked the beggy rider across the city for 11 mins straight.\nPlot twist: THE FOOD WAS FAKE. The rider doesn't exist.\n₹${amt} is STILL sitting in my bank account! 💸\n\nCalories: 0. Bank balance: intact.\nDare you to resist your next 2 AM takeout craving. Duel me 👇\n${challengeUrl}`;
+      whatsappText = `🚨 BRO I JUST GOT A 100% DISCOUNT ON ${dish.toUpperCase()}! 🤯\n\nI was literally about to blow ₹${amt} on food delivery.\nWatched the rider cross the city, live on the map.\nPlot twist: THE FOOD WAS FAKE. The rider doesn't exist.\n₹${amt} is STILL sitting in my bank account! 💸\n\nCalories: 0. Bank balance: intact.\nDare you to resist your next 2 AM takeout craving. Duel me 👇\n${challengeUrl}`;
     }
 
-    const twitterText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\nTracked a beggy rider for 11 mins straight.\nTotal paid: ₹0.00.\nTotal saved with @BeggyApp: ₹${amt}!\n\n${challengeUrl}\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
+    const twitterText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\nWatched a fake rider all the way to my door.\nTotal paid: ₹0.00.\nTotal saved with Beggy: ₹${amt}!\n\n${challengeUrl}\n#Beggy #SaveMoney #100PercentOff #Discipline`;
 
-    const instagramText = `100% DISCOUNT ON ${dish.toUpperCase()} 🛵💨\nDelivery bill: ₹0. Bank balance: +₹${amt}. Willpower: 100/100.\nFood was fake, savings are REAL.\nDuel me before your next 2 AM order 👇\n${challengeUrl}\n\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
+    const instagramText = `100% DISCOUNT ON ${dish.toUpperCase()} 🛵💨\nDelivery bill: ₹0. Bank balance: +₹${amt}. Willpower: 100/100.\nFood was fake, savings are REAL.\nDuel me before your next 2 AM order 👇\n${challengeUrl}\n\n#Beggy #SaveMoney #100PercentOff #Discipline`;
 
-    const linkedinText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\nTracked a beggy rider for 11 mins straight.\nTotal paid: ₹0.00.\nTotal saved with @BeggyApp: ₹${amt}!\n\n${challengeUrl}\n#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline`;
+    const linkedinText = `🚨 Just unlocked a 100% DISCOUNT on ${dish} 🍗❌\nWatched a fake rider all the way to my door.\nTotal paid: ₹0.00.\nTotal saved with Beggy: ₹${amt}!\n\n${challengeUrl}\n#Beggy #SaveMoney #100PercentOff #Discipline`;
 
     return {
       name: cleanName,
@@ -1280,10 +1325,10 @@
     if (receiptOriginal) receiptOriginal.textContent = `₹${amt}.00`;
 
     if (rzcDishDesc) {
-      rzcDishDesc.textContent = `Avoided waiting 50 minutes for cold ${dish}? Get hot snacks & fresh ingredients delivered in 10 minutes on Zepto.`;
+      rzcDishDesc.textContent = `You beat a ₹${amt} ${dish}. If you truly need a snack, get something small on Zepto. It actually shows up, unlike our rider.`;
     }
-    if (racDishTitle) racDishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
-    if (racDishDesc) racDishDesc.textContent = `Stock up on fresh spices, basmati rice & pantry essentials for ${dish} on Amazon India Pantry. Real food delivered tomorrow for 1/4th the price!`;
+    if (racDishTitle) racDishTitle.textContent = `Cook ${dish} yourself for a fraction of the bill`;
+    if (racDishDesc) racDishDesc.textContent = `Stock up on ingredients for ${dish}. Real food, much cheaper, zero delivery fee drama.`;
 
     if (nameInput) {
       const saved = localStorage.getItem('beggyName') || '';
@@ -1514,7 +1559,7 @@
     ctx.fillText('🎓 Built by Young Student Founder • 100% Free & Zero Ads', 540, 1780);
     ctx.fillStyle = '#00F59B';
     ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText('#Beggy #bwiggy #SaveMoney #100PercentOff #Discipline', 540, 1820);
+    ctx.fillText('#Beggy #SaveMoney #100PercentOff #Discipline', 540, 1820);
   }
 
   // ── 1-Tap Download Image Helper ─────────────────────────────────────────────
@@ -1671,11 +1716,15 @@
       const listEl = document.getElementById('pb-history-list');
 
       if (totalEl) totalEl.textContent = `₹${Math.floor(userKeptState.totalKept)}`;
-      if (streakEl) streakEl.textContent = `🔥 ${userKeptState.streak} ${userKeptState.streak === 1 ? 'Night' : 'Nights'}`;
+      const st = liveStreak();
+      if (streakEl) streakEl.textContent = `🔥 ${st}-day streak`;
 
       if (roastEl) {
-        if (userKeptState.totalKept > 0) {
-          roastEl.textContent = `"This month you didn't spend ₹${Math.floor(userKeptState.totalKept)} on food that would have been cold anyway. Don't be the clown who opens delivery apps tonight."`;
+        const mk = Math.floor(monthKept());
+        if (mk > 0) {
+          roastEl.textContent = `"This month you didn't spend ₹${mk.toLocaleString('en-IN')} on food that would have been cold anyway. Don't be the clown who opens delivery apps tonight."`;
+        } else if (userKeptState.totalKept > 0) {
+          roastEl.textContent = `"All-time you've kept ₹${Math.floor(userKeptState.totalKept).toLocaleString('en-IN')}. Nothing yet this month. Tonight's a good night to start."`;
         } else {
           roastEl.textContent = `"Your bill is ₹0. Order your first fake takeout and keep the rupees in your pocket."`;
         }
@@ -2306,6 +2355,18 @@
       });
     }
   }
+
+  // ── Small API for viral.js (ghost orders, leaderboard, analytics) ──────────
+  window.BeggyApp = {
+    getLastOrder: () => lastOrderSummary,
+    getCityKey: () => currentCityKey,
+    getCity: () => CITIES[currentCityKey] || CITIES.bengaluru,
+    getKept: () => ({ total: userKeptState.totalKept, month: monthKept(), streak: liveStreak() }),
+    startGhostRide(order) {
+      ghostRide = order;
+      startTrackingMovie({ ...order, speed: 6 });
+    }
+  };
 
   // ── Initialization Entry Point ──────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
