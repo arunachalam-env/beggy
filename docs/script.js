@@ -1129,6 +1129,11 @@
     if (dishTitle) dishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
     if (dishDesc) dishDesc.textContent = `Get fresh gourmet ingredients for authentic ${dish} delivered via Amazon India Pantry. Total prep: 15 mins.`;
 
+    const zeptoDesc = document.getElementById('pdm-zepto-desc');
+    if (zeptoDesc) zeptoDesc.textContent = `Avoided waiting 50 minutes for cold ${dish}? If you still want a quick bite, get fresh ingredients or hot snacks delivered in 10 minutes on Zepto.`;
+    const rzcDesc = document.getElementById('rzc-dish-desc');
+    if (rzcDesc) rzcDesc.textContent = `Avoided waiting 50 minutes for cold ${dish}? Get hot snacks & fresh ingredients delivered in 10 minutes on Zepto.`;
+
     // Reset Founder tip to default ₹10 and sync pills UI
     updatePdmTipUI(10);
     const pdmPillsRow = document.getElementById('pdm-pills-row');
@@ -2158,6 +2163,29 @@
     }
   }
 
+  // ── 5-Second Zepto Subtle Bottom Slide Banner ──
+  function initZeptoBanner() {
+    setTimeout(() => {
+      const banner = document.getElementById('zepto-slide-banner');
+      if (banner && sessionStorage.getItem('zepto_banner_dismissed') !== 'true') {
+        banner.style.display = 'block';
+        setTimeout(() => banner.classList.add('show'), 50);
+      }
+    }, 5000);
+
+    const zsbCloseBtn = document.getElementById('zsb-close-btn');
+    if (zsbCloseBtn) {
+      zsbCloseBtn.addEventListener('click', () => {
+        const banner = document.getElementById('zepto-slide-banner');
+        if (banner) {
+          banner.classList.remove('show');
+          setTimeout(() => banner.style.display = 'none', 400);
+          sessionStorage.setItem('zepto_banner_dismissed', 'true');
+        }
+      });
+    }
+  }
+
   // ── Initialization Entry Point ──────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
@@ -2167,6 +2195,7 @@
     initCheckout();
     initPassbookModal();
     initEvents();
+    initZeptoBanner();
 
     const isDuel = parseUrlDuel();
     renderKitchens();
