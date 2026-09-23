@@ -129,7 +129,7 @@
 
   <!-- Leaflet CSS for real-world interactive map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css?v=2.2-zepto-7020bc">
+  <link rel="stylesheet" href="style.css?v=2.3-back-buttons">
 </head>
 <body class="beggy-body">
 
@@ -218,6 +218,9 @@
         <p class="duel-taunt">Beat them. Order something bigger and keep the cash.</p>
         <button class="duel-accept-btn" id="duel-accept-btn" type="button">
           <span>I'll waste more than <span id="duel-btn-amt">₹340</span> ➔</span>
+        </button>
+        <button class="duel-skip-btn" id="duel-skip-btn" type="button">
+          ← Skip Challenge &amp; Browse All Kitchens
         </button>
       </div>
 
@@ -328,6 +331,9 @@
   <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
     <div class="cart-header">
       <div class="cart-title-row">
+        <button class="cart-back-btn" id="cart-back-btn" type="button" aria-label="Back to restaurants">
+          ← Back
+        </button>
         <h3>Your Bill 🛒</h3>
         <button class="close-cart-btn" id="close-cart-btn" aria-label="Close cart">&times;</button>
       </div>
@@ -374,6 +380,9 @@
         <span class="btn-text">Proceed to Checkout ➔</span>
         <span class="btn-subtext">Look at payment options before the twist</span>
       </button>
+      <button class="cart-keep-browsing-btn" id="cart-keep-browsing-btn" type="button">
+        ← Keep Browsing &amp; Add More Items
+      </button>
     </div>
   </aside>
 
@@ -385,8 +394,11 @@
   <div class="checkout-modal" id="checkout-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="co-title">
     <div class="checkout-card">
       <div class="co-header">
+        <button class="co-back-btn" id="co-back-btn" type="button" aria-label="Back to cart">
+          ← Back
+        </button>
         <h3 id="co-title">Confirm Delivery</h3>
-        <button class="co-close-btn" id="co-close-btn">&times;</button>
+        <button class="co-close-btn" id="co-close-btn" aria-label="Close checkout">&times;</button>
       </div>
 
       <div class="co-address-box">
@@ -439,6 +451,10 @@
         <span class="btn-place-sub">Food will not arrive. Money will not leave.</span>
       </button>
 
+      <button class="co-cancel-btn" id="co-cancel-btn" type="button">
+        ← Back to Modify Cart
+      </button>
+
       <p class="co-tiny-disclaimer">
         *Zero rupees charged. Zero food cooked. 100% money stays in your bank account.
       </p>
@@ -452,6 +468,10 @@
     
     <!-- Top Tracking Bar -->
     <div class="tracking-top-bar">
+      <button class="btn-track-back" id="track-back-btn" type="button" aria-label="Exit simulation and go back to restaurants">
+        ← Back to Menu
+      </button>
+
       <div class="tt-left">
         <span class="tt-pulse">🔴</span>
         <div class="tt-info">
@@ -561,6 +581,14 @@
   <section class="reveal-screen" id="reveal-screen" style="display: none;">
     <div class="reveal-container">
       
+      <!-- Top Sticky Navigation Bar with Back Button -->
+      <div class="reveal-top-bar" id="reveal-top-bar">
+        <button class="reveal-back-btn" id="reveal-top-back-btn" type="button" aria-label="Back to restaurants">
+          ← Back to Kitchens
+        </button>
+        <span class="reveal-top-pill">🎉 100% Saved</span>
+      </div>
+
       <div class="reveal-punchline-block">
         <h1 class="reveal-main-title">Your food was never ordered.</h1>
         <div class="reveal-giant-rupees">
@@ -728,7 +756,7 @@
 
         <!-- Do it again button -->
         <button class="btn-reveal-restart" id="btn-reveal-restart" type="button">
-          <span>Resist another craving ➔</span>
+          <span>← Back to Restaurants (Order Again)</span>
         </button>
       </div>
 
@@ -746,6 +774,11 @@
        ==================================================================== -->
   <div class="pdm-overlay" id="post-delivery-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pdm-title">
     <div class="pdm-card" id="pdm-card">
+      <div class="pdm-top-nav">
+        <button class="pdm-back-top-btn" id="pdm-back-top-btn" type="button" aria-label="Back to restaurants">
+          ← Back to Kitchens
+        </button>
+      </div>
       <button class="pdm-close-btn" id="pdm-close-btn" aria-label="Close popup">&times;</button>
 
       <div class="pdm-header">
@@ -867,6 +900,7 @@
       </div>
 
       <div class="pdm-footer">
+        <button class="pdm-back-home-btn" id="pdm-back-home-btn" type="button">← Back to Restaurants (Order Again)</button>
         <button class="pdm-dismiss-link" id="pdm-dismiss-btn" type="button">I'll hold out, continue to reveal ➔</button>
       </div>
     </div>
@@ -928,6 +962,9 @@
   <div class="passbook-modal" id="passbook-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pb-title">
     <div class="passbook-card">
       <div class="pb-header">
+        <button class="pb-back-btn" id="pb-back-btn" type="button" aria-label="Back to kitchens">
+          ← Back
+        </button>
         <div>
           <h2 id="pb-title">The bill you kept</h2>
           <p class="pb-sub">Every rupee you didn't hand over to food delivery apps.</p>
@@ -976,7 +1013,7 @@
 
       <div class="pb-footer">
         <button class="pb-reset-btn" id="pb-reset-btn" type="button">Clear local history</button>
-        <button class="pb-done-btn" id="pb-done-btn" type="button">Done</button>
+        <button class="pb-done-btn" id="pb-done-btn" type="button">← Back to Kitchens</button>
       </div>
     </div>
   </div>
@@ -1057,7 +1094,7 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- App Script -->
-  <script src="script.js?v=2.2-zepto-7020bc"></script>
+  <script src="script.js?v=2.3-back-buttons"></script>
   <!-- Vercel Web Analytics -->
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };

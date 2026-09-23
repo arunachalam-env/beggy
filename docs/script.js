@@ -774,11 +774,21 @@
       });
     }
 
+    const returnToCart = () => {
+      if (checkoutModal) checkoutModal.style.display = 'none';
+      openCartDrawer();
+    };
+
     if (closeBtn && checkoutModal) {
       closeBtn.addEventListener('click', () => {
         checkoutModal.style.display = 'none';
       });
     }
+
+    const coBackBtn = document.getElementById('co-back-btn');
+    const coCancelBtn = document.getElementById('co-cancel-btn');
+    if (coBackBtn) coBackBtn.addEventListener('click', returnToCart);
+    if (coCancelBtn) coCancelBtn.addEventListener('click', returnToCart);
 
     if (placeOrderBtn) {
       placeOrderBtn.addEventListener('click', () => {
@@ -1257,6 +1267,7 @@
     const nameInput = document.getElementById('reveal-name-input');
     const racDishTitle = document.getElementById('rac-dish-title');
     const racDishDesc = document.getElementById('rac-dish-desc');
+    const rzcDishDesc = document.getElementById('rzc-dish-desc');
 
     const amt = Math.round(lastOrderSummary.amount || 458);
     const dish = lastOrderSummary.dish || 'Biryani';
@@ -1268,6 +1279,9 @@
     if (receiptDishName) receiptDishName.textContent = dish;
     if (receiptOriginal) receiptOriginal.textContent = `₹${amt}.00`;
 
+    if (rzcDishDesc) {
+      rzcDishDesc.textContent = `Avoided waiting 50 minutes for cold ${dish}? Get hot snacks & fresh ingredients delivered in 10 minutes on Zepto.`;
+    }
     if (racDishTitle) racDishTitle.textContent = `Cook ${dish} at Home for ₹85!`;
     if (racDishDesc) racDishDesc.textContent = `Stock up on fresh spices, basmati rice & pantry essentials for ${dish} on Amazon India Pantry. Real food delivered tomorrow for 1/4th the price!`;
 
@@ -1689,6 +1703,8 @@
     if (billBtn) billBtn.addEventListener('click', openModal);
     if (founderChaiBtn) founderChaiBtn.addEventListener('click', openModal);
 
+    const pbBackBtn = document.getElementById('pb-back-btn');
+    if (pbBackBtn && modal) pbBackBtn.addEventListener('click', () => modal.style.display = 'none');
     if (closeBtn && modal) closeBtn.addEventListener('click', () => modal.style.display = 'none');
     if (doneBtn && modal) doneBtn.addEventListener('click', () => modal.style.display = 'none');
 
@@ -1757,6 +1773,20 @@
       });
     }
 
+    // Skip duel and browse normally
+    const duelSkipBtn = document.getElementById('duel-skip-btn');
+    if (duelSkipBtn) {
+      duelSkipBtn.addEventListener('click', () => {
+        const duelScreen = document.getElementById('duel-screen');
+        const strip = document.getElementById('active-duel-strip');
+        if (duelScreen) duelScreen.style.display = 'none';
+        if (strip) strip.style.display = 'none';
+        activeDuel = null;
+        const browseSec = document.getElementById('browse-section');
+        if (browseSec) browseSec.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
     // Search filter
     const searchInput = document.getElementById('search-input');
     const searchClear = document.getElementById('search-clear-btn');
@@ -1792,10 +1822,34 @@
     const closeCartBtn = document.getElementById('close-cart-btn');
     const cartBackdrop = document.getElementById('cart-backdrop');
 
+    const cartBackBtn = document.getElementById('cart-back-btn');
+    const cartKeepBrowsingBtn = document.getElementById('cart-keep-browsing-btn');
+
     if (headerCartBtn) headerCartBtn.addEventListener('click', openCartDrawer);
     if (floatingProceedBtn) floatingProceedBtn.addEventListener('click', openCartDrawer);
     if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
+    if (cartBackBtn) cartBackBtn.addEventListener('click', closeCartDrawer);
+    if (cartKeepBrowsingBtn) cartKeepBrowsingBtn.addEventListener('click', closeCartDrawer);
     if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
+
+    // Tracking Screen Back / Exit Button
+    const trackBackBtn = document.getElementById('track-back-btn');
+    if (trackBackBtn) {
+      trackBackBtn.addEventListener('click', () => {
+        if (confirm('Cancel simulation and return to restaurants?')) {
+          if (trackingTimer) {
+            clearInterval(trackingTimer);
+            trackingTimer = null;
+          }
+          const trackingScreen = document.getElementById('tracking-screen');
+          if (trackingScreen) trackingScreen.style.display = 'none';
+          const appMain = document.getElementById('app-main');
+          if (appMain) appMain.style.display = 'block';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showShareToast('Simulation ended. Returned to kitchens.');
+        }
+      });
+    }
 
     // Tracking Speed Controls
     document.querySelectorAll('.speed-btn').forEach(btn => {
@@ -1860,29 +1914,96 @@
       });
     }
 
+    // Reveal Screen Back & Reset Navigation
+    const revealTopBackBtn = document.getElementById('reveal-top-back-btn');
     const btnRestart = document.getElementById('btn-reveal-restart');
-    if (btnRestart) {
-      btnRestart.addEventListener('click', () => {
-        const reveal = document.getElementById('reveal-screen');
-        if (reveal) reveal.style.display = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
+    const exitRevealToHome = () => {
+      const reveal = document.getElementById('reveal-screen');
+      if (reveal) reveal.style.display = 'none';
+      const appMain = document.getElementById('app-main');
+      if (appMain) appMain.style.display = 'block';
+      cart = [];
+      updateCartBadge();
+      renderCartDrawer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    if (revealTopBackBtn) revealTopBackBtn.addEventListener('click', exitRevealToHome);
+    if (btnRestart) btnRestart.addEventListener('click', exitRevealToHome);
 
     // Post-Delivery Celebration Modal Controls
     const pdmClose = document.getElementById('pdm-close-btn');
     const pdmNext = document.getElementById('pdm-next-btn');
     const pdmDismiss = document.getElementById('pdm-dismiss-btn');
     const pdmModal = document.getElementById('post-delivery-modal');
+    const pdmBackTopBtn = document.getElementById('pdm-back-top-btn');
+    const pdmBackHomeBtn = document.getElementById('pdm-back-home-btn');
+
+    const exitPdmToHome = () => {
+      hidePostDeliveryModal();
+      const reveal = document.getElementById('reveal-screen');
+      if (reveal) reveal.style.display = 'none';
+      const appMain = document.getElementById('app-main');
+      if (appMain) appMain.style.display = 'block';
+      cart = [];
+      updateCartBadge();
+      renderCartDrawer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     if (pdmClose) pdmClose.addEventListener('click', hidePostDeliveryModal);
     if (pdmNext) pdmNext.addEventListener('click', hidePostDeliveryModal);
     if (pdmDismiss) pdmDismiss.addEventListener('click', hidePostDeliveryModal);
+    if (pdmBackTopBtn) pdmBackTopBtn.addEventListener('click', exitPdmToHome);
+    if (pdmBackHomeBtn) pdmBackHomeBtn.addEventListener('click', exitPdmToHome);
     if (pdmModal) {
       pdmModal.addEventListener('click', (e) => {
         if (e.target === pdmModal) hidePostDeliveryModal();
       });
     }
+
+    // Native browser & mobile hardware Back button support
+    window.addEventListener('popstate', () => {
+      const reveal = document.getElementById('reveal-screen');
+      if (reveal && reveal.style.display !== 'none') {
+        exitRevealToHome();
+        return;
+      }
+      const pdm = document.getElementById('post-delivery-modal');
+      if (pdm && pdm.style.display !== 'none') {
+        hidePostDeliveryModal();
+        return;
+      }
+      const pb = document.getElementById('passbook-modal');
+      if (pb && pb.style.display !== 'none') {
+        pb.style.display = 'none';
+        const backdrop = document.getElementById('passbook-backdrop');
+        if (backdrop) backdrop.style.display = 'none';
+        return;
+      }
+      const co = document.getElementById('checkout-modal');
+      if (co && co.style.display !== 'none') {
+        co.style.display = 'none';
+        openCartDrawer();
+        return;
+      }
+      const cartDrawer = document.getElementById('cart-drawer');
+      if (cartDrawer && cartDrawer.classList.contains('open')) {
+        closeCartDrawer();
+        return;
+      }
+      const track = document.getElementById('tracking-screen');
+      if (track && track.style.display !== 'none') {
+        if (trackingTimer) {
+          clearInterval(trackingTimer);
+          trackingTimer = null;
+        }
+        track.style.display = 'none';
+        const appMain = document.getElementById('app-main');
+        if (appMain) appMain.style.display = 'block';
+        return;
+      }
+    });
 
     // Escape key closes modal
     document.addEventListener('keydown', (e) => {
